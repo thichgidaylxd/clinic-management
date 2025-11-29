@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const authRoutes = require('./auth.routes');
+const specialtyRoutes = require('./specialty.routes');
 
 // Route mặc định
 router.get('/', (req, res) => {
@@ -11,6 +12,7 @@ router.get('/', (req, res) => {
         version: '1.0.0',
         endpoints: {
             auth: '/api/v1/auth',
+            specialties: '/api/v1/specialties',
             users: '/api/v1/users',
             doctors: '/api/v1/doctors',
             patients: '/api/v1/patients',
@@ -21,5 +23,8 @@ router.get('/', (req, res) => {
 
 // Auth routes
 router.use('/auth', authRoutes);
+
+// Specialty routes
+router.use('/specialties', specialtyRoutes);
 
 module.exports = router;

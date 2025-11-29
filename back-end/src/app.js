@@ -3,9 +3,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const swaggerUi = require('swagger-ui-express');
 
 const routes = require('./routes');
 const errorMiddleware = require('./middlewares/error.middleware');
+const swaggerSpec = require('./config/swagger');
 const { ENV } = require('./config/env');
 
 const app = express();
@@ -19,8 +21,8 @@ app.use(cors({
 
 // Rate Limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 phút
-    max: 100, // Giới hạn 100 requests
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: 'Quá nhiều request từ IP này, vui lòng thử lại sau 15 phút'
 });
 app.use('/api/', limiter);
@@ -33,6 +35,19 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 if (ENV.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Clinic Management API Documentation'
+}));
+
+// Swagger JSON
+app.get('/api-docs.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+});
 
 // Health Check
 app.get('/health', (req, res) => {
