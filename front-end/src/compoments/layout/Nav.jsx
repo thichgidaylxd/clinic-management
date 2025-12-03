@@ -1,47 +1,85 @@
-import React, { useState, useEffect } from "react";
-import { ArrowRight } from "lucide-react";
-
+import React, { useState } from "react";
+import { ArrowRight, User } from "lucide-react";
+import { Stethoscope, Layers, Briefcase, Info, BookOpen } from "lucide-react";
 function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     return (
-        <nav className="container mx-auto px-6 py-4">
+        <nav className="container mx-auto px-6 py-2 left-0 w-full bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
             <div className="flex items-center justify-between">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-teal-700 rounded-lg flex items-center justify-center">
-                        <div className="w-6 h-6 border-2 border-white rounded"></div>
-                    </div>
-                    <span className="text-2xl font-semibold text-gray-800">MedSphere</span>
+                    <img
+                        src="/clinic_logo_no_bg.png"
+                        alt="Clinic Logo"
+                        className="w-auto h-12"
+                    />
+                    <span className="text-2xl font-semibold text-gray-800">Health</span>
                 </div>
 
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center space-x-8">
-                    {["Tìm Bác Sĩ", "Chuyên Khoa", "Dịch Vụ", "Về Chúng Tôi", "Tài Nguyên"].map(
-                        (item, idx) => (
-                            <a
-                                key={idx}
-                                href="#"
-                                className="relative text-gray-600 hover:text-teal-700 transition 
-                  after:content-[''] after:absolute after:left-1/2 after:bottom-0 
-                  after:w-0 after:h-[2px] after:bg-teal-700 after:transition-all after:duration-300 
-                  hover:after:w-full hover:after:left-0"
-                            >
-                                {item}
-                            </a>
-                        )
-                    )}
+                    {[
+                        { label: "Tìm Bác Sĩ", icon: <Stethoscope className="w-4 h-4 text-gray-500" /> },
+                        { label: "Chuyên Khoa", icon: <Layers className="w-4 h-4 text-gray-500" /> },
+                        { label: "Dịch Vụ", icon: <Briefcase className="w-4 h-4 text-gray-500" /> },
+                        { label: "Về Chúng Tôi", icon: <Info className="w-4 h-4 text-gray-500" /> },
+                        { label: "Tài Nguyên", icon: <BookOpen className="w-4 h-4 text-gray-500" /> },
+                    ].map((item, idx) => (
+                        <a
+                            key={idx}
+                            href="#"
+                            className="flex items-center gap-2 relative text-gray-600 hover:text-teal-700 transition 
+        after:content-[''] after:absolute after:left-1/2 after:bottom-0 
+        after:w-0 after:h-[2px] after:bg-teal-700 after:transition-all after:duration-300 
+        hover:after:w-full hover:after:left-0"
+                        >
+                            {item.icon}
+                            {item.label}
+                        </a>
+                    ))}
                 </div>
 
-                {/* Auth Buttons */}
-                <div className="hidden md:flex items-center gap-4">
+                {/* Auth / User Avatar */}
+                <div className="hidden md:flex items-center gap-4 relative">
                     {user ? (
-                        <button
-                            onClick={onLogout}
-                            className="bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700 transition"
-                        >
-                            Đăng Xuất
-                        </button>
+                        <div className="relative">
+                            {/* Avatar */}
+                            <button
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold"
+                            >
+                                {user.ten_nguoi_dung?.charAt(0) || <User className="w-5 h-5" />}
+                            </button>
+
+                            {/* Dropdown menu */}
+                            {dropdownOpen && (
+                                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-50">
+                                    <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                                        {user.ten_nguoi_dung}
+                                    </div>
+                                    <a
+                                        href="#profile"
+                                        className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                                    >
+                                        Profile
+                                    </a>
+                                    <a
+                                        href="#history"
+                                        className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                                    >
+                                        Lịch sử
+                                    </a>
+                                    <button
+                                        onClick={onLogout}
+                                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                    >
+                                        Đăng Xuất
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <>
                             <button
@@ -97,12 +135,26 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                         )
                     )}
                     {user ? (
-                        <button
-                            onClick={onLogout}
-                            className="w-full bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700"
-                        >
-                            Đăng Xuất
-                        </button>
+                        <>
+                            <a
+                                href="#profile"
+                                className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                            >
+                                Profile
+                            </a>
+                            <a
+                                href="#history"
+                                className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                            >
+                                Lịch sử
+                            </a>
+                            <button
+                                onClick={onLogout}
+                                className="w-full bg-red-600 text-white px-6 py-2.5 rounded-full hover:bg-red-700"
+                            >
+                                Đăng Xuất
+                            </button>
+                        </>
                     ) : (
                         <>
                             <button

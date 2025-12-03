@@ -1,84 +1,72 @@
 import { Mail, Phone, User, X, Lock } from "lucide-react";
 import { useState } from "react";
 
+
+
 function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const [formData, setFormData] = useState({
-        ten_nguoi_dung: '',
-        ten_dang_nhap: '',
-        email: '',
-        so_dien_thoai: '',
-        mat_khau: '',
-        confirmPassword: '',
-        gioi_tinh: 1, // 1: Nam, 0: Nữ
-        dia_chi: ''
+        ho_nguoi_dung: "",
+        ten_nguoi_dung: "",
+        ten_dang_nhap_nguoi_dung: "",
+        email_nguoi_dung: "",
+        so_dien_thoai_nguoi_dung: "",
+        mat_khau_nguoi_dung: "",
+        confirmPassword: "",
+        gioi_tinh_nguoi_dung: 1, // 1: Nam, 0: Nữ
+        dia_chi_nguoi_dung: ""
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+        setError("");
 
         // Validate
-        if (formData.mat_khau !== formData.confirmPassword) {
-            setError('Mật khẩu không khớp!');
+        if (formData.mat_khau_nguoi_dung !== formData.confirmPassword) {
+            setError("Mật khẩu không khớp!");
             setLoading(false);
             return;
         }
 
-        if (formData.so_dien_thoai.length !== 10) {
-            setError('Số điện thoại phải có 10 chữ số!');
+        if (formData.so_dien_thoai_nguoi_dung.length !== 10) {
+            setError("Số điện thoại phải có 10 chữ số!");
             setLoading(false);
             return;
         }
 
         try {
-            // Tách họ và tên
-            const nameParts = formData.ten_nguoi_dung.trim().split(' ');
-            const ho = nameParts.slice(0, -1).join(' ');
-            const ten = nameParts[nameParts.length - 1];
-
             const payload = {
-                ten_dang_nhap: formData.ten_dang_nhap,
-                mat_khau: formData.mat_khau,
-                ten_nguoi_dung: ten,
-                ho_nguoi_dung: ho,
-                email: formData.email,
-                so_dien_thoai: formData.so_dien_thoai,
-                gioi_tinh: formData.gioi_tinh,
-                dia_chi: formData.dia_chi,
-                ma_vai_tro: '550e8400-e29b-41d4-a716-446655440005' // Bệnh nhân
+                ...formData,
             };
 
-            const response = await fetch('http://localhost:8080/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const response = await fetch("http://localhost:5000/api/v1/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                alert("Đăng ký thành công! Vui lòng đăng nhập.");
                 onSwitchToLogin();
             } else {
-                setError(data.message || 'Đăng ký thất bại');
+                setError(data.message || "Đăng ký thất bại");
             }
         } catch (err) {
-            setError('Không thể kết nối đến server');
-            console.error('Register error:', err);
+            setError("Không thể kết nối đến server");
+            console.error("Register error:", err);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
             <div className="bg-white rounded-3xl max-w-md w-full p-8 relative max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
@@ -102,23 +90,27 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Họ và tên */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Họ và tên đầy đủ
-                        </label>
-                        <div className="relative">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Nguyễn Văn A"
-                                value={formData.ten_nguoi_dung}
-                                onChange={(e) => setFormData({ ...formData, ten_nguoi_dung: e.target.value })}
-                                className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
-                                required
-                            />
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Họ và tên đầy đủ
+                            </label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Nguyễn Văn A"
+                                    value={formData.ten_nguoi_dung}
+                                    onChange={(e) => setFormData({ ...formData, ten_nguoi_dung: e.target.value })}
+                                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
 
+                    {/* Tên đăng nhập */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Tên đăng nhập
@@ -127,15 +119,18 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="username"
-                                value={formData.ten_dang_nhap}
-                                onChange={(e) => setFormData({ ...formData, ten_dang_nhap: e.target.value })}
+                                placeholder="tendangnhap"
+                                value={formData.ten_dang_nhap_nguoi_dung}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, ten_dang_nhap_nguoi_dung: e.target.value })
+                                }
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 required
                             />
                         </div>
                     </div>
 
+                    {/* Email */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Email
@@ -145,14 +140,17 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                             <input
                                 type="email"
                                 placeholder="email@example.com"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                value={formData.email_nguoi_dung}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, email_nguoi_dung: e.target.value })
+                                }
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 required
                             />
                         </div>
                     </div>
 
+                    {/* Số điện thoại */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Số điện thoại (10 số)
@@ -162,8 +160,10 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                             <input
                                 type="tel"
                                 placeholder="0901234567"
-                                value={formData.so_dien_thoai}
-                                onChange={(e) => setFormData({ ...formData, so_dien_thoai: e.target.value })}
+                                value={formData.so_dien_thoai_nguoi_dung}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, so_dien_thoai_nguoi_dung: e.target.value })
+                                }
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 pattern="[0-9]{10}"
                                 maxLength="10"
@@ -172,6 +172,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         </div>
                     </div>
 
+                    {/* Giới tính */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Giới tính
@@ -182,8 +183,10 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                                     type="radio"
                                     name="gender"
                                     value="1"
-                                    checked={formData.gioi_tinh === 1}
-                                    onChange={() => setFormData({ ...formData, gioi_tinh: 1 })}
+                                    checked={formData.gioi_tinh_nguoi_dung === 1}
+                                    onChange={() =>
+                                        setFormData({ ...formData, gioi_tinh_nguoi_dung: 1 })
+                                    }
                                     className="w-4 h-4 text-teal-700"
                                 />
                                 <span className="text-gray-700">Nam</span>
@@ -193,8 +196,10 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                                     type="radio"
                                     name="gender"
                                     value="0"
-                                    checked={formData.gioi_tinh === 0}
-                                    onChange={() => setFormData({ ...formData, gioi_tinh: 0 })}
+                                    checked={formData.gioi_tinh_nguoi_dung === 0}
+                                    onChange={() =>
+                                        setFormData({ ...formData, gioi_tinh_nguoi_dung: 0 })
+                                    }
                                     className="w-4 h-4 text-teal-700"
                                 />
                                 <span className="text-gray-700">Nữ</span>
@@ -202,6 +207,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                         </div>
                     </div>
 
+                    {/* Mật khẩu */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Mật khẩu
@@ -211,8 +217,8 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                             <input
                                 type="password"
                                 placeholder="••••••••"
-                                value={formData.mat_khau}
-                                onChange={(e) => setFormData({ ...formData, mat_khau: e.target.value })}
+                                value={formData.mat_khau_nguoi_dung}
+                                onChange={(e) => setFormData({ ...formData, mat_khau_nguoi_dung: e.target.value })}
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 minLength="6"
                                 required
