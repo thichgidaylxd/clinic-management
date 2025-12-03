@@ -58,7 +58,9 @@ const validateQuery = (req, res, next) => {
 router.get(
     '/',
     validateQuery,
-    MedicineController.getAll
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
+    MedicineController.getAll,
 );
 
 /**

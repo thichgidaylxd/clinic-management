@@ -4,6 +4,7 @@ const router = express.Router();
 const authRoutes = require('./auth.routes');
 const specialtyRoutes = require('./specialty.routes');
 const medicineRoutes = require('./medicine.routes');
+const serviceRoutes = require('./service.routes');
 
 // Route mặc định
 router.get('/', (req, res) => {
@@ -15,6 +16,7 @@ router.get('/', (req, res) => {
             auth: '/api/v1/auth',
             specialties: '/api/v1/specialties',
             medicines: '/api/v1/medicines',
+            services: '/api/v1/services',
             users: '/api/v1/users',
             doctors: '/api/v1/doctors',
             patients: '/api/v1/patients',
@@ -27,5 +29,6 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/specialties', specialtyRoutes);
 router.use('/medicines', medicineRoutes);
+router.use('/services', serviceRoutes);
 
 module.exports = router;
