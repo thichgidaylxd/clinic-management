@@ -242,6 +242,11 @@ const options = {
                 name: 'Work Schedules',
                 description: 'API quản lý lịch làm việc bác sĩ'
             },
+            {
+                name: 'Patients',
+                description: 'API quản lý bệnh nhân'
+            },
+
         ]
     },
     apis: ['./src/routes/*.js', './src/controllers/*.js'] // Đường dẫn tới các file chứa JSDoc
