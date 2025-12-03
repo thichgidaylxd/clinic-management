@@ -5,6 +5,7 @@ const authRoutes = require('./auth.routes');
 const specialtyRoutes = require('./specialty.routes');
 const medicineRoutes = require('./medicine.routes');
 const serviceRoutes = require('./service.routes');
+const roomRoutes = require('./room.routes');
 
 // Route mặc định
 router.get('/', (req, res) => {
@@ -17,6 +18,7 @@ router.get('/', (req, res) => {
             specialties: '/api/v1/specialties',
             medicines: '/api/v1/medicines',
             services: '/api/v1/services',
+            rooms: '/api/v1/rooms',
             users: '/api/v1/users',
             doctors: '/api/v1/doctors',
             patients: '/api/v1/patients',
@@ -30,5 +32,6 @@ router.use('/auth', authRoutes);
 router.use('/specialties', specialtyRoutes);
 router.use('/medicines', medicineRoutes);
 router.use('/services', serviceRoutes);
+router.use('/rooms', roomRoutes);
 
 module.exports = router;
