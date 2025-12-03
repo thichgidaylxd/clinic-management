@@ -233,7 +233,11 @@ const options = {
             {
                 name: 'Invoices',
                 description: 'API quản lý hóa đơn'
-            }
+            },
+            {
+                name: 'Rooms',
+                description: 'API quản lý phòng khám và loại phòng khám'
+            },
         ]
     },
     apis: ['./src/routes/*.js', './src/controllers/*.js'] // Đường dẫn tới các file chứa JSDoc
