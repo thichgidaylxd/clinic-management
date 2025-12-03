@@ -1,47 +1,57 @@
-import React, { useState } from 'react';
-import { Search, ArrowRight, Video, Shield, X, Mail, Lock, User, Phone } from 'lucide-react';
+import React, { useState } from "react";
+import { X, Lock, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
 
-// Login Modal Component
 function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     const [formData, setFormData] = useState({
-        ten_dang_nhap: '',
-        mat_khau: ''
+        ten_dang_nhap_nguoi_dung: "",
+        mat_khau_nguoi_dung: ""
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
+        setError("");
 
         try {
-            const response = await fetch('http://localhost:8080/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            const response = await fetch("http://localhost:5000/api/v1/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData)
             });
 
             const data = await response.json();
+            console.log("Login response data:", data);
 
             if (response.ok) {
-                // Lưu token vào localStorage
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
+                // Lưu token và user
+                localStorage.setItem("token", data.data.token);
+                localStorage.setItem("user", JSON.stringify(data.data.user));
 
-                alert('Đăng nhập thành công!');
+
+
+                // chạy progress rồi mới navigate
+                NProgress.start();
+                NProgress.set(0.3);
+                setTimeout(() => NProgress.set(0.7), 300);
+                setTimeout(() => {
+                    NProgress.done();
+                    window.location.reload();
+                }, 600);
                 onClose();
-                window.location.reload(); // Reload để cập nhật UI
             } else {
-                setError(data.message || 'Đăng nhập thất bại');
+                setError(data.message || "Đăng nhập thất bại");
             }
         } catch (err) {
-            setError('Không thể kết nối đến server');
-            console.error('Login error:', err);
+            setError("Không thể kết nối đến server");
+            console.error("Login error:", err);
         } finally {
             setLoading(false);
         }
@@ -81,8 +91,10 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                             <input
                                 type="text"
                                 placeholder="username"
-                                value={formData.ten_dang_nhap}
-                                onChange={(e) => setFormData({ ...formData, ten_dang_nhap: e.target.value })}
+                                value={formData.ten_dang_nhap_nguoi_dung}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, ten_dang_nhap_nguoi_dung: e.target.value })
+                                }
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 required
                             />
@@ -98,22 +110,14 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                             <input
                                 type="password"
                                 placeholder="••••••••"
-                                value={formData.mat_khau}
-                                onChange={(e) => setFormData({ ...formData, mat_khau: e.target.value })}
+                                value={formData.mat_khau_nguoi_dung}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, mat_khau_nguoi_dung: e.target.value })
+                                }
                                 className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
                                 required
                             />
                         </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" className="w-4 h-4 text-teal-700 rounded" />
-                            <span className="text-gray-600">Ghi nhớ đăng nhập</span>
-                        </label>
-                        <a href="#" className="text-teal-700 hover:text-teal-800 font-medium">
-                            Quên mật khẩu?
-                        </a>
                     </div>
 
                     <button
@@ -121,12 +125,12 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                         disabled={loading}
                         className="w-full bg-teal-700 text-white py-3 rounded-xl hover:bg-teal-800 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
                 </form>
 
                 <div className="mt-6 text-center text-sm text-gray-600">
-                    Chưa có tài khoản?{' '}
+                    Chưa có tài khoản?{" "}
                     <button
                         onClick={onSwitchToRegister}
                         className="text-teal-700 hover:text-teal-800 font-medium"
