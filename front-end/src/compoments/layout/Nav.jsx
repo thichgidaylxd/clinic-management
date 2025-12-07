@@ -39,6 +39,16 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                             {item.label}
                         </a>
                     ))}
+                    <button
+                        onClick={() => navigate('/booking')}
+                        className="flex items-center gap-2 relative text-gray-600 hover:text-teal-700 transition 
+              after:content-[''] after:absolute after:left-1/2 after:bottom-0 
+              after:w-0 after:h-[2px] after:bg-teal-700 after:transition-all after:duration-300 
+              hover:after:w-full hover:after:left-0"
+                    >
+                        <Stethoscope className="w-4 h-4 text-gray-500" />
+                        Đặt Lịch Khám
+                    </button>
                 </div>
 
                 {/* Auth / User Avatar */}
