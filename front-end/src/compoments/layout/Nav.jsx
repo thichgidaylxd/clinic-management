@@ -76,7 +76,7 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                                         Profile
                                     </a>
                                     <a
-                                        href="#history"
+                                        href="/appointments"
                                         className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
                                     >
                                         Lịch sử

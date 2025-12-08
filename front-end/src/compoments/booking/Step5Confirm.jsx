@@ -37,15 +37,20 @@ function Step5Confirm({
         setError('');
 
         try {
+            // Format date sang YYYY-MM-DD
+            const formattedDate = date.split('T')[0]; // Nếu date là ISO string
+
             const appointmentData = {
                 ma_bac_si: doctor.ma_bac_si,
                 ma_chuyen_khoa: specialty?.ma_chuyen_khoa || null,
                 ma_dich_vu_lich_hen: service?.ma_dich_vu || null,
-                ngay: date,
+                ngay: formattedDate,
                 thoi_gian_bat_dau: timeSlot.start,
                 thoi_gian_ket_thuc: timeSlot.end,
                 ly_do_kham_lich_hen: formData.ly_do_kham_lich_hen
             };
+
+            console.log('Sending appointment data:', appointmentData); // ⭐ Debug
 
             let response;
 
@@ -54,18 +59,25 @@ function Step5Confirm({
                 response = await bookingAPI.createAuthAppointment(appointmentData, token);
             } else {
                 // Chưa đăng nhập - gọi API guest
-                response = await bookingAPI.createGuestAppointment({
+                const guestData = {
                     ...appointmentData,
-                    ...formData
-                });
+                    ten_benh_nhan: formData.ten_benh_nhan,
+                    so_dien_thoai_benh_nhan: formData.so_dien_thoai_benh_nhan,
+                    gioi_tinh_benh_nhan: formData.gioi_tinh_benh_nhan
+                };
+
+                console.log('Guest booking data:', guestData); // ⭐ Debug
+                response = await bookingAPI.createGuestAppointment(guestData);
             }
+
+            console.log('Booking response:', response); // ⭐ Debug
 
             // Success
             onSuccess(response.data);
 
         } catch (err) {
+            console.error('Booking error:', err); // ⭐ Debug
             setError(err.message || 'Đặt lịch thất bại. Vui lòng thử lại.');
-            console.error(err);
         } finally {
             setLoading(false);
         }

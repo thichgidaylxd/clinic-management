@@ -2,19 +2,18 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home";
 import Booking from "../pages/Booking";
+import MyAppointments from "../pages/MyAppointments";
 import Layout from "../compoments/layout/Layout";
 
 function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Layout />}>
-                {/* Trang chủ */}
                 <Route index element={<Home />} />
-
-                {/* Đặt lịch khám */}
                 <Route path="booking" element={<Booking />} />
+                <Route path="appointments" element={<MyAppointments />} />
 
-                {/* 404 - Not Found */}
+                {/* 404 */}
                 <Route path="*" element={
                     <div className="min-h-screen flex items-center justify-center bg-gray-50">
                         <div className="text-center">
