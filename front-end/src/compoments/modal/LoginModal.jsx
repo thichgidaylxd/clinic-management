@@ -32,7 +32,7 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
             if (response.ok) {
                 // Lưu token và user
-                localStorage.setItem("token", data.data.token);
+                localStorage.setItem("token", data.data.accessToken);
                 localStorage.setItem("user", JSON.stringify(data.data.user));
 
 

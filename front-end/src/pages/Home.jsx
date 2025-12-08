@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Search, ArrowRight, Users, FileText, Video, Shield } from 'lucide-react';
 import LoginModal from '../compoments/modal/LoginModal';
 import RegisterModal from '../compoments/modal/RegisterModal';
-
+import { useNavigate } from 'react-router-dom';
 export default function Home() {
-
-
+    const navigate = useNavigate(); // <-- khai báo navigate
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
             {/* Hero Section */}
@@ -25,10 +24,16 @@ export default function Home() {
 
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                            <button className="flex items-center justify-center gap-2 bg-teal-800 border-2 border-teal-700 text-white px-8 py-4 rounded-full hover:text-teal-800 hover:bg-teal-50 transition font-medium">
+                            <button
+                                onClick={() => navigate('/booking')}
+                                className="flex items-center justify-center gap-2 bg-teal-800 border-2 border-teal-700 text-white px-8 py-4 rounded-full hover:text-teal-800 hover:bg-teal-50 transition font-medium"
+                            >
                                 Đặt Lịch Ngay
                             </button>
-                            <button className="flex items-center justify-center gap-2 bg-white border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-full hover:bg-gray-50 transition font-medium">
+                            <button
+                                onClick={() => navigate('/booking')}
+                                className="flex items-center justify-center gap-2 bg-white border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-full hover:bg-gray-50 transition font-medium"
+                            >
                                 <Search className="w-5 h-5" />
                                 Tìm bác sĩ
                             </button>
@@ -57,7 +62,7 @@ export default function Home() {
                         <div className="relative rounded-3xl overflow-hidden min-h-[600px]">
                             {/* Doctor Image - Full background */}
                             <img
-                                src="/doctor-no-trans.png"
+                                src="/doctor-no-trans.webp"
                                 alt="Doctor"
                                 className="absolute inset-0 w-full h-full object-cover"
                             />
@@ -249,3 +254,4 @@ export default function Home() {
         </div>
     );
 }
+
