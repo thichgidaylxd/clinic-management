@@ -3,20 +3,26 @@ const ResponseUtil = require('../utils/response.util');
 const validate = (schema) => {
     return (req, res, next) => {
         const { error, value } = schema.validate(req.body, {
-            abortEarly: false, // Hiển thị tất cả lỗi
-            stripUnknown: true // Loại bỏ các field không được định nghĩa
+            abortEarly: false, // Lấy tất cả lỗi
+            stripUnknown: true  // Bỏ các fields không có trong schema
         });
 
         if (error) {
+            console.error('Validation error:', error.details); // ⭐ Debug
+
             const errors = error.details.map(detail => ({
                 field: detail.path.join('.'),
                 message: detail.message
             }));
 
-            return ResponseUtil.validationError(res, errors);
+            return res.status(400).json({
+                success: false,
+                message: 'Dữ liệu không hợp lệ',
+                errors
+            });
         }
 
-        // Gán value đã được validate vào req.body
+        // Gán validated data vào req.body
         req.body = value;
         next();
     };

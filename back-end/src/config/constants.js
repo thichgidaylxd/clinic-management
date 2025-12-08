@@ -27,12 +27,16 @@ const CONSTANTS = {
         CREDIT_CARD: 3
     },
 
-    // Trạng thái lịch hẹn
     APPOINTMENT_STATUS: {
-        PENDING: 0,
-        CONFIRMED: 1,
-        COMPLETED: 2,
-        CANCELLED: 3
+        PENDING: 0,      // Chờ xác nhận
+        CONFIRMED: 1,    // Đã xác nhận
+        CHECKED_IN: 2,   // Đã check-in
+        COMPLETED: 3,    // Hoàn thành
+        CANCELLED: 4     // Đã hủy
+    },
+    JWT: {
+        ACCESS_TOKEN_EXPIRES: '1h',
+        REFRESH_TOKEN_EXPIRES: '7d'
     }
 };
 

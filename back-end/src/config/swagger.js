@@ -238,6 +238,19 @@ const options = {
                 name: 'Rooms',
                 description: 'API quản lý phòng khám và loại phòng khám'
             },
+            {
+                name: 'Work Schedules',
+                description: 'API quản lý lịch làm việc bác sĩ'
+            },
+            {
+                name: 'Patients',
+                description: 'API quản lý bệnh nhân'
+            },
+            {
+                name: 'Appointments',
+                description: 'API quản lý đặt lịch khám bệnh'
+            },
+
         ]
     },
     apis: ['./src/routes/*.js', './src/controllers/*.js'] // Đường dẫn tới các file chứa JSDoc
