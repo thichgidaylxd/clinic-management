@@ -6,11 +6,10 @@ class PatientModel {
     static async create(patientData) {
         const {
             ten_benh_nhan,
-            gioi_tinh_benh_nhan,
             so_dien_thoai_benh_nhan,
-            chieu_cao_benh_nhan,
-            can_nang_benh_nhan,
-            hinh_anh_benh_nhan
+            gioi_tinh_benh_nhan,
+            chieu_cao_benh_nhan = null,
+            can_nang_benh_nhan = null
         } = patientData;
 
         const ma_benh_nhan = UUIDUtil.generate();
@@ -19,25 +18,69 @@ class PatientModel {
       INSERT INTO bang_benh_nhan (
         ma_benh_nhan,
         ten_benh_nhan,
-        gioi_tinh_benh_nhan,
         so_dien_thoai_benh_nhan,
+        gioi_tinh_benh_nhan,
         chieu_cao_benh_nhan,
-        can_nang_benh_nhan,
-        hinh_anh_benh_nhan
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        can_nang_benh_nhan
+      ) VALUES (
+        UUID_TO_BIN(?),
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+      )
     `;
 
+        console.log('📝 Creating patient with data:', { ma_benh_nhan, ten_benh_nhan, so_dien_thoai_benh_nhan }); // Debug
+
         await db.execute(query, [
-            UUIDUtil.toBinary(ma_benh_nhan),
+            ma_benh_nhan,
             ten_benh_nhan,
-            gioi_tinh_benh_nhan !== undefined ? gioi_tinh_benh_nhan : null,
-            so_dien_thoai_benh_nhan || null,
-            chieu_cao_benh_nhan || null,
-            can_nang_benh_nhan || null,
-            hinh_anh_benh_nhan || null
+            so_dien_thoai_benh_nhan,
+            gioi_tinh_benh_nhan,
+            chieu_cao_benh_nhan,
+            can_nang_benh_nhan
         ]);
 
         return ma_benh_nhan;
+    }
+
+    // Tìm bệnh nhân theo ID
+    static async findById(patientId) {
+        const query = `
+      SELECT 
+        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+        ten_benh_nhan,
+        so_dien_thoai_benh_nhan,
+        gioi_tinh_benh_nhan,
+        chieu_cao_benh_nhan,
+        can_nang_benh_nhan
+      FROM bang_benh_nhan
+      WHERE ma_benh_nhan = UUID_TO_BIN(?)
+    `;
+
+        const [rows] = await db.execute(query, [patientId]);
+        return rows[0] || null;
+    }
+
+    // Tìm bệnh nhân theo SĐT
+    static async findByPhone(phone) {
+        const query = `
+      SELECT 
+        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+        ten_benh_nhan,
+        so_dien_thoai_benh_nhan,
+        gioi_tinh_benh_nhan,
+        chieu_cao_benh_nhan,
+        can_nang_benh_nhan
+      FROM bang_benh_nhan
+      WHERE so_dien_thoai_benh_nhan = ?
+      LIMIT 1
+    `;
+
+        const [rows] = await db.execute(query, [phone]);
+        return rows[0] || null;
     }
 
     // Lấy danh sách bệnh nhân

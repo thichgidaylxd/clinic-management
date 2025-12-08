@@ -246,6 +246,10 @@ const options = {
                 name: 'Patients',
                 description: 'API quản lý bệnh nhân'
             },
+            {
+                name: 'Appointments',
+                description: 'API quản lý đặt lịch khám bệnh'
+            },
 
         ]
     },

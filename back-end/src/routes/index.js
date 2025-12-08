@@ -9,6 +9,7 @@ const roomRoutes = require('./room.routes');
 const doctorRoutes = require('./doctor.routes');
 const workScheduleRoutes = require('./workSchedule.routes');
 const patientRoutes = require('./patient.routes');
+const appointmentRoutes = require('./appointment.routes');
 
 // Route mặc định
 router.get('/', (req, res) => {
@@ -39,5 +40,6 @@ router.use('/rooms', roomRoutes);
 router.use('/doctors', doctorRoutes);
 router.use('/work-schedules', workScheduleRoutes);
 router.use('/patients', patientRoutes);
+router.use('/appointments', appointmentRoutes);
 
 module.exports = router;
