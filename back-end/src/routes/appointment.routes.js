@@ -579,7 +579,7 @@ router.get(
  * @swagger
  * /appointments/today:
  *   get:
- *     summary: Lấy lịch hẹn hôm nay (Lễ tân: tất cả, Bác sĩ: của mình)
+ *     summary: Lấy lịch hẹn hôm nay (Lễ tân tất cả, Bác sĩ của mình)
  *     tags: [Appointments]
  *     security:
  *       - bearerAuth: []

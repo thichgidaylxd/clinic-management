@@ -21,11 +21,17 @@ app.use(cors({
 
 // Rate Limiting
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    message: 'Quá nhiều request từ IP này, vui lòng thử lại sau 15 phút'
+    windowMs: 15 * 60 * 1000, // 15 phút
+    max: 100, // 100 requests
+    message: 'Quá nhiều request từ IP này, vui lòng thử lại sau 15 phút',
+    // ✅ THÊM: Skip rate limit trong development
+    skip: (req) => ENV.NODE_ENV === 'development'
 });
-app.use('/api/', limiter);
+
+// ✅ CHỈ apply rate limit khi production
+if (ENV.NODE_ENV === 'production') {
+    app.use('/api/', limiter);
+}
 
 // Body Parser Middlewares
 app.use(express.json({ limit: '10mb' }));
@@ -54,7 +60,8 @@ app.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
         message: 'Server đang hoạt động bình thường',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: ENV.NODE_ENV // ✅ THÊM để kiểm tra
     });
 });
 

@@ -1,107 +1,54 @@
 const DoctorModel = require('../models/doctor.model');
 const PositionModel = require('../models/position.model');
 const UserModel = require('../models/user.model');
+const RoleModel = require('../models/role.model');
+const bcrypt = require('bcryptjs');
 const CONSTANTS = require('../config/constants');
 
 class DoctorService {
-    // ===== CHỨC VỤ =====
-
-    // Tạo chức vụ
-    static async createPosition(positionData) {
-        const { ten_chuc_vu } = positionData;
-
-        const exists = await PositionModel.existsByName(ten_chuc_vu);
-        if (exists) {
-            throw new Error('Tên chức vụ đã tồn tại');
-        }
-
-        const positionId = await PositionModel.create(positionData);
-        return await PositionModel.findById(positionId);
-    }
-
-    // Lấy tất cả chức vụ
-    static async getAllPositions(status = null) {
-        return await PositionModel.findAll(status);
-    }
-
-    // Lấy chức vụ theo ID
-    static async getPositionById(positionId) {
-        const position = await PositionModel.findById(positionId);
-        if (!position) {
-            throw new Error('Không tìm thấy chức vụ');
-        }
-        return position;
-    }
-
-    // Cập nhật chức vụ
-    static async updatePosition(positionId, updateData) {
-        const position = await PositionModel.findById(positionId);
-        if (!position) {
-            throw new Error('Không tìm thấy chức vụ');
-        }
-
-        if (updateData.ten_chuc_vu) {
-            const exists = await PositionModel.existsByName(
-                updateData.ten_chuc_vu,
-                positionId
-            );
-            if (exists) {
-                throw new Error('Tên chức vụ đã tồn tại');
-            }
-        }
-
-        const updated = await PositionModel.update(positionId, updateData);
-        if (!updated) {
-            throw new Error('Cập nhật chức vụ thất bại');
-        }
-
-        return await PositionModel.findById(positionId);
-    }
-
-    // Xóa chức vụ
-    static async deletePosition(positionId) {
-        const position = await PositionModel.findById(positionId);
-        if (!position) {
-            throw new Error('Không tìm thấy chức vụ');
-        }
-
-        const inUse = await PositionModel.isInUse(positionId);
-        if (inUse) {
-            throw new Error('Không thể xóa chức vụ đang được sử dụng');
-        }
-
-        const deleted = await PositionModel.delete(positionId);
-        if (!deleted) {
-            throw new Error('Xóa chức vụ thất bại');
-        }
-
-        return true;
-    }
-
-    // ===== BÁC SĨ =====
-
-    // Tạo bác sĩ
+    // Tạo bác sĩ (tạo cả User + Doctor)
     static async createDoctor(doctorData) {
-        const { ma_nguoi_dung_bac_si, ma_chuc_vu_bac_si } = doctorData;
+        const {
+            // User fields
+            ten_nguoi_dung,
+            ho_nguoi_dung,
+            ten_dang_nhap_nguoi_dung,
+            email_nguoi_dung,
+            so_dien_thoai_nguoi_dung,
+            mat_khau_nguoi_dung,
+            gioi_tinh_nguoi_dung,
+            // Doctor fields
+            ma_chuyen_khoa_bac_si,
+            ma_chuc_vu_bac_si,
+            so_nam_kinh_nghiem_bac_si,
+            bang_cap_bac_si
+        } = doctorData;
 
-        // Kiểm tra user có tồn tại
-        const user = await UserModel.findById(ma_nguoi_dung_bac_si);
-        if (!user) {
-            throw new Error('Người dùng không tồn tại');
+        // 1. Kiểm tra username đã tồn tại
+        const existingUsername = await UserModel.findByUsername(ten_dang_nhap_nguoi_dung);
+        if (existingUsername) {
+            throw new Error('Tên đăng nhập đã tồn tại');
         }
 
-        // Kiểm tra user đã là bác sĩ chưa
-        const exists = await DoctorModel.existsByUserId(ma_nguoi_dung_bac_si);
-        if (exists) {
-            throw new Error('Người dùng này đã là bác sĩ');
+        // 2. Kiểm tra email đã tồn tại
+        const existingEmail = await UserModel.findByEmail(email_nguoi_dung);
+        if (existingEmail) {
+            throw new Error('Email đã tồn tại');
         }
 
-        // Kiểm tra role phải là Bác sĩ
-        if (user.ten_vai_tro !== CONSTANTS.ROLES.DOCTOR) {
-            throw new Error('Người dùng phải có vai trò Bác sĩ');
+        // 3. Kiểm tra số điện thoại đã tồn tại
+        const existingPhone = await UserModel.findByPhone(so_dien_thoai_nguoi_dung);
+        if (existingPhone) {
+            throw new Error('Số điện thoại đã tồn tại');
         }
 
-        // Kiểm tra chức vụ có tồn tại (nếu có)
+        // 4. Lấy role "Bác sĩ"
+        const doctorRole = await RoleModel.findByName(CONSTANTS.ROLES.DOCTOR);
+        if (!doctorRole) {
+            throw new Error('Vai trò Bác sĩ không tồn tại trong hệ thống');
+        }
+
+        // 5. Kiểm tra chức vụ (nếu có)
         if (ma_chuc_vu_bac_si) {
             const position = await PositionModel.findById(ma_chuc_vu_bac_si);
             if (!position) {
@@ -109,16 +56,46 @@ class DoctorService {
             }
         }
 
-        // Xử lý bằng cấp base64 nếu có
-        if (doctorData.bang_cap_bac_si) {
-            const base64Data = doctorData.bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-            doctorData.bang_cap_bac_si = Buffer.from(base64Data, 'base64');
+        // 6. Hash password
+        const hashedPassword = await bcrypt.hash(mat_khau_nguoi_dung, 10);
+
+        // 7. Tạo User
+        const userId = await UserModel.create({
+            ten_nguoi_dung,
+            ho_nguoi_dung,
+            ten_dang_nhap_nguoi_dung,
+            email_nguoi_dung,
+            so_dien_thoai_nguoi_dung,
+            mat_khau_nguoi_dung: hashedPassword,
+            gioi_tinh_nguoi_dung,
+            ma_vai_tro: doctorRole.ma_vai_tro
+        });
+
+        console.log('✅ Created user:', userId);
+
+        // 8. Xử lý bằng cấp base64 nếu có
+        let processedBangCap = null;
+        if (bang_cap_bac_si) {
+            const base64Data = bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
+            processedBangCap = Buffer.from(base64Data, 'base64');
         }
 
-        const doctorId = await DoctorModel.create(doctorData);
+        // 9. Tạo Doctor
+        const doctorId = await DoctorModel.create({
+            ma_nguoi_dung_bac_si: userId,
+            ma_chuyen_khoa_bac_si: ma_chuyen_khoa_bac_si || null,
+            ma_chuc_vu_bac_si: ma_chuc_vu_bac_si || null,
+            so_nam_kinh_nghiem_bac_si: so_nam_kinh_nghiem_bac_si || null,
+            bang_cap_bac_si: processedBangCap,
+            dang_hoat_dong_bac_si: 1
+        });
+
+        console.log('✅ Created doctor:', doctorId);
+
+        // 10. Lấy thông tin đầy đủ
         const doctor = await DoctorModel.findById(doctorId);
 
-        // Chuyển BLOB sang base64
+        // 11. Chuyển BLOB sang base64
         if (doctor.bang_cap_bac_si) {
             doctor.bang_cap_bac_si = doctor.bang_cap_bac_si.toString('base64');
         }
@@ -171,23 +148,45 @@ class DoctorService {
             throw new Error('Không tìm thấy bác sĩ');
         }
 
-        // Kiểm tra chức vụ có tồn tại (nếu có)
-        if (updateData.ma_chuc_vu_bac_si) {
-            const position = await PositionModel.findById(updateData.ma_chuc_vu_bac_si);
+        // Tách data User và Doctor
+        const userUpdateData = {};
+        const doctorUpdateData = {};
+
+        // User fields
+        if (updateData.ten_nguoi_dung !== undefined) userUpdateData.ten_nguoi_dung = updateData.ten_nguoi_dung;
+        if (updateData.ho_nguoi_dung !== undefined) userUpdateData.ho_nguoi_dung = updateData.ho_nguoi_dung;
+        if (updateData.email_nguoi_dung !== undefined) userUpdateData.email_nguoi_dung = updateData.email_nguoi_dung;
+        if (updateData.so_dien_thoai_nguoi_dung !== undefined) userUpdateData.so_dien_thoai_nguoi_dung = updateData.so_dien_thoai_nguoi_dung;
+        if (updateData.gioi_tinh_nguoi_dung !== undefined) userUpdateData.gioi_tinh_nguoi_dung = updateData.gioi_tinh_nguoi_dung;
+
+        // Doctor fields
+        if (updateData.ma_chuyen_khoa_bac_si !== undefined) doctorUpdateData.ma_chuyen_khoa_bac_si = updateData.ma_chuyen_khoa_bac_si;
+        if (updateData.ma_chuc_vu_bac_si !== undefined) doctorUpdateData.ma_chuc_vu_bac_si = updateData.ma_chuc_vu_bac_si;
+        if (updateData.so_nam_kinh_nghiem_bac_si !== undefined) doctorUpdateData.so_nam_kinh_nghiem_bac_si = updateData.so_nam_kinh_nghiem_bac_si;
+        if (updateData.dang_hoat_dong_bac_si !== undefined) doctorUpdateData.dang_hoat_dong_bac_si = updateData.dang_hoat_dong_bac_si;
+
+        // Xử lý bằng cấp base64
+        if (updateData.bang_cap_bac_si) {
+            const base64Data = updateData.bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
+            doctorUpdateData.bang_cap_bac_si = Buffer.from(base64Data, 'base64');
+        }
+
+        // Kiểm tra chức vụ
+        if (doctorUpdateData.ma_chuc_vu_bac_si) {
+            const position = await PositionModel.findById(doctorUpdateData.ma_chuc_vu_bac_si);
             if (!position) {
                 throw new Error('Chức vụ không tồn tại');
             }
         }
 
-        // Xử lý bằng cấp base64 nếu có
-        if (updateData.bang_cap_bac_si) {
-            const base64Data = updateData.bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-            updateData.bang_cap_bac_si = Buffer.from(base64Data, 'base64');
+        // Update User (nếu có)
+        if (Object.keys(userUpdateData).length > 0) {
+            await UserModel.update(doctor.ma_nguoi_dung_bac_si, userUpdateData);
         }
 
-        const updated = await DoctorModel.update(doctorId, updateData);
-        if (!updated) {
-            throw new Error('Cập nhật bác sĩ thất bại');
+        // Update Doctor (nếu có)
+        if (Object.keys(doctorUpdateData).length > 0) {
+            await DoctorModel.update(doctorId, doctorUpdateData);
         }
 
         return await this.getDoctorById(doctorId);
@@ -205,10 +204,11 @@ class DoctorService {
             throw new Error('Không thể xóa bác sĩ đang có lịch làm việc hoặc lịch hẹn');
         }
 
-        const deleted = await DoctorModel.delete(doctorId);
-        if (!deleted) {
-            throw new Error('Xóa bác sĩ thất bại');
-        }
+        // Xóa Doctor trước
+        await DoctorModel.delete(doctorId);
+
+        // Xóa User
+        await UserModel.delete(doctor.ma_nguoi_dung_bac_si);
 
         return true;
     }
