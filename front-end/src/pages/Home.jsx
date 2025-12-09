@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ArrowRight, Users, FileText, Video, Shield } from 'lucide-react';
-import LoginModal from '../compoments/modal/LoginModal';
-import RegisterModal from '../compoments/modal/RegisterModal';
+import LoginModal from '../components/modal/LoginModal';
+import RegisterModal from '../components/modal/RegisterModal';
 import { useNavigate } from 'react-router-dom';
 export default function Home() {
     const navigate = useNavigate(); // <-- khai báo navigate

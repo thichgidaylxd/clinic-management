@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, MapPin, Phone, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { bookingAPI } from '../services/api';
-import CancelModal from '../compoments/appointments/CancelModal';
+import CancelModal from '../components/appointments/CancelModal';
 
 function MyAppointments() {
     const navigate = useNavigate();
