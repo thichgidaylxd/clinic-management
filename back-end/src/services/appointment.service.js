@@ -69,16 +69,19 @@ class AppointmentService {
         console.log('Patient created/found:', patient.ma_benh_nhan); // Debug
 
         // 6. Tạo lịch hẹn
-        const appointmentId = await AppointmentModel.create({
-            ma_nguoi_tao_lich_hen: null, // Khách vãng lai
+        const ma_lich_hen = await AppointmentModel.createAppointment({
+            ma_nguoi_tao_lich_hen: null,
             ma_bac_si,
             ma_benh_nhan: patient.ma_benh_nhan,
             ma_chuyen_khoa,
             ma_dich_vu_lich_hen,
-            trang_thai_lich_hen: 0, // PENDING
+            trang_thai_lich_hen: 0,
             ly_do_kham_lich_hen,
             gia_dich_vu_lich_hen: serviceFee,
-            tong_gia_lich_hen: serviceFee
+            tong_gia_lich_hen: serviceFee,
+            ngay_hen: ngay,
+            gio_bat_dau: thoi_gian_bat_dau,
+            gio_ket_thuc: thoi_gian_ket_thuc
         });
 
         console.log('Appointment created:', appointmentId); // Debug

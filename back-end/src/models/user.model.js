@@ -164,6 +164,9 @@ class UserModel {
     return rows[0].count > 0;
   }
 
+
+
+
   // ✅ CẬP NHẬT người dùng
   static async update(userId, updateData) {
     const {
@@ -173,6 +176,8 @@ class UserModel {
       so_dien_thoai_nguoi_dung,
       gioi_tinh_nguoi_dung,
       dia_chi_nguoi_dung,
+      mat_khau_nguoi_dung, // ✅ THÊM: Để đổi password
+      ma_vai_tro,          // ✅ THÊM: Để đổi vai trò
       trang_thai_nguoi_dung
     } = updateData;
 
@@ -209,6 +214,18 @@ class UserModel {
       values.push(dia_chi_nguoi_dung);
     }
 
+    // ✅ THÊM: Password update
+    if (mat_khau_nguoi_dung !== undefined) {
+      fields.push('mat_khau_nguoi_dung = ?');
+      values.push(mat_khau_nguoi_dung);
+    }
+
+    // ✅ THÊM: Role update
+    if (ma_vai_tro !== undefined) {
+      fields.push('ma_vai_tro = ?');
+      values.push(UUIDUtil.toBinary(ma_vai_tro));
+    }
+
     if (trang_thai_nguoi_dung !== undefined) {
       fields.push('trang_thai_nguoi_dung = ?');
       values.push(trang_thai_nguoi_dung);
@@ -221,15 +238,14 @@ class UserModel {
     values.push(UUIDUtil.toBinary(userId));
 
     const query = `
-      UPDATE bang_nguoi_dung 
-      SET ${fields.join(', ')}
-      WHERE ma_nguoi_dung = ?
+        UPDATE bang_nguoi_dung 
+        SET ${fields.join(', ')}
+        WHERE ma_nguoi_dung = ?
     `;
 
     const [result] = await db.execute(query, values);
     return result.affectedRows > 0;
   }
-
   // ✅ Xóa người dùng
   static async delete(userId) {
     const query = 'DELETE FROM bang_nguoi_dung WHERE ma_nguoi_dung = ?';

@@ -19,12 +19,6 @@ class WorkScheduleValidator {
                     'string.guid': 'Mã phòng khám không hợp lệ'
                 }),
 
-            ma_chuyen_khoa_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã chuyên khoa không hợp lệ'
-                }),
 
             ngay_lich_lam_viec: Joi.date()
                 .required()
@@ -82,12 +76,6 @@ class WorkScheduleValidator {
                     'string.guid': 'Mã phòng khám không hợp lệ'
                 }),
 
-            ma_chuyen_khoa_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã chuyên khoa không hợp lệ'
-                }),
 
             ngay_lich_lam_viec: Joi.date()
                 .min('now')
@@ -145,10 +133,6 @@ class WorkScheduleValidator {
                 .default(10),
 
             doctorId: Joi.string()
-                .uuid()
-                .allow(null, ''),
-
-            specialtyId: Joi.string()
                 .uuid()
                 .allow(null, ''),
 

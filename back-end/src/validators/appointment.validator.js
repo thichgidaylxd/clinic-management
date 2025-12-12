@@ -1,10 +1,14 @@
 const Joi = require('joi');
 
 class AppointmentValidator {
+
     // Validate đặt lịch (guest - khách vãng lai)
     static createGuest() {
         return Joi.object({
-            // Thông tin bệnh nhân
+
+            // ======================
+            // 1. Thông tin bệnh nhân
+            // ======================
             ten_benh_nhan: Joi.string()
                 .required()
                 .max(100)
@@ -29,9 +33,11 @@ class AppointmentValidator {
                     'any.only': 'Giới tính không hợp lệ (0: Nữ, 1: Nam, 2: Khác)'
                 }),
 
-            // Thông tin lịch hẹn
+            // ======================
+            // 2. Mã API (UUID)
+            // ======================
             ma_bac_si: Joi.string()
-                .uuid()
+                .guid()
                 .required()
                 .messages({
                     'string.guid': 'Mã bác sĩ không hợp lệ',
@@ -39,14 +45,14 @@ class AppointmentValidator {
                 }),
 
             ma_chuyen_khoa: Joi.string()
-                .uuid()
+                .guid()
                 .allow(null)
                 .messages({
                     'string.guid': 'Mã chuyên khoa không hợp lệ'
                 }),
 
             ma_dich_vu_lich_hen: Joi.string()
-                .uuid()
+                .guid()
                 .allow(null)
                 .messages({
                     'string.guid': 'Mã dịch vụ không hợp lệ'
@@ -61,8 +67,10 @@ class AppointmentValidator {
                     'any.required': 'Lý do khám là bắt buộc'
                 }),
 
-            // Thời gian
-            ngay: Joi.date()
+            // ======================
+            // 3. Thời gian lịch hẹn
+            // ======================
+            ngay_hen: Joi.date()
                 .required()
                 .min(new Date().toISOString().split('T')[0])
                 .messages({
@@ -71,6 +79,7 @@ class AppointmentValidator {
                     'any.required': 'Ngày khám là bắt buộc'
                 }),
 
+            // đồng bộ với DB → gio_bat_dau
             thoi_gian_bat_dau: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
@@ -79,6 +88,7 @@ class AppointmentValidator {
                     'any.required': 'Thời gian bắt đầu là bắt buộc'
                 }),
 
+            // đồng bộ với DB → gio_ket_thuc
             thoi_gian_ket_thuc: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
@@ -86,8 +96,8 @@ class AppointmentValidator {
                     'string.pattern.base': 'Thời gian kết thúc không hợp lệ (HH:mm)',
                     'any.required': 'Thời gian kết thúc là bắt buộc'
                 })
+
         }).custom((value, helpers) => {
-            // Validate thời gian kết thúc > thời gian bắt đầu
             if (value.thoi_gian_bat_dau >= value.thoi_gian_ket_thuc) {
                 return helpers.error('custom.timeRange', {
                     message: 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu'
@@ -97,12 +107,14 @@ class AppointmentValidator {
         });
     }
 
-    // Validate đặt lịch (authenticated - bệnh nhân đã đăng nhập)
+    // ==========================================================
+    //   ĐẶT LỊCH CHO USER ĐÃ ĐĂNG NHẬP
+    // ==========================================================
     static createAuthenticated() {
         return Joi.object({
-            // Thông tin lịch hẹn (không cần thông tin bệnh nhân vì đã có trong token)
+
             ma_bac_si: Joi.string()
-                .uuid()
+                .guid()
                 .required()
                 .messages({
                     'string.guid': 'Mã bác sĩ không hợp lệ',
@@ -110,14 +122,14 @@ class AppointmentValidator {
                 }),
 
             ma_chuyen_khoa: Joi.string()
-                .uuid()
+                .guid()
                 .allow(null)
                 .messages({
                     'string.guid': 'Mã chuyên khoa không hợp lệ'
                 }),
 
             ma_dich_vu_lich_hen: Joi.string()
-                .uuid()
+                .guid()
                 .allow(null)
                 .messages({
                     'string.guid': 'Mã dịch vụ không hợp lệ'
@@ -132,8 +144,8 @@ class AppointmentValidator {
                     'any.required': 'Lý do khám là bắt buộc'
                 }),
 
-            // Thời gian
-            ngay: Joi.date()
+            // đồng bộ tên biến → dùng chung "ngay_hen"
+            ngay_hen: Joi.date()
                 .required()
                 .min(new Date().toISOString().split('T')[0])
                 .messages({
@@ -144,19 +156,12 @@ class AppointmentValidator {
 
             thoi_gian_bat_dau: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
-                .required()
-                .messages({
-                    'string.pattern.base': 'Thời gian bắt đầu không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian bắt đầu là bắt buộc'
-                }),
+                .required(),
 
             thoi_gian_ket_thuc: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
-                .messages({
-                    'string.pattern.base': 'Thời gian kết thúc không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian kết thúc là bắt buộc'
-                })
+
         }).custom((value, helpers) => {
             if (value.thoi_gian_bat_dau >= value.thoi_gian_ket_thuc) {
                 return helpers.error('custom.timeRange', {
@@ -167,11 +172,13 @@ class AppointmentValidator {
         });
     }
 
-    // Validate cập nhật lịch hẹn
+    // ==========================================================
+    // UPDATE
+    // ==========================================================
     static update() {
         return Joi.object({
             ma_phong_kham: Joi.string()
-                .uuid()
+                .guid()
                 .allow(null)
                 .messages({
                     'string.guid': 'Mã phòng khám không hợp lệ'
@@ -194,39 +201,21 @@ class AppointmentValidator {
         });
     }
 
-    // Validate query params cho danh sách lịch hẹn
+    // ==========================================================
+    // QUERY LIST
+    // ==========================================================
     static query() {
         return Joi.object({
-            page: Joi.number()
-                .integer()
-                .min(1)
-                .default(1),
+            page: Joi.number().integer().min(1).default(1),
+            limit: Joi.number().integer().min(1).max(100).default(10),
 
-            limit: Joi.number()
-                .integer()
-                .min(1)
-                .max(100)
-                .default(10),
+            doctorId: Joi.string().guid().allow(null, ''),
+            patientId: Joi.string().guid().allow(null, ''),
+            specialtyId: Joi.string().guid().allow(null, ''),
 
-            doctorId: Joi.string()
-                .uuid()
-                .allow(null, ''),
+            status: Joi.number().valid(0, 1, 2, 3, 4).allow(null),
 
-            patientId: Joi.string()
-                .uuid()
-                .allow(null, ''),
-
-            specialtyId: Joi.string()
-                .uuid()
-                .allow(null, ''),
-
-            status: Joi.number()
-                .valid(0, 1, 2, 3, 4)
-                .allow(null),
-
-            fromDate: Joi.date()
-                .allow(null, ''),
-
+            fromDate: Joi.date().allow(null, ''),
             toDate: Joi.date()
                 .allow(null, '')
                 .when('fromDate', {
@@ -236,16 +225,17 @@ class AppointmentValidator {
                     })
                 }),
 
-            search: Joi.string()
-                .allow('')
+            search: Joi.string().allow('')
         });
     }
 
-    // Validate query available slots
+    // ==========================================================
+    // Query available slots
+    // ==========================================================
     static queryAvailableSlots() {
         return Joi.object({
             doctorId: Joi.string()
-                .uuid()
+                .guid()
                 .required()
                 .messages({
                     'string.guid': 'Mã bác sĩ không hợp lệ',
@@ -271,41 +261,27 @@ class AppointmentValidator {
         });
     }
 
-    // Validate check availability
+    // ==========================================================
+    // CHECK AVAILABILITY
+    // ==========================================================
     static checkAvailability() {
         return Joi.object({
             doctorId: Joi.string()
-                .uuid()
-                .required()
-                .messages({
-                    'string.guid': 'Mã bác sĩ không hợp lệ',
-                    'any.required': 'Mã bác sĩ là bắt buộc'
-                }),
+                .guid()
+                .required(),
 
             date: Joi.date()
                 .required()
-                .min('now')
-                .messages({
-                    'date.base': 'Ngày không hợp lệ',
-                    'date.min': 'Ngày phải từ hôm nay trở đi',
-                    'any.required': 'Ngày là bắt buộc'
-                }),
+                .min('now'),
 
             startTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
-                .required()
-                .messages({
-                    'string.pattern.base': 'Thời gian bắt đầu không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian bắt đầu là bắt buộc'
-                }),
+                .required(),
 
             endTime: Joi.string()
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
-                .messages({
-                    'string.pattern.base': 'Thời gian kết thúc không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian kết thúc là bắt buộc'
-                })
+
         }).custom((value, helpers) => {
             if (value.startTime >= value.endTime) {
                 return helpers.error('custom.timeRange', {
@@ -316,7 +292,9 @@ class AppointmentValidator {
         });
     }
 
-    // Validate hủy lịch
+    // ==========================================================
+    // CANCEL APPOINTMENT
+    // ==========================================================
     static cancel() {
         return Joi.object({
             ly_do_huy_lich_hen: Joi.string()

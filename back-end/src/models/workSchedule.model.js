@@ -3,11 +3,13 @@ const UUIDUtil = require('../utils/uuid.util');
 
 class WorkScheduleModel {
   // Tạo lịch làm việc
+  // ✅ XÓA tất cả references đến ma_chuyen_khoa_lich_lam_viec
+
+  // Trong method create
   static async create(scheduleData) {
     const {
-      ma_phong_kham_lich_lam_viec,
       ma_bac_si_lich_lam_viec,
-      ma_chuyen_khoa_lich_lam_viec,
+      ma_phong_kham_lich_lam_viec, // ✅ Có field này
       ngay_lich_lam_viec,
       thoi_gian_bat_dau_lich_lam_viec,
       thoi_gian_ket_thuc_lich_lam_viec,
@@ -17,23 +19,21 @@ class WorkScheduleModel {
     const ma_lich_lam_viec = UUIDUtil.generate();
 
     const query = `
-      INSERT INTO bang_lich_lam_viec (
-        ma_lich_lam_viec,
-        ma_phong_kham_lich_lam_viec,
-        ma_bac_si_lich_lam_viec,
-        ma_chuyen_khoa_lich_lam_viec,
-        ngay_lich_lam_viec,
-        thoi_gian_bat_dau_lich_lam_viec,
-        thoi_gian_ket_thuc_lich_lam_viec,
-        trang_thai_lich_lam_viec
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO bang_lich_lam_viec (
+            ma_lich_lam_viec,
+            ma_bac_si_lich_lam_viec,
+            ma_phong_kham_lich_lam_viec,
+            ngay_lich_lam_viec,
+            thoi_gian_bat_dau_lich_lam_viec,
+            thoi_gian_ket_thuc_lich_lam_viec,
+            trang_thai_lich_lam_viec
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     await db.execute(query, [
       UUIDUtil.toBinary(ma_lich_lam_viec),
-      ma_phong_kham_lich_lam_viec ? UUIDUtil.toBinary(ma_phong_kham_lich_lam_viec) : null,
       UUIDUtil.toBinary(ma_bac_si_lich_lam_viec),
-      ma_chuyen_khoa_lich_lam_viec ? UUIDUtil.toBinary(ma_chuyen_khoa_lich_lam_viec) : null,
+      ma_phong_kham_lich_lam_viec ? UUIDUtil.toBinary(ma_phong_kham_lich_lam_viec) : null, // ✅ Thêm
       ngay_lich_lam_viec,
       thoi_gian_bat_dau_lich_lam_viec,
       thoi_gian_ket_thuc_lich_lam_viec,
@@ -43,7 +43,7 @@ class WorkScheduleModel {
     return ma_lich_lam_viec;
   }
 
-  // Lấy danh sách lịch làm việc
+  // Trong method findAll - XÓA JOIN với bang_chuyen_khoa
   static async findAll(page = 1, limit = 10, filters = {}) {
     const pageInt = parseInt(page) || 1;
     const limitInt = parseInt(limit) || 10;
@@ -51,45 +51,41 @@ class WorkScheduleModel {
 
     const {
       doctorId,
-      specialtyId,
+      // ❌ XÓA: specialtyId,
       roomId,
       fromDate,
       toDate,
       status
     } = filters;
-    // ✅ DEBUG: Log filters
-    console.log('🔍 WorkSchedule.findAll - Filters:', {
-      doctorId,
-      specialtyId,
-      roomId,
-      fromDate,
-      toDate,
-      status,
-      page: pageInt,
-      limit: limitInt
-    });
+
     let query = `
-      SELECT 
-        BIN_TO_UUID(llv.ma_lich_lam_viec) as ma_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_phong_kham_lich_lam_viec) as ma_phong_kham_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_bac_si_lich_lam_viec) as ma_bac_si_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_chuyen_khoa_lich_lam_viec) as ma_chuyen_khoa_lich_lam_viec,
-        llv.ngay_lich_lam_viec,
-        llv.thoi_gian_bat_dau_lich_lam_viec,
-        llv.thoi_gian_ket_thuc_lich_lam_viec,
-        llv.trang_thai_lich_lam_viec,
-        llv.ngay_tao_lich_lam_viec,
-        llv.ngay_cap_nhat_lich_lam_viec,
-        nd.ten_nguoi_dung,
-        nd.ho_nguoi_dung,
-        ck.ten_chuyen_khoa,
-        pk.ten_phong_kham,
-        pk.so_phong_kham
-      FROM bang_lich_lam_viec llv
-      INNER JOIN bang_bac_si bs ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
-      INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-      LEFT JOIN bang_chuyen_khoa ck ON llv.ma_chuyen_khoa_lich_lam_viec = ck.ma_chuyen_khoa
-      LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
+SELECT 
+    BIN_TO_UUID(llv.ma_lich_lam_viec) AS ma_lich_lam_viec,
+    BIN_TO_UUID(llv.ma_phong_kham_lich_lam_viec) AS ma_phong_kham_lich_lam_viec,
+    BIN_TO_UUID(llv.ma_bac_si_lich_lam_viec) AS ma_bac_si_lich_lam_viec,
+    llv.ngay_lich_lam_viec,
+    llv.thoi_gian_bat_dau_lich_lam_viec,
+    llv.thoi_gian_ket_thuc_lich_lam_viec,
+    llv.trang_thai_lich_lam_viec,
+    llv.ngay_tao_lich_lam_viec,
+    llv.ngay_cap_nhat_lich_lam_viec,
+    nd.ten_nguoi_dung,
+    nd.ho_nguoi_dung,
+    ck.ten_chuyen_khoa,
+    pk.ten_phong_kham,
+    pk.so_phong_kham
+FROM bang_lich_lam_viec llv
+INNER JOIN bang_bac_si bs 
+    ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
+INNER JOIN bang_nguoi_dung nd 
+    ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+LEFT JOIN bang_bac_si_chuyen_khoa bsck 
+    ON bs.ma_bac_si = bsck.ma_bac_si
+LEFT JOIN bang_chuyen_khoa ck 
+    ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
+LEFT JOIN bang_phong_kham pk 
+    ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
+
     `;
 
     const params = [];
@@ -100,10 +96,11 @@ class WorkScheduleModel {
       params.push(UUIDUtil.toBinary(doctorId));
     }
 
-    if (specialtyId) {
-      conditions.push('llv.ma_chuyen_khoa_lich_lam_viec = ?');
-      params.push(UUIDUtil.toBinary(specialtyId));
-    }
+    // ❌ XÓA specialtyId filter
+    // if (specialtyId) {
+    //     conditions.push('llv.ma_chuyen_khoa_lich_lam_viec = ?');
+    //     params.push(UUIDUtil.toBinary(specialtyId));
+    // }
 
     if (roomId) {
       conditions.push('llv.ma_phong_kham_lich_lam_viec = ?');
@@ -119,8 +116,11 @@ class WorkScheduleModel {
     }
 
     if (toDate) {
+      const toDateStr = toDate instanceof Date
+        ? toDate.toISOString().split('T')[0]
+        : toDate;
       conditions.push('llv.ngay_lich_lam_viec <= ?');
-      params.push(toDate);
+      params.push(toDateStr);
     }
 
     if (status !== null && status !== undefined) {
@@ -134,18 +134,60 @@ class WorkScheduleModel {
 
     query += ` ORDER BY llv.ngay_lich_lam_viec DESC, llv.thoi_gian_bat_dau_lich_lam_viec ASC LIMIT ${offset}, ${limitInt}`;
 
+    console.log('📋 Query:', query);
+    console.log('📋 Params:', params);
+
     const [rows] = await db.execute(query, params);
 
-    // Đếm tổng số
+    console.log(`✅ Found ${rows.length} schedules`);
+
+    // Count query cũng xóa specialtyId
     let countQuery = `
       SELECT COUNT(*) as total 
       FROM bang_lich_lam_viec llv
     `;
-    if (conditions.length > 0) {
-      countQuery += ' WHERE ' + conditions.join(' AND ');
+
+    const countParams = [];
+    const countConditions = [];
+
+    if (doctorId) {
+      countConditions.push('llv.ma_bac_si_lich_lam_viec = ?');
+      countParams.push(UUIDUtil.toBinary(doctorId));
     }
 
-    const [countResult] = await db.execute(countQuery, params);
+    // ❌ XÓA specialtyId
+
+    if (roomId) {
+      countConditions.push('llv.ma_phong_kham_lich_lam_viec = ?');
+      countParams.push(UUIDUtil.toBinary(roomId));
+    }
+
+    if (fromDate) {
+      const fromDateStr = fromDate instanceof Date
+        ? fromDate.toISOString().split('T')[0]
+        : fromDate;
+      countConditions.push('llv.ngay_lich_lam_viec >= ?');
+      countParams.push(fromDateStr);
+    }
+
+    if (toDate) {
+      const toDateStr = toDate instanceof Date
+        ? toDate.toISOString().split('T')[0]
+        : toDate;
+      countConditions.push('llv.ngay_lich_lam_viec <= ?');
+      countParams.push(toDateStr);
+    }
+
+    if (status !== null && status !== undefined) {
+      countConditions.push('llv.trang_thai_lich_lam_viec = ?');
+      countParams.push(parseInt(status));
+    }
+
+    if (countConditions.length > 0) {
+      countQuery += ' WHERE ' + countConditions.join(' AND ');
+    }
+
+    const [countResult] = await db.execute(countQuery, countParams);
 
     return {
       data: rows,
@@ -158,43 +200,11 @@ class WorkScheduleModel {
     };
   }
 
-  // Tìm lịch làm việc theo ID
-  static async findById(scheduleId) {
-    const query = `
-      SELECT 
-        BIN_TO_UUID(llv.ma_lich_lam_viec) as ma_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_phong_kham_lich_lam_viec) as ma_phong_kham_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_bac_si_lich_lam_viec) as ma_bac_si_lich_lam_viec,
-        BIN_TO_UUID(llv.ma_chuyen_khoa_lich_lam_viec) as ma_chuyen_khoa_lich_lam_viec,
-        llv.ngay_lich_lam_viec,
-        llv.thoi_gian_bat_dau_lich_lam_viec,
-        llv.thoi_gian_ket_thuc_lich_lam_viec,
-        llv.trang_thai_lich_lam_viec,
-        llv.ngay_tao_lich_lam_viec,
-        llv.ngay_cap_nhat_lich_lam_viec,
-        nd.ten_nguoi_dung,
-        nd.ho_nguoi_dung,
-        nd.email_nguoi_dung,
-        ck.ten_chuyen_khoa,
-        pk.ten_phong_kham,
-        pk.so_phong_kham
-      FROM bang_lich_lam_viec llv
-      INNER JOIN bang_bac_si bs ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
-      INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-      LEFT JOIN bang_chuyen_khoa ck ON llv.ma_chuyen_khoa_lich_lam_viec = ck.ma_chuyen_khoa
-      LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
-      WHERE llv.ma_lich_lam_viec = ?
-    `;
-
-    const [rows] = await db.execute(query, [UUIDUtil.toBinary(scheduleId)]);
-    return rows[0] || null;
-  }
-
-  // Cập nhật lịch làm việc
+  // Trong method update - XÓA ma_chuyen_khoa_lich_lam_viec
   static async update(scheduleId, updateData) {
     const {
       ma_phong_kham_lich_lam_viec,
-      ma_chuyen_khoa_lich_lam_viec,
+      // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec,
       ngay_lich_lam_viec,
       thoi_gian_bat_dau_lich_lam_viec,
       thoi_gian_ket_thuc_lich_lam_viec,
@@ -209,10 +219,7 @@ class WorkScheduleModel {
       values.push(ma_phong_kham_lich_lam_viec ? UUIDUtil.toBinary(ma_phong_kham_lich_lam_viec) : null);
     }
 
-    if (ma_chuyen_khoa_lich_lam_viec !== undefined) {
-      fields.push('ma_chuyen_khoa_lich_lam_viec = ?');
-      values.push(ma_chuyen_khoa_lich_lam_viec ? UUIDUtil.toBinary(ma_chuyen_khoa_lich_lam_viec) : null);
-    }
+    // ❌ XÓA ma_chuyen_khoa_lich_lam_viec
 
     if (ngay_lich_lam_viec !== undefined) {
       fields.push('ngay_lich_lam_viec = ?');
@@ -231,7 +238,7 @@ class WorkScheduleModel {
 
     if (trang_thai_lich_lam_viec !== undefined) {
       fields.push('trang_thai_lich_lam_viec = ?');
-      values.push(trang_thai_lich_lam_viec);
+      values.push(parseInt(trang_thai_lich_lam_viec));
     }
 
     if (fields.length === 0) {
@@ -248,6 +255,41 @@ class WorkScheduleModel {
 
     const [result] = await db.execute(query, values);
     return result.affectedRows > 0;
+  }
+
+  // Tìm lịch làm việc theo ID
+  static async findById(scheduleId) {
+    const query = `
+      SELECT 
+        BIN_TO_UUID(llv.ma_lich_lam_viec) as ma_lich_lam_viec,
+        BIN_TO_UUID(llv.ma_phong_kham_lich_lam_viec) as ma_phong_kham_lich_lam_viec,
+        BIN_TO_UUID(llv.ma_bac_si_lich_lam_viec) as ma_bac_si_lich_lam_viec,
+        -- ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
+        llv.ngay_lich_lam_viec,
+        llv.thoi_gian_bat_dau_lich_lam_viec,
+        llv.thoi_gian_ket_thuc_lich_lam_viec,
+        llv.trang_thai_lich_lam_viec,
+        llv.ngay_tao_lich_lam_viec,
+        llv.ngay_cap_nhat_lich_lam_viec,
+        nd.ten_nguoi_dung,
+        nd.ho_nguoi_dung,
+        nd.email_nguoi_dung,
+        -- ✅ Lấy chuyên khoa từ bác sĩ
+        GROUP_CONCAT(DISTINCT ck.ten_chuyen_khoa SEPARATOR ', ') as ten_chuyen_khoa,
+        pk.ten_phong_kham,
+        pk.so_phong_kham
+      FROM bang_lich_lam_viec llv
+      INNER JOIN bang_bac_si bs ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
+      INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+      LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
+      LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
+      LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
+      WHERE llv.ma_lich_lam_viec = ?
+      GROUP BY llv.ma_lich_lam_viec
+    `;
+
+    const [rows] = await db.execute(query, [UUIDUtil.toBinary(scheduleId)]);
+    return rows[0] || null;
   }
 
   // Xóa lịch làm việc
@@ -329,14 +371,18 @@ class WorkScheduleModel {
         llv.thoi_gian_bat_dau_lich_lam_viec,
         llv.thoi_gian_ket_thuc_lich_lam_viec,
         llv.trang_thai_lich_lam_viec,
-        ck.ten_chuyen_khoa,
+        -- ✅ Lấy chuyên khoa từ bác sĩ
+        GROUP_CONCAT(DISTINCT ck.ten_chuyen_khoa SEPARATOR ', ') as ten_chuyen_khoa,
         pk.ten_phong_kham,
         pk.so_phong_kham
       FROM bang_lich_lam_viec llv
-      LEFT JOIN bang_chuyen_khoa ck ON llv.ma_chuyen_khoa_lich_lam_viec = ck.ma_chuyen_khoa
+      INNER JOIN bang_bac_si bs ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
+      LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
+      LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
       LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
       WHERE llv.ma_bac_si_lich_lam_viec = ?
         AND llv.ngay_lich_lam_viec = ?
+      GROUP BY llv.ma_lich_lam_viec
       ORDER BY llv.thoi_gian_bat_dau_lich_lam_viec ASC
     `;
 
@@ -356,14 +402,18 @@ class WorkScheduleModel {
         llv.thoi_gian_bat_dau_lich_lam_viec,
         llv.thoi_gian_ket_thuc_lich_lam_viec,
         llv.trang_thai_lich_lam_viec,
-        ck.ten_chuyen_khoa,
+        -- ✅ Lấy chuyên khoa từ bác sĩ
+        GROUP_CONCAT(DISTINCT ck.ten_chuyen_khoa SEPARATOR ', ') as ten_chuyen_khoa,
         pk.ten_phong_kham,
         pk.so_phong_kham
       FROM bang_lich_lam_viec llv
-      LEFT JOIN bang_chuyen_khoa ck ON llv.ma_chuyen_khoa_lich_lam_viec = ck.ma_chuyen_khoa
+      INNER JOIN bang_bac_si bs ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
+      LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
+      LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
       LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
       WHERE llv.ma_bac_si_lich_lam_viec = ?
         AND llv.ngay_lich_lam_viec BETWEEN ? AND ?
+      GROUP BY llv.ma_lich_lam_viec
       ORDER BY llv.ngay_lich_lam_viec ASC, llv.thoi_gian_bat_dau_lich_lam_viec ASC
     `;
 
@@ -374,7 +424,6 @@ class WorkScheduleModel {
     ]);
     return rows;
   }
-
   // Thống kê lịch làm việc theo bác sĩ
   static async getStatsByDoctor(fromDate, toDate) {
     const query = `

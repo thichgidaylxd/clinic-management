@@ -9,7 +9,7 @@ class WorkScheduleService {
         const {
             ma_bac_si_lich_lam_viec,
             ma_phong_kham_lich_lam_viec,
-            ma_chuyen_khoa_lich_lam_viec,
+            // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
             ngay_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec
@@ -41,13 +41,7 @@ class WorkScheduleService {
             }
         }
 
-        // Kiểm tra chuyên khoa có tồn tại (nếu có)
-        if (ma_chuyen_khoa_lich_lam_viec) {
-            const specialty = await SpecialtyModel.findById(ma_chuyen_khoa_lich_lam_viec);
-            if (!specialty) {
-                throw new Error('Chuyên khoa không tồn tại');
-            }
-        }
+        // ❌ XÓA: Validate chuyên khoa
 
         // Kiểm tra bác sĩ có trùng lịch không
         const hasConflict = await WorkScheduleModel.hasConflict(
@@ -67,7 +61,7 @@ class WorkScheduleService {
 
     // Lấy danh sách lịch làm việc
     static async getAll(page, limit, filters) {
-        // Kiểm tra các tham số filter
+        // Kiểm tra bác sĩ
         if (filters.doctorId) {
             const doctor = await DoctorModel.findById(filters.doctorId);
             if (!doctor) {
@@ -75,13 +69,9 @@ class WorkScheduleService {
             }
         }
 
-        if (filters.specialtyId) {
-            const specialty = await SpecialtyModel.findById(filters.specialtyId);
-            if (!specialty) {
-                throw new Error('Chuyên khoa không tồn tại');
-            }
-        }
+        // ❌ XÓA: Validate specialtyId
 
+        // Kiểm tra phòng
         if (filters.roomId) {
             const room = await RoomModel.findById(filters.roomId);
             if (!room) {
@@ -110,7 +100,7 @@ class WorkScheduleService {
 
         const {
             ma_phong_kham_lich_lam_viec,
-            ma_chuyen_khoa_lich_lam_viec,
+            // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
             ngay_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec
@@ -137,13 +127,7 @@ class WorkScheduleService {
             }
         }
 
-        // Kiểm tra chuyên khoa có tồn tại (nếu có)
-        if (ma_chuyen_khoa_lich_lam_viec) {
-            const specialty = await SpecialtyModel.findById(ma_chuyen_khoa_lich_lam_viec);
-            if (!specialty) {
-                throw new Error('Chuyên khoa không tồn tại');
-            }
-        }
+        // ❌ XÓA: Validate chuyên khoa
 
         // Kiểm tra trùng lịch nếu có thay đổi thời gian
         if (ngay_lich_lam_viec || thoi_gian_bat_dau_lich_lam_viec || thoi_gian_ket_thuc_lich_lam_viec) {
@@ -167,6 +151,8 @@ class WorkScheduleService {
 
         return await WorkScheduleModel.findById(scheduleId);
     }
+
+
 
     // Xóa lịch làm việc
     static async delete(scheduleId) {

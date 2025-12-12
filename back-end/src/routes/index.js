@@ -11,7 +11,8 @@ const positionRoutes = require('./position.routes'); // ✅ Thêm
 const workScheduleRoutes = require('./workSchedule.routes');
 const patientRoutes = require('./patient.routes');
 const appointmentRoutes = require('./appointment.routes');
-
+const userRoutes = require('./user.routes');
+const roleRoutes = require('./role.routes');
 // Route mặc định
 router.get('/', (req, res) => {
     res.json({
@@ -28,7 +29,9 @@ router.get('/', (req, res) => {
             positions: '/api/v1/positions', // ✅ Thêm
             workSchedules: '/api/v1/work-schedules',
             patients: '/api/v1/patients',
-            appointments: '/api/v1/appointments'
+            appointments: '/api/v1/appointments',
+            users: '/api/v1/users',
+            roles: '/api/v1/roles'
         }
     });
 });
@@ -44,5 +47,7 @@ router.use('/positions', positionRoutes); // ✅ Thêm
 router.use('/work-schedules', workScheduleRoutes);
 router.use('/patients', patientRoutes);
 router.use('/appointments', appointmentRoutes);
+router.use('/users', userRoutes);
+router.use('/roles', roleRoutes);
 
 module.exports = router;

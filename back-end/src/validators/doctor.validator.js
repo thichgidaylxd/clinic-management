@@ -38,6 +38,15 @@ class DoctorValidator {
                     'string.max': 'Họ không được vượt quá 50 ký tự',
                     'any.required': 'Họ là bắt buộc'
                 }),
+            // ✅ Doctor fields
+            chuyen_khoa_ids: Joi.array()
+                .items(Joi.string())
+                .min(1)
+                .required()
+                .messages({
+                    'array.min': 'Phải chọn ít nhất 1 chuyên khoa',
+                    'any.required': 'Chuyên khoa là bắt buộc'
+                }),
             ten_dang_nhap_nguoi_dung: Joi.string()
                 .trim()
                 .min(3)
@@ -176,6 +185,15 @@ class DoctorValidator {
                 .allow('', null)
                 .messages({
                     'string.guid': 'ID chức vụ không hợp lệ'
+                }),
+            // ✅ Doctor fields
+            chuyen_khoa_ids: Joi.array()
+                .items(Joi.string())
+                .min(1)
+                .required()
+                .messages({
+                    'array.min': 'Phải chọn ít nhất 1 chuyên khoa',
+                    'any.required': 'Chuyên khoa là bắt buộc'
                 }),
             so_nam_kinh_nghiem_bac_si: Joi.number()
                 .integer()

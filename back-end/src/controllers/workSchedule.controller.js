@@ -21,11 +21,10 @@ class WorkScheduleController {
     // Lấy danh sách lịch làm việc
     static async getAll(req, res, next) {
         try {
-            const { page, limit, doctorId, specialtyId, roomId, fromDate, toDate, status } = req.query;
+            const { page, limit, doctorId, roomId, fromDate, toDate, status } = req.query;
 
             const filters = {
                 doctorId,
-                specialtyId,
                 roomId,
                 fromDate,
                 toDate,
