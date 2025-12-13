@@ -101,20 +101,22 @@ class SpecialtyModel {
         return rows[0] || null;
     }
 
-    // Tìm theo tên
+    // Tìm chuyên khoa theo tên
     static async findByName(name) {
         const query = `
-      SELECT 
-        BIN_TO_UUID(ma_chuyen_khoa) as ma_chuyen_khoa,
-        ten_chuyen_khoa
-      FROM bang_chuyen_khoa
-      WHERE ten_chuyen_khoa = ?
+        SELECT 
+            BIN_TO_UUID(ma_chuyen_khoa) as ma_chuyen_khoa,
+            ten_chuyen_khoa,
+            mo_ta_chuyen_khoa,
+            hinh_anh_chuyen_khoa
+        FROM bang_chuyen_khoa
+        WHERE ten_chuyen_khoa LIKE ?
+        LIMIT 1
     `;
 
-        const [rows] = await db.execute(query, [name]);
+        const [rows] = await db.execute(query, [`%${name}%`]);
         return rows[0] || null;
     }
-
     // Cập nhật chuyên khoa
     static async update(specialtyId, updateData) {
         const {
@@ -199,6 +201,7 @@ class SpecialtyModel {
 
         return false;
     }
+
 }
 
 module.exports = SpecialtyModel;

@@ -1,4 +1,5 @@
 const SpecialtyService = require('../services/specialty.service');
+const SpecialtyModel = require('../models/specialty.model');
 const ResponseUtil = require('../utils/response.util');
 
 class SpecialtyController {
@@ -39,6 +40,31 @@ class SpecialtyController {
         try {
             const { id } = req.params;
             const specialty = await SpecialtyService.getById(id);
+
+            return ResponseUtil.success(
+                res,
+                specialty,
+                'Lấy thông tin chuyên khoa thành công'
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // ⭐ Lấy chuyên khoa theo tên
+    static async getByName(req, res, next) {
+        try {
+            const { name } = req.query;
+
+            if (!name) {
+                return ResponseUtil.error(res, 'Tên chuyên khoa là bắt buộc', 400);
+            }
+
+            const specialty = await SpecialtyModel.findByName(name);
+
+            if (!specialty) {
+                return ResponseUtil.error(res, 'Không tìm thấy chuyên khoa', 404);
+            }
 
             return ResponseUtil.success(
                 res,

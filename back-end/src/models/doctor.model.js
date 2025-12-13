@@ -205,6 +205,57 @@ class DoctorModel {
     return rows[0] || null;
   }
 
+  // Lấy bác sĩ có lịch làm việc trong ngày
+  static async findByWorkSchedule(date, specialtyId = null) {
+    let query = `
+        SELECT DISTINCT
+            BIN_TO_UUID(bs.ma_bac_si) as ma_bac_si,
+            nd.ten_nguoi_dung,
+            nd.ho_nguoi_dung,
+            nd.gioi_tinh_nguoi_dung,
+            nd.hinh_anh_nguoi_dung,
+            bs.so_nam_kinh_nghiem_bac_si,
+            cv.ten_chuc_vu,
+            GROUP_CONCAT(DISTINCT ck.ten_chuyen_khoa SEPARATOR ', ') as chuyen_khoa,
+            -- Work schedule info (use ANY_VALUE or add to GROUP BY)
+            MAX(llv.thoi_gian_bat_dau_lich_lam_viec) as thoi_gian_bat_dau_lich_lam_viec,
+            MAX(llv.thoi_gian_ket_thuc_lich_lam_viec) as thoi_gian_ket_thuc_lich_lam_viec,
+            MAX(pk.ten_phong_kham) as ten_phong_kham,
+            MAX(pk.so_phong_kham) as so_phong_kham
+        FROM bang_bac_si bs
+        INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+        LEFT JOIN bang_chuc_vu cv ON bs.ma_chuc_vu_bac_si = cv.ma_chuc_vu
+        LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
+        LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        INNER JOIN bang_lich_lam_viec llv ON bs.ma_bac_si = llv.ma_bac_si_lich_lam_viec
+        LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
+        WHERE llv.ngay_lich_lam_viec = ?
+            AND llv.trang_thai_lich_lam_viec = 1
+            AND bs.dang_hoat_dong_bac_si = 1
+    `;
+
+    const params = [date];
+
+    if (specialtyId) {
+      query += ' AND bsck.ma_chuyen_khoa = UUID_TO_BIN(?)';
+      params.push(specialtyId);
+    }
+
+    query += ` GROUP BY 
+        bs.ma_bac_si,
+        nd.ten_nguoi_dung,
+        nd.ho_nguoi_dung,
+        nd.gioi_tinh_nguoi_dung,
+        nd.hinh_anh_nguoi_dung,
+        bs.so_nam_kinh_nghiem_bac_si,
+        cv.ten_chuc_vu`;
+
+    query += ' ORDER BY nd.ten_nguoi_dung';
+
+    const [rows] = await db.execute(query, params);
+    return rows;
+  }
+
   // Cập nhật bác sĩ
   static async update(doctorId, updateData) {
     const {

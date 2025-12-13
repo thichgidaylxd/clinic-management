@@ -8,7 +8,11 @@ const CONSTANTS = require('../config/constants');
 // Middleware: Chỉ Receptionist & Admin
 const receptionistAuth = [
     AuthMiddleware.authenticate,
-    AuthMiddleware.authorize([CONSTANTS.ROLES.RECEPTIONIST, CONSTANTS.ROLES.ADMIN])
+    AuthMiddleware.authorize(
+        CONSTANTS.ROLES.RECEPTIONIST,
+        CONSTANTS.ROLES.ADMIN
+    )
+
 ];
 
 /**

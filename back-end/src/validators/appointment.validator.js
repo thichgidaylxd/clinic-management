@@ -18,12 +18,34 @@ class AppointmentValidator {
                     'any.required': 'Tên bệnh nhân là bắt buộc'
                 }),
 
+            ho_benh_nhan: Joi.string()  // ✅ THÊM
+                .max(50)
+                .allow(null, '')
+                .messages({
+                    'string.max': 'Họ bệnh nhân không được quá 50 ký tự'
+                }),
+
             so_dien_thoai_benh_nhan: Joi.string()
                 .pattern(/^[0-9]{10}$/)
                 .required()
                 .messages({
                     'string.pattern.base': 'Số điện thoại phải có 10 chữ số',
                     'any.required': 'Số điện thoại là bắt buộc'
+                }),
+
+            email_benh_nhan: Joi.string()  // ✅ THÊM
+                .email()
+                .allow(null, '')
+                .messages({
+                    'string.email': 'Email không hợp lệ'
+                }),
+
+            ngay_sinh_benh_nhan: Joi.date()  // ✅ THÊM
+                .max('now')
+                .allow(null)
+                .messages({
+                    'date.base': 'Ngày sinh không hợp lệ',
+                    'date.max': 'Ngày sinh không được là tương lai'
                 }),
 
             gioi_tinh_benh_nhan: Joi.number()
@@ -79,28 +101,26 @@ class AppointmentValidator {
                     'any.required': 'Ngày khám là bắt buộc'
                 }),
 
-            // đồng bộ với DB → gio_bat_dau
-            thoi_gian_bat_dau: Joi.string()
+            gio_bat_dau: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_bat_dau)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
-                    'string.pattern.base': 'Thời gian bắt đầu không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian bắt đầu là bắt buộc'
+                    'string.pattern.base': 'Giờ bắt đầu không hợp lệ (HH:mm)',
+                    'any.required': 'Giờ bắt đầu là bắt buộc'
                 }),
 
-            // đồng bộ với DB → gio_ket_thuc
-            thoi_gian_ket_thuc: Joi.string()
+            gio_ket_thuc: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_ket_thuc)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
-                    'string.pattern.base': 'Thời gian kết thúc không hợp lệ (HH:mm)',
-                    'any.required': 'Thời gian kết thúc là bắt buộc'
+                    'string.pattern.base': 'Giờ kết thúc không hợp lệ (HH:mm)',
+                    'any.required': 'Giờ kết thúc là bắt buộc'
                 })
 
         }).custom((value, helpers) => {
-            if (value.thoi_gian_bat_dau >= value.thoi_gian_ket_thuc) {
+            if (value.gio_bat_dau >= value.gio_ket_thuc) {  // ✅ ĐỔI TÊN
                 return helpers.error('custom.timeRange', {
-                    message: 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu'
+                    message: 'Giờ kết thúc phải lớn hơn giờ bắt đầu'
                 });
             }
             return value;
@@ -144,7 +164,6 @@ class AppointmentValidator {
                     'any.required': 'Lý do khám là bắt buộc'
                 }),
 
-            // đồng bộ tên biến → dùng chung "ngay_hen"
             ngay_hen: Joi.date()
                 .required()
                 .min(new Date().toISOString().split('T')[0])
@@ -154,18 +173,26 @@ class AppointmentValidator {
                     'any.required': 'Ngày khám là bắt buộc'
                 }),
 
-            thoi_gian_bat_dau: Joi.string()
-                .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
-                .required(),
-
-            thoi_gian_ket_thuc: Joi.string()
+            gio_bat_dau: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_bat_dau)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
+                .messages({
+                    'string.pattern.base': 'Giờ bắt đầu không hợp lệ (HH:mm)',
+                    'any.required': 'Giờ bắt đầu là bắt buộc'
+                }),
+
+            gio_ket_thuc: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_ket_thuc)
+                .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+                .required()
+                .messages({
+                    'string.pattern.base': 'Giờ kết thúc không hợp lệ (HH:mm)',
+                    'any.required': 'Giờ kết thúc là bắt buộc'
+                })
 
         }).custom((value, helpers) => {
-            if (value.thoi_gian_bat_dau >= value.thoi_gian_ket_thuc) {
+            if (value.gio_bat_dau >= value.gio_ket_thuc) {  // ✅ ĐỔI TÊN
                 return helpers.error('custom.timeRange', {
-                    message: 'Thời gian kết thúc phải lớn hơn thời gian bắt đầu'
+                    message: 'Giờ kết thúc phải lớn hơn giờ bắt đầu'
                 });
             }
             return value;
@@ -185,9 +212,9 @@ class AppointmentValidator {
                 }),
 
             trang_thai_lich_hen: Joi.number()
-                .valid(0, 1, 2, 3, 4)
+                .valid(0, 1, 2, 3, 4, 5, 6)  // ✅ THÊM 5, 6 (CANCELLED, NO_SHOW)
                 .messages({
-                    'any.only': 'Trạng thái không hợp lệ (0-PENDING, 1-CONFIRMED, 2-CHECKED_IN, 3-COMPLETED, 4-CANCELLED)'
+                    'any.only': 'Trạng thái không hợp lệ (0-PENDING, 1-CONFIRMED, 2-CHECKED_IN, 3-IN_PROGRESS, 4-COMPLETED, 5-CANCELLED, 6-NO_SHOW)'
                 }),
 
             ly_do_huy_lich_hen: Joi.string()
@@ -195,7 +222,15 @@ class AppointmentValidator {
                 .allow(null, '')
                 .messages({
                     'string.max': 'Lý do hủy không được quá 500 ký tự'
+                }),
+
+            ghi_chu_lich_hen: Joi.string()  // ✅ THÊM
+                .max(1000)
+                .allow(null, '')
+                .messages({
+                    'string.max': 'Ghi chú không được quá 1000 ký tự'
                 })
+
         }).min(1).messages({
             'object.min': 'Phải có ít nhất một trường để cập nhật'
         });
@@ -213,7 +248,7 @@ class AppointmentValidator {
             patientId: Joi.string().guid().allow(null, ''),
             specialtyId: Joi.string().guid().allow(null, ''),
 
-            status: Joi.number().valid(0, 1, 2, 3, 4).allow(null),
+            status: Joi.number().valid(0, 1, 2, 3, 4, 5, 6).allow(null),  // ✅ THÊM 5, 6
 
             fromDate: Joi.date().allow(null, ''),
             toDate: Joi.date()

@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const CONSTANTS = require('../config/constants');
 const DoctorSpecialtyModel = require('../models/doctorSpecialty.model');
 const SpecialtyModel = require('../models/specialty.model');
+const AppointmentModel = require('../models/appointment.model');
 
 class DoctorService {
     // Tạo bác sĩ (tạo cả User + Doctor)
@@ -413,6 +414,30 @@ class DoctorService {
         await UserModel.delete(doctor.ma_nguoi_dung_bac_si);
 
         return true;
+    }
+
+    // Lấy bác sĩ available theo ngày giờ
+    static async getAvailableDoctors(date, startTime, endTime, specialtyId = null) {
+        console.log('Getting available doctors for', date, startTime, endTime, specialtyId);
+        // 1. Lấy tất cả bác sĩ có lịch làm việc trong ngày
+        const doctors = await DoctorModel.findByWorkSchedule(date, specialtyId);
+        // 2. Filter bác sĩ có slot available
+        const availableDoctors = [];
+
+        for (const doctor of doctors) {
+            const isAvailable = await AppointmentModel.isSlotAvailable(
+                doctor.ma_bac_si,
+                date,
+                startTime,
+                endTime
+            );
+
+            if (isAvailable) {
+                availableDoctors.push(doctor);
+            }
+        }
+
+        return availableDoctors;
     }
 
     // Lấy đánh giá của bác sĩ

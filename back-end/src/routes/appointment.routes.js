@@ -167,20 +167,34 @@ router.post(
  *               - so_dien_thoai_benh_nhan
  *               - ma_bac_si
  *               - ly_do_kham_lich_hen
- *               - ngay
- *               - thoi_gian_bat_dau
- *               - thoi_gian_ket_thuc
+ *               - ngay_hen
+ *               - gio_bat_dau
+ *               - gio_ket_thuc
  *             properties:
  *               ten_benh_nhan:
  *                 type: string
- *                 example: Nguyễn Văn A
+ *                 example: A
+ *                 description: Tên (không bao gồm họ)
+ *               ho_benh_nhan:
+ *                 type: string
+ *                 example: Nguyễn Văn
+ *                 description: Họ và tên đệm
  *               so_dien_thoai_benh_nhan:
  *                 type: string
  *                 pattern: '^[0-9]{10}$'
  *                 example: "0123456789"
+ *               email_benh_nhan:
+ *                 type: string
+ *                 format: email
+ *                 example: nguyenvana@example.com
+ *               ngay_sinh_benh_nhan:
+ *                 type: string
+ *                 format: date
+ *                 example: "1990-01-01"
  *               gioi_tinh_benh_nhan:
  *                 type: integer
  *                 enum: [0, 1, 2]
+ *                 description: 0=Nữ, 1=Nam, 2=Khác
  *               ma_bac_si:
  *                 type: string
  *                 format: uuid
@@ -193,15 +207,17 @@ router.post(
  *               ly_do_kham_lich_hen:
  *                 type: string
  *                 example: Đau đầu, sốt nhẹ
- *               ngay:
+ *               ngay_hen:
  *                 type: string
  *                 format: date
- *                 example: "2025-12-10"
- *               thoi_gian_bat_dau:
+ *                 example: "2025-12-20"
+ *               gio_bat_dau:
  *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
  *                 example: "09:00"
- *               thoi_gian_ket_thuc:
+ *               gio_ket_thuc:
  *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
  *                 example: "09:30"
  *     responses:
  *       201:
@@ -356,9 +372,9 @@ router.get(
  *             required:
  *               - ma_bac_si
  *               - ly_do_kham_lich_hen
- *               - ngay
- *               - thoi_gian_bat_dau
- *               - thoi_gian_ket_thuc
+ *               - ngay_hen
+ *               - gio_bat_dau
+ *               - gio_ket_thuc
  *             properties:
  *               ma_bac_si:
  *                 type: string
@@ -371,13 +387,19 @@ router.get(
  *                 format: uuid
  *               ly_do_kham_lich_hen:
  *                 type: string
- *               ngay:
+ *                 example: Khám định kỳ
+ *               ngay_hen:
  *                 type: string
  *                 format: date
- *               thoi_gian_bat_dau:
+ *                 example: "2025-12-20"
+ *               gio_bat_dau:
  *                 type: string
- *               thoi_gian_ket_thuc:
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "14:00"
+ *               gio_ket_thuc:
  *                 type: string
+ *                 pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+ *                 example: "14:30"
  *     responses:
  *       201:
  *         description: Đặt lịch thành công

@@ -3,8 +3,8 @@ const DoctorModel = require('../models/doctor.model');
 const PatientModel = require('../models/patient.model');
 const UserModel = require('../models/user.model');
 const RoleModel = require('../models/role.model');
-const bcrypt = require('bcrypt');
 const CONSTANTS = require('../config/constants');
+const BcryptUtil = require('../utils/bcrypt.util');
 
 class ReceptionistService {
     // Dashboard stats
@@ -161,7 +161,7 @@ class ReceptionistService {
             }
 
             // Hash password
-            const hashedPassword = await bcrypt.hash(mat_khau_nguoi_dung, 10);
+            const hashedPassword = await BcryptUtil.hash(mat_khau_nguoi_dung, 10);
 
             // Tạo User
             userId = await UserModel.create({

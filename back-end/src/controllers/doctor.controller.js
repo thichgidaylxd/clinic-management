@@ -18,6 +18,32 @@ class DoctorController {
         }
     }
 
+    // Lấy bác sĩ available theo ngày giờ
+    static async getAvailableDoctors(req, res, next) {
+        try {
+            const { date, startTime, endTime, specialtyId } = req.query;
+
+            if (!date || !startTime || !endTime) {
+                return ResponseUtil.error(res, 'Ngày và giờ là bắt buộc', 400);
+            }
+
+            const doctors = await DoctorService.getAvailableDoctors(
+                date,
+                startTime,
+                endTime,
+                specialtyId
+            );
+
+            return ResponseUtil.success(
+                res,
+                doctors,
+                'Lấy danh sách bác sĩ available thành công'
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
     // Lấy danh sách bác sĩ
     static async getAllDoctors(req, res, next) {
         try {

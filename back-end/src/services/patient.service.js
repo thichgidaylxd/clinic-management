@@ -191,9 +191,17 @@ class PatientService {
 
     // Tạo hoặc lấy bệnh nhân theo SĐT (cho chức năng đặt lịch)
     static async findOrCreate(patientData) {
-        const { ten_benh_nhan, so_dien_thoai_benh_nhan, gioi_tinh_benh_nhan } = patientData;
+        const {
+            ten_benh_nhan,
+            ho_benh_nhan,  // ✅ THÊM
+            so_dien_thoai_benh_nhan,
+            email_benh_nhan,  // ✅ THÊM
+            ngay_sinh_benh_nhan,  // ✅ THÊM
+            gioi_tinh_benh_nhan,
+            ma_nguoi_dung_benh_nhan  // ✅ THÊM
+        } = patientData;
 
-        console.log('🔍 Finding patient by phone:', so_dien_thoai_benh_nhan); // Debug
+        console.log('🔍 Finding patient by phone:', so_dien_thoai_benh_nhan);
 
         // 1. Tìm bệnh nhân theo SĐT
         let patient = await PatientModel.findByPhone(so_dien_thoai_benh_nhan);
@@ -204,15 +212,19 @@ class PatientService {
         }
 
         // 2. Nếu chưa có → Tạo mới
-        console.log('➕ Creating new patient...'); // Debug
+        console.log('➕ Creating new patient...');
 
         const patientId = await PatientModel.create({
             ten_benh_nhan,
+            ho_benh_nhan,  // ✅ THÊM
             so_dien_thoai_benh_nhan,
-            gioi_tinh_benh_nhan
+            email_benh_nhan,  // ✅ THÊM
+            ngay_sinh_benh_nhan,  // ✅ THÊM
+            gioi_tinh_benh_nhan,
+            ma_nguoi_dung_benh_nhan  // ✅ THÊM
         });
 
-        console.log('✅ Patient created:', patientId); // Debug
+        console.log('✅ Patient created:', patientId);
 
         // 3. Lấy lại thông tin bệnh nhân vừa tạo
         const newPatient = await PatientModel.findById(patientId);

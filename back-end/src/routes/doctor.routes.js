@@ -26,7 +26,51 @@ const validateQuery = (req, res, next) => {
 };
 
 // ===== BÁC SĨ ROUTES =====
-
+/**
+ * @swagger
+ * /doctors/available:
+ *   get:
+ *     summary: Lấy danh sách bác sĩ còn trống lịch
+ *     tags: [Doctors]
+ *     parameters:
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày cần kiểm tra lịch (YYYY-MM-DD)
+ *       - in: query
+ *         name: startTime
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "09:00"
+ *         description: Thời gian bắt đầu
+ *       - in: query
+ *         name: endTime
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "10:00"
+ *         description: Thời gian kết thúc
+ *       - in: query
+ *         name: specialtyId
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Lọc theo chuyên khoa (tùy chọn)
+ *     responses:
+ *       200:
+ *         description: Lấy danh sách bác sĩ có lịch trống thành công
+ *       400:
+ *         description: Thiếu hoặc sai tham số đầu vào
+ */
+router.get(
+    '/available',
+    DoctorController.getAvailableDoctors
+);
 /**
  * @swagger
  * /doctors:
@@ -277,5 +321,9 @@ router.delete(
     AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
     DoctorController.deleteDoctor
 );
+
+
+
+
 
 module.exports = router;

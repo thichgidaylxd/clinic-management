@@ -13,6 +13,8 @@ const patientRoutes = require('./patient.routes');
 const appointmentRoutes = require('./appointment.routes');
 const userRoutes = require('./user.routes');
 const roleRoutes = require('./role.routes');
+const receptionistRoutes = require('./receptionist.routes'); // ✅ Thêm
+
 // Route mặc định
 router.get('/', (req, res) => {
     res.json({
@@ -31,7 +33,8 @@ router.get('/', (req, res) => {
             patients: '/api/v1/patients',
             appointments: '/api/v1/appointments',
             users: '/api/v1/users',
-            roles: '/api/v1/roles'
+            roles: '/api/v1/roles',
+            receptionists: '/api/v1/receptionists' // ✅ Thêm
         }
     });
 });
@@ -49,5 +52,7 @@ router.use('/patients', patientRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/users', userRoutes);
 router.use('/roles', roleRoutes);
+router.use('/receptionist', receptionistRoutes); // ✅ Thêm
+
 
 module.exports = router;
