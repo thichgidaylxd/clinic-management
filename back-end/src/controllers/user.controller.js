@@ -41,7 +41,7 @@ class UserController {
         try {
             const user = await UserService.createUser(req.body);
 
-            return ResponseUtil.created(
+            return ResponseUtil.success(
                 res,
                 user,
                 'Tạo người dùng thành công'

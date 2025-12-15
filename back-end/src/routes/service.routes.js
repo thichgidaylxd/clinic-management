@@ -24,11 +24,6 @@ const validateQuery = (req, res, next) => {
     req.query = value;
     next();
 };
-// GET /api/services?specialtyId={id}
-router.get(
-    '/',
-    ServiceController.getBySpecialty  // Hoặc getAll nếu đã có
-);
 /**
  * @swagger
  * /services:

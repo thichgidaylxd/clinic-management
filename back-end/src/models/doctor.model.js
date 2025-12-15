@@ -39,11 +39,17 @@ class DoctorModel {
 
   // Lấy danh sách bác sĩ
   // Trong method findAll - JOIN với bảng trung gian
-  static async findAll(page = 1, limit = 10, search = '', positionId = null, status = null) {
+  static async findAll(
+    page = 1,
+    limit = 10,
+    search = '',
+    status = null,
+    positionId = null
+  ) {
     const pageInt = parseInt(page) || 1;
     const limitInt = parseInt(limit) || 10;
     const offset = (pageInt - 1) * limitInt;
-
+    console.log({ search, status, positionId });
     let query = `
         SELECT 
             BIN_TO_UUID(bs.ma_bac_si) as ma_bac_si,

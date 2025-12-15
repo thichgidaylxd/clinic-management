@@ -698,6 +698,7 @@ class AppointmentModel {
         });
         return updated;
     }
+
     // Lấy lịch hẹn hôm nay (tất cả)
     static async getTodayAppointments(filters = {}) {
         const {
@@ -793,6 +794,7 @@ class AppointmentModel {
 
         return result.affectedRows > 0;
     }
+
     // Check-in bệnh nhân
     static async checkIn(appointmentId) {
         const query = `
@@ -944,6 +946,66 @@ class AppointmentModel {
             queryDate
         ]);
 
+        return rows;
+    }
+
+    // Lấy lịch hẹn của bác sĩ theo ngày
+    static async findByDoctorAndDate(doctorId, date) {
+        const query = `
+        SELECT 
+            BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
+            BIN_TO_UUID(lh.ma_nguoi_tao_lich_hen) as ma_nguoi_tao_lich_hen,
+            BIN_TO_UUID(lh.ma_bac_si) as ma_bac_si,
+            BIN_TO_UUID(lh.ma_benh_nhan) as ma_benh_nhan,
+            BIN_TO_UUID(lh.ma_chuyen_khoa) as ma_chuyen_khoa,
+            BIN_TO_UUID(lh.ma_phong_kham) as ma_phong_kham,
+            BIN_TO_UUID(lh.ma_dich_vu_lich_hen) as ma_dich_vu_lich_hen,
+            BIN_TO_UUID(lh.ma_lich_lam_viec) as ma_lich_lam_viec,
+            lh.ngay_hen,
+            lh.gio_bat_dau,
+            lh.gio_ket_thuc,
+            lh.trang_thai_lich_hen,
+            lh.ly_do_kham_lich_hen,
+            lh.ly_do_huy_lich_hen,
+            lh.ghi_chu_lich_hen,
+            lh.thoi_gian_xac_nhan,
+            lh.thoi_gian_check_in,
+            lh.thoi_gian_vao_kham,
+            lh.thoi_gian_hoan_thanh,
+            lh.gia_dich_vu_lich_hen,
+            lh.tong_gia_lich_hen,
+            lh.ngay_tao_lich_hen,
+            lh.ngay_cap_nhat_lich_hen,
+            
+            -- Patient info
+            bn.ten_benh_nhan,
+            bn.ho_benh_nhan,
+            bn.so_dien_thoai_benh_nhan,
+            bn.gioi_tinh_benh_nhan,
+            bn.ngay_sinh_benh_nhan,
+            
+            -- Specialty
+            ck.ten_chuyen_khoa,
+            
+            -- Room
+            pk.ten_phong_kham,
+            pk.so_phong_kham,
+            
+            -- Service
+            dv.ten_dich_vu,
+            dv.don_gia_dich_vu
+            
+        FROM bang_lich_hen lh
+        INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
+        LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+        LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
+        WHERE lh.ma_bac_si = UUID_TO_BIN(?)
+            AND lh.ngay_hen = ?
+        ORDER BY lh.gio_bat_dau ASC, lh.ngay_tao_lich_hen ASC
+    `;
+
+        const [rows] = await db.execute(query, [doctorId, date]);
         return rows;
     }
 

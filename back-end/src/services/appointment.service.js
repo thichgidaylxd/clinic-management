@@ -287,6 +287,7 @@ class AppointmentService {
 
     // Xác nhận lịch hẹn (Lễ tân)
     static async confirm(appointmentId, userId) {
+        console.log('Confirming appointment:', appointmentId, 'by user:', userId);
         const appointment = await AppointmentModel.findById(appointmentId);
         if (!appointment) {
             throw new Error('Không tìm thấy lịch hẹn');
