@@ -265,18 +265,26 @@ export const adminAPI = {
     },
 
     // =================== USERS ===================
-    getUsers: async (page = 1, limit = 10, role = null) => {
+    getUsers: async (page = 1, limit = 10, search = '', roleId = null) => {
         const params = new URLSearchParams({ page, limit });
-        if (role) params.append('role', role);
-        const response = await fetch(
-            `${API_BASE_URL}/users?${params}`,
-            { headers: getAuthHeaders() }
-        );
+        if (search) params.append('search', search);
+        if (roleId) params.append('roleId', roleId);
+
+        const response = await fetch(`${API_BASE_URL}/users?${params}`, {
+            headers: getAuthHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    getUserById: async (id) => {
+        const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+            headers: getAuthHeaders()
+        });
         return handleResponse(response);
     },
 
     createUser: async (data) => {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${API_BASE_URL}/users`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
@@ -301,7 +309,18 @@ export const adminAPI = {
         return handleResponse(response);
     },
 
-    // =================== ROLES & POSITIONS ===================
+    changeUserPassword: async (id, oldPassword, newPassword) => {
+        const response = await fetch(`${API_BASE_URL}/users/${id}/password`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                mat_khau_cu: oldPassword,
+                mat_khau_moi: newPassword
+            })
+        });
+        return handleResponse(response);
+    },
+
     getRoles: async () => {
         const response = await fetch(`${API_BASE_URL}/roles`, {
             headers: getAuthHeaders()
@@ -309,10 +328,28 @@ export const adminAPI = {
         return handleResponse(response);
     },
 
+    // =================== POSITIONS ===================
+
     getPositions: async () => {
         const response = await fetch(`${API_BASE_URL}/positions`, {
             headers: getAuthHeaders()
         });
         return handleResponse(response);
-    }
+    },
+    // =================== ROOM TYPES ===================
+    getRoomTypes: async () => {
+        const response = await fetch(`${API_BASE_URL}/rooms/types`, {
+            headers: getAuthHeaders()
+        });
+        return handleResponse(response);
+    },
+
+    createRoomType: async (data) => {
+        const response = await fetch(`${API_BASE_URL}/rooms/types`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(response);
+    },
 };

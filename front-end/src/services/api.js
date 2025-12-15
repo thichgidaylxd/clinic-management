@@ -4,10 +4,9 @@ const API_BASE_URL = 'http://localhost:5000/api/v1';
 const handleResponse = async (response) => {
     const data = await response.json();
 
-    console.log('API Response:', response.status, data); // ⭐ Debug
+    console.log('API Response:', response.status, data);
 
     if (!response.ok) {
-        // Nếu có errors array (validation errors)
         if (data.errors && Array.isArray(data.errors)) {
             const errorMessages = data.errors.map(err => err.message).join(', ');
             throw new Error(errorMessages);
@@ -16,35 +15,51 @@ const handleResponse = async (response) => {
     }
     return data;
 };
+
 // API calls
 export const bookingAPI = {
-    // Lấy danh sách chuyên khoa
-    getSpecialties: async () => {
-        const response = await fetch(`${API_BASE_URL}/specialties`);
-        return handleResponse(response);
-    },
-
-    // Lấy danh sách bác sĩ
-    getDoctors: async (params = {}) => {
+    // ========== SPECIALTIES ==========
+    getSpecialties: async (params = {}) => {
         const queryString = new URLSearchParams(params).toString();
-        const response = await fetch(`${API_BASE_URL}/doctors?${queryString}`);
+        const response = await fetch(`${API_BASE_URL}/specialties?${queryString}`);
         return handleResponse(response);
     },
 
-    // Lấy chi tiết bác sĩ
-    getDoctorById: async (doctorId) => {
-        const response = await fetch(`${API_BASE_URL}/doctors/${doctorId}`);
-        return handleResponse(response);
-    },
-
-    // Lấy danh sách dịch vụ
+    // ========== SERVICES ==========
     getServices: async (params = {}) => {
         const queryString = new URLSearchParams(params).toString();
         const response = await fetch(`${API_BASE_URL}/services?${queryString}`);
         return handleResponse(response);
     },
 
-    // ⭐ Lấy available slots
+    // Lấy dịch vụ theo chuyên khoa
+    getServicesBySpecialty: async (specialtyId) => {
+        const response = await fetch(`${API_BASE_URL}/services/specialty/${specialtyId}`);
+        return handleResponse(response);
+    },
+
+    // ========== DOCTORS ==========
+    getDoctors: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/doctors?${queryString}`);
+        return handleResponse(response);
+    },
+
+    getDoctorById: async (doctorId) => {
+        const response = await fetch(`${API_BASE_URL}/doctors/${doctorId}`);
+        return handleResponse(response);
+    },
+
+    // Lấy bác sĩ khả dụng
+    getAvailableDoctors: async (params = {}) => {
+        const queryString = new URLSearchParams(params).toString();
+        const response = await fetch(`${API_BASE_URL}/doctors/available?${queryString}`);
+        return handleResponse(response);
+    },
+
+    // ========== APPOINTMENTS ==========
+
+    // Lấy available slots theo bác sĩ
     getAvailableSlots: async (doctorId, date, slotDuration = 30) => {
         const params = new URLSearchParams({ doctorId, date, slotDuration });
         const response = await fetch(`${API_BASE_URL}/appointments/available-slots?${params}`);
@@ -63,7 +78,7 @@ export const bookingAPI = {
 
     // Đặt lịch (khách vãng lai)
     createGuestAppointment: async (data) => {
-        console.log('createGuestAppointment - Request data:', data); // ⭐ Debug
+        console.log('createGuestAppointment - Request data:', data);
 
         const response = await fetch(`${API_BASE_URL}/appointments/guest`, {
             method: 'POST',
@@ -75,7 +90,7 @@ export const bookingAPI = {
 
     // Đặt lịch (đã đăng nhập)
     createAuthAppointment: async (data, token) => {
-        console.log('createAuthAppointment - Request data:', data); // ⭐ Debug
+        console.log('createAuthAppointment - Request data:', data);
 
         const response = await fetch(`${API_BASE_URL}/appointments`, {
             method: 'POST',
@@ -87,6 +102,7 @@ export const bookingAPI = {
         });
         return handleResponse(response);
     },
+
     // Lấy lịch hẹn của tôi
     getMyAppointments: async (token, status = null) => {
         const params = new URLSearchParams();

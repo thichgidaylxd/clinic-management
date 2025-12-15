@@ -15,7 +15,7 @@ import AppointmentDetail from "../pages/patient/AppointmentDetail";
 
 // Admin Pages
 import AdminLayout from "../pages/admin/AdminLayout";
-import AdminDashboard from "../pages/admin/AdminDashboard"; // ✅ Đổi tên
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminSpecialties from "../pages/admin/Specialties";
 import AdminServices from "../pages/admin/Services";
 import AdminDoctors from "../pages/admin/Doctors";
@@ -26,15 +26,27 @@ import AdminUsers from "../pages/admin/Users";
 
 // Receptionist Pages
 import ReceptionistLayout from "../pages/receptionist/ReceptionistLayout";
-import ReceptionistDashboard from "../pages/receptionist/ReceptionistDashboard"; // ✅ Đổi tên
 import ReceptionistAppointments from "../pages/receptionist/Appointments";
 import ReceptionistPatients from "../pages/receptionist/Patients";
+import ReceptionistWalkIn from "../pages/receptionist/WalkIn";
+import ReceptionistQueue from "../pages/receptionist/Queue";
+import ReceptionistDashboard from "../pages/receptionist/ReceptionistDashboard";
 
 // Doctor Pages
 import DoctorLayout from "../pages/doctor/DoctorLayout";
-import DoctorDashboard from "../pages/doctor/DoctorDashboard"; // ✅ Đổi tên
+import DoctorDashboard from "../pages/doctor/DoctorDashboard";
 import DoctorSchedule from "../pages/doctor/Schedule";
 import DoctorExamination from "../pages/doctor/Examination";
+
+// ⭐ NEW: Prescription & Medical Records Pages
+
+
+// Other
+import BookingV2 from "../pages/BookingV2";
+import PrescriptionPage from "../pages/doctor/PrescriptionPages";
+import InvoiceViewPage from "../pages/doctor/InvoiceViewPage";
+import MedicalRecordDetail from "../components/medicine/MedicalRecordDetail";
+import MedicalRecords from "../components/medicine/Medicalrecords";
 
 function AppRoutes() {
     return (
@@ -42,7 +54,7 @@ function AppRoutes() {
             {/* =================== PUBLIC ROUTES =================== */}
             <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
-                <Route path="booking" element={<Booking />} />
+                <Route path="booking" element={<BookingV2 />} />
             </Route>
 
             {/* =================== PATIENT ROUTES =================== */}
@@ -83,6 +95,8 @@ function AppRoutes() {
                 <Route path="dashboard" element={<ReceptionistDashboard />} />
                 <Route path="appointments" element={<ReceptionistAppointments />} />
                 <Route path="patients" element={<ReceptionistPatients />} />
+                <Route path="walk-in" element={<ReceptionistWalkIn />} />
+                <Route path="queue" element={<ReceptionistQueue />} />
             </Route>
 
             {/* =================== DOCTOR ROUTES =================== */}
@@ -95,7 +109,22 @@ function AppRoutes() {
                 <Route path="dashboard" element={<DoctorDashboard />} />
                 <Route path="schedule" element={<DoctorSchedule />} />
                 <Route path="examination" element={<DoctorExamination />} />
+
+                {/* ⭐ NEW: Prescription routes */}
+                <Route path="prescription/:appointmentId" element={<PrescriptionPage />} />
+
+                {/* ⭐ NEW: Medical Records routes */}
+                <Route path="medical-records" element={<MedicalRecords />} />
+                <Route path="medical-records/:recordId" element={<MedicalRecordDetail />} />
             </Route>
+
+            {/* =================== SHARED ROUTES (Multi-role) =================== */}
+            {/* ⭐ NEW: Invoice route - Accessible by Doctor, Receptionist, Admin */}
+            <Route path="/invoices/:invoiceId" element={
+                <ProtectedRoute allowedRoles={['Bác sĩ', 'Lễ tân', 'Admin']}>
+                    <InvoiceViewPage />
+                </ProtectedRoute>
+            } />
 
             {/* =================== 404 NOT FOUND =================== */}
             <Route path="*" element={

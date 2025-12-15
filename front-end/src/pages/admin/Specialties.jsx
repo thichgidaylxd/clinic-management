@@ -22,6 +22,7 @@ function Specialties() {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
+            console.log('Loaded specialties:', data);
             setSpecialties(data.data.data || []);
         } catch (error) {
             console.error('Load specialties error:', error);
