@@ -330,30 +330,6 @@ router.get(
     AppointmentController.getAll
 );
 
-/**
- * @swagger
- * /appointments/{id}:
- *   get:
- *     summary: Lấy chi tiết lịch hẹn
- *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           format: uuid
- *     responses:
- *       200:
- *         description: Lấy thông tin thành công
- */
-router.get(
-    '/:id',
-    AuthMiddleware.authenticate,
-    AppointmentController.getById
-);
 
 /**
  * @swagger
@@ -764,5 +740,31 @@ router.put(
     AppointmentController.complete
 );
 
+
+
+/**
+ * @swagger
+ * /appointments/{id}:
+ *   get:
+ *     summary: Lấy chi tiết lịch hẹn
+ *     tags: [Appointments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Lấy thông tin thành công
+ */
+router.get(
+    '/:id',
+    AuthMiddleware.authenticate,
+    AppointmentController.getById
+);
 
 module.exports = router;

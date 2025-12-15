@@ -513,47 +513,59 @@ class AppointmentModel {
         const today = new Date().toISOString().split('T')[0];
 
         let query = `
-      SELECT 
-        BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
-        BIN_TO_UUID(lh.ma_bac_si) as ma_bac_si,
-        BIN_TO_UUID(lh.ma_benh_nhan) as ma_benh_nhan,
-        lh.trang_thai_lich_hen,
-        lh.ly_do_kham_lich_hen,
-        lh.ngay_tao_lich_hen,
-        bn.ten_benh_nhan,
-        bn.so_dien_thoai_benh_nhan,
-        nd.ten_nguoi_dung as ten_bac_si,
-        nd.ho_nguoi_dung as ho_bac_si,
-        ck.ten_chuyen_khoa,
-        pk.ten_phong_kham,
-        tg.thoi_gian_bat_dau,
-        tg.thoi_gian_ket_thuc,
-        CASE 
-          WHEN lh.trang_thai_lich_hen = 0 THEN 'Chờ xác nhận'
-          WHEN lh.trang_thai_lich_hen = 1 THEN 'Đã xác nhận'
-          WHEN lh.trang_thai_lich_hen = 2 THEN 'Đã check-in'
-          WHEN lh.trang_thai_lich_hen = 3 THEN 'Hoàn thành'
-          WHEN lh.trang_thai_lich_hen = 4 THEN 'Đã hủy'
-        END as trang_thai_text
-      FROM bang_lich_hen lh
-      INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
-      INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
-      INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-      LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
-      LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
-      LEFT JOIN bang_thoi_gian_chi_tiet tg ON lh.ma_lich_hen = tg.ma_lich_hen
-      WHERE tg.ngay = ?
+        SELECT 
+            BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
+            BIN_TO_UUID(lh.ma_bac_si) as ma_bac_si,
+            BIN_TO_UUID(lh.ma_benh_nhan) as ma_benh_nhan,
+            BIN_TO_UUID(lh.ma_chuyen_khoa) as ma_chuyen_khoa,
+            BIN_TO_UUID(lh.ma_phong_kham) as ma_phong_kham,
+            lh.ngay_hen,
+            lh.gio_bat_dau,
+            lh.gio_ket_thuc,
+            lh.trang_thai_lich_hen,
+            lh.ly_do_kham_lich_hen,
+            lh.ngay_tao_lich_hen,
+            -- Patient info
+            bn.ten_benh_nhan,
+            bn.ho_benh_nhan,
+            bn.so_dien_thoai_benh_nhan,
+            bn.gioi_tinh_benh_nhan,
+            -- Doctor info
+            nd.ten_nguoi_dung as ten_bac_si,
+            nd.ho_nguoi_dung as ho_bac_si,
+            -- Specialty
+            ck.ten_chuyen_khoa,
+            -- Room
+            pk.ten_phong_kham,
+            pk.so_phong_kham,
+            -- Status text
+            CASE 
+                WHEN lh.trang_thai_lich_hen = 0 THEN 'Chờ xác nhận'
+                WHEN lh.trang_thai_lich_hen = 1 THEN 'Đã xác nhận'
+                WHEN lh.trang_thai_lich_hen = 2 THEN 'Đã check-in'
+                WHEN lh.trang_thai_lich_hen = 3 THEN 'Đang khám'
+                WHEN lh.trang_thai_lich_hen = 4 THEN 'Hoàn thành'
+                WHEN lh.trang_thai_lich_hen = 5 THEN 'Đã hủy'
+                WHEN lh.trang_thai_lich_hen = 6 THEN 'Không đến'
+            END as trang_thai_text
+        FROM bang_lich_hen lh
+        INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
+        INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
+        INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+        LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+        WHERE lh.ngay_hen = ?
     `;
 
         const params = [today];
 
         // Nếu là Bác sĩ, chỉ lấy lịch hẹn của mình
         if (role === 'Bác sĩ' && userId) {
-            query += ' AND bs.ma_nguoi_dung_bac_si = ?';
-            params.push(UUIDUtil.toBinary(userId));
+            query += ' AND bs.ma_nguoi_dung_bac_si = UUID_TO_BIN(?)';
+            params.push(userId);
         }
 
-        query += ' ORDER BY tg.thoi_gian_bat_dau ASC';
+        query += ' ORDER BY lh.gio_bat_dau ASC';
 
         const [rows] = await db.execute(query, params);
         return rows;

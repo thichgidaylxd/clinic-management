@@ -407,7 +407,22 @@ class AppointmentService {
             appointments
         };
     }
+    /**
+         * Lấy lịch hẹn hôm nay
+         * @param {String} userId - ID người dùng
+         * @param {String} role - Vai trò (Bác sĩ, Lễ tân, Admin)
+         */
+    static async getTodayAppointments(userId, role) {
+        try {
+            // Call Model method
+            const appointments = await AppointmentModel.getTodayAppointments(userId, role);
 
+            return appointments;
+        } catch (error) {
+            console.error('Service - Get today appointments error:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = AppointmentService;
