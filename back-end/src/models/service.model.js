@@ -132,14 +132,17 @@ class ServiceModel {
     // Lấy dịch vụ theo chuyên khoa
     static async findBySpecialty(specialtyId) {
         const query = `
-      SELECT 
-        BIN_TO_UUID(ma_dich_vu) as ma_dich_vu,
-        ten_dich_vu,
-        mo_ta_dich_vu,
-        don_gia_dich_vu
-      FROM bang_dich_vu
-      WHERE ma_chuyen_khoa_dich_vu = ?
-      ORDER BY ten_dich_vu ASC
+        SELECT 
+            BIN_TO_UUID(dv.ma_dich_vu) as ma_dich_vu,
+            dv.ten_dich_vu,
+            dv.mo_ta_dich_vu,
+            dv.don_gia_dich_vu,
+            BIN_TO_UUID(dv.ma_chuyen_khoa_dich_vu) as ma_chuyen_khoa,
+            ck.ten_chuyen_khoa
+        FROM bang_dich_vu dv
+        LEFT JOIN bang_chuyen_khoa ck ON dv.ma_chuyen_khoa_dich_vu = ck.ma_chuyen_khoa
+        WHERE dv.ma_chuyen_khoa_dich_vu = ?
+        ORDER BY dv.ten_dich_vu
     `;
 
         const [rows] = await db.execute(query, [UUIDUtil.toBinary(specialtyId)]);

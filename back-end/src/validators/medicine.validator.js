@@ -12,6 +12,12 @@ class MedicineValidator {
                     'string.max': 'Tên thuốc không được quá 100 ký tự',
                     'any.required': 'Tên thuốc là bắt buộc'
                 }),
+            thanh_phan_thuoc: Joi.string()
+                .max(255)
+                .allow('', null)
+                .messages({
+                    'string.max': 'Thành phần không được quá 255 ký tự'
+                }),
 
             don_gia_thuoc: Joi.number()
                 .required()
@@ -66,6 +72,13 @@ class MedicineValidator {
                 .max(100)
                 .messages({
                     'string.max': 'Tên thuốc không được quá 100 ký tự'
+                }),
+
+            thanh_phan_thuoc: Joi.string()
+                .max(255)
+                .allow('', null)
+                .messages({
+                    'string.max': 'Thành phần không được quá 255 ký tự'
                 }),
 
             don_gia_thuoc: Joi.number()

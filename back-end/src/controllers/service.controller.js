@@ -1,4 +1,5 @@
 const ServiceService = require('../services/service.service');
+const ServiceModel = require('../models/service.model');
 const ResponseUtil = require('../utils/response.util');
 
 class ServiceController {
@@ -50,16 +51,21 @@ class ServiceController {
         }
     }
 
-    // Lấy dịch vụ theo chuyên khoa
+    // ⭐ Lấy dịch vụ theo chuyên khoa (for route: /services/specialty/:specialtyId)
     static async getBySpecialty(req, res, next) {
         try {
-            const { specialtyId } = req.params;
-            const services = await ServiceService.getBySpecialty(specialtyId);
+            const { specialtyId } = req.params; // ⭐ Lấy từ params thay vì query
+
+            if (!specialtyId) {
+                return ResponseUtil.error(res, 'Mã chuyên khoa là bắt buộc', 400);
+            }
+
+            const services = await ServiceModel.findBySpecialty(specialtyId);
 
             return ResponseUtil.success(
                 res,
                 services,
-                'Lấy danh sách dịch vụ theo chuyên khoa thành công'
+                'Lấy danh sách dịch vụ thành công'
             );
         } catch (error) {
             next(error);

@@ -19,16 +19,17 @@ class WorkScheduleValidator {
                     'string.guid': 'Mã phòng khám không hợp lệ'
                 }),
 
-            ma_chuyen_khoa_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã chuyên khoa không hợp lệ'
-                }),
 
             ngay_lich_lam_viec: Joi.date()
                 .required()
-                .min('now')
+                .custom((value, helpers) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // reset về 00:00
+                    if (value < today) {
+                        return helpers.error('date.min');
+                    }
+                    return value;
+                })
                 .messages({
                     'date.base': 'Ngày làm việc không hợp lệ',
                     'date.min': 'Ngày làm việc phải từ hôm nay trở đi',
@@ -82,18 +83,21 @@ class WorkScheduleValidator {
                     'string.guid': 'Mã phòng khám không hợp lệ'
                 }),
 
-            ma_chuyen_khoa_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã chuyên khoa không hợp lệ'
-                }),
 
             ngay_lich_lam_viec: Joi.date()
-                .min('now')
+                .required()
+                .custom((value, helpers) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // reset về 00:00
+                    if (value < today) {
+                        return helpers.error('date.min');
+                    }
+                    return value;
+                })
                 .messages({
                     'date.base': 'Ngày làm việc không hợp lệ',
-                    'date.min': 'Ngày làm việc phải từ hôm nay trở đi'
+                    'date.min': 'Ngày làm việc phải từ hôm nay trở đi',
+                    'any.required': 'Ngày làm việc là bắt buộc'
                 }),
 
             thoi_gian_bat_dau_lich_lam_viec: Joi.string()
@@ -145,10 +149,6 @@ class WorkScheduleValidator {
                 .default(10),
 
             doctorId: Joi.string()
-                .uuid()
-                .allow(null, ''),
-
-            specialtyId: Joi.string()
                 .uuid()
                 .allow(null, ''),
 

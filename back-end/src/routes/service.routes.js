@@ -24,7 +24,6 @@ const validateQuery = (req, res, next) => {
     req.query = value;
     next();
 };
-
 /**
  * @swagger
  * /services:

@@ -6,6 +6,7 @@ class MedicineModel {
     static async create(medicineData, userId) {
         const {
             ten_thuoc,
+            thanh_phan_thuoc, // ✅ Thêm
             don_gia_thuoc,
             huong_dan_su_dung_thuoc,
             don_vi_tinh,
@@ -22,6 +23,7 @@ class MedicineModel {
         ma_nguoi_tao_thuoc,
         ma_nguoi_cap_nhat_thuoc,
         ten_thuoc,
+        thanh_phan_thuoc,
         don_gia_thuoc,
         huong_dan_su_dung_thuoc,
         don_vi_tinh,
@@ -29,7 +31,7 @@ class MedicineModel {
         han_su_dung_thuoc,
         giay_to_kiem_dinh_thuoc,
         trang_thai_thuoc
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `;
 
         await db.execute(query, [
@@ -37,6 +39,7 @@ class MedicineModel {
             UUIDUtil.toBinary(userId),
             UUIDUtil.toBinary(userId),
             ten_thuoc,
+            thanh_phan_thuoc || null, // ✅ Thêm
             don_gia_thuoc,
             huong_dan_su_dung_thuoc || null,
             don_vi_tinh || null,
@@ -60,6 +63,7 @@ class MedicineModel {
         BIN_TO_UUID(t.ma_nguoi_tao_thuoc) as ma_nguoi_tao_thuoc,
         BIN_TO_UUID(t.ma_nguoi_cap_nhat_thuoc) as ma_nguoi_cap_nhat_thuoc,
         t.ten_thuoc,
+        t.thanh_phan_thuoc,
         t.don_gia_thuoc,
         t.huong_dan_su_dung_thuoc,
         t.don_vi_tinh,
@@ -163,6 +167,7 @@ class MedicineModel {
     static async update(medicineId, updateData, userId) {
         const {
             ten_thuoc,
+            thanh_phan_thuoc,
             don_gia_thuoc,
             huong_dan_su_dung_thuoc,
             don_vi_tinh,
@@ -175,6 +180,10 @@ class MedicineModel {
         const fields = [];
         const values = [];
 
+        if (thanh_phan_thuoc !== undefined) {
+            fields.push('thanh_phan_thuoc = ?');
+            values.push(thanh_phan_thuoc);
+        }
         if (ten_thuoc !== undefined) {
             fields.push('ten_thuoc = ?');
             values.push(ten_thuoc);

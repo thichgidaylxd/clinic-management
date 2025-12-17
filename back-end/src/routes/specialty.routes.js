@@ -196,4 +196,10 @@ router.delete(
     SpecialtyController.delete
 );
 
+
+router.get(
+    '/by-name',
+    SpecialtyController.getByName
+);
+
 module.exports = router;

@@ -5,188 +5,186 @@ class PatientModel {
     // Tạo bệnh nhân mới
     static async create(patientData) {
         const {
-            ten_benh_nhan,
+            ma_nguoi_dung_benh_nhan = null,  // ✅ THÊM
+            ten_benh_nhan = null,
+            ho_benh_nhan = null,  // ✅ THÊM
             so_dien_thoai_benh_nhan,
-            gioi_tinh_benh_nhan,
+            email_benh_nhan = null,  // ✅ THÊM
+            ngay_sinh_benh_nhan = null,  // ✅ THÊM
+            gioi_tinh_benh_nhan = null,
             chieu_cao_benh_nhan = null,
-            can_nang_benh_nhan = null
+            can_nang_benh_nhan = null,
+            dia_chi_benh_nhan = null  // ✅ THÊM
         } = patientData;
 
         const ma_benh_nhan = UUIDUtil.generate();
 
         const query = `
-      INSERT INTO bang_benh_nhan (
-        ma_benh_nhan,
-        ten_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        gioi_tinh_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan
-      ) VALUES (
-        UUID_TO_BIN(?),
-        ?,
-        ?,
-        ?,
-        ?,
-        ?
-      )
-    `;
-
-        console.log('📝 Creating patient with data:', { ma_benh_nhan, ten_benh_nhan, so_dien_thoai_benh_nhan }); // Debug
+            INSERT INTO bang_benh_nhan (
+                ma_benh_nhan,
+                ma_nguoi_dung_benh_nhan,
+                ten_benh_nhan,
+                ho_benh_nhan,
+                so_dien_thoai_benh_nhan,
+                email_benh_nhan,
+                ngay_sinh_benh_nhan,
+                gioi_tinh_benh_nhan,
+                chieu_cao_benh_nhan,
+                can_nang_benh_nhan,
+                dia_chi_benh_nhan
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
 
         await db.execute(query, [
-            ma_benh_nhan,
+            UUIDUtil.toBinary(ma_benh_nhan),
+            ma_nguoi_dung_benh_nhan ? UUIDUtil.toBinary(ma_nguoi_dung_benh_nhan) : null,
             ten_benh_nhan,
+            ho_benh_nhan,
             so_dien_thoai_benh_nhan,
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan,
             chieu_cao_benh_nhan,
-            can_nang_benh_nhan
+            can_nang_benh_nhan,
+            dia_chi_benh_nhan
         ]);
 
         return ma_benh_nhan;
     }
 
-    // Tìm bệnh nhân theo ID
+    // ============ FIND BY ID ============
     static async findById(patientId) {
         const query = `
-      SELECT 
-        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
-        ten_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        gioi_tinh_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan
-      FROM bang_benh_nhan
-      WHERE ma_benh_nhan = UUID_TO_BIN(?)
-    `;
-
-        const [rows] = await db.execute(query, [patientId]);
-        return rows[0] || null;
-    }
-
-    // Tìm bệnh nhân theo SĐT
-    static async findByPhone(phone) {
-        const query = `
-      SELECT 
-        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
-        ten_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        gioi_tinh_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan
-      FROM bang_benh_nhan
-      WHERE so_dien_thoai_benh_nhan = ?
-      LIMIT 1
-    `;
-
-        const [rows] = await db.execute(query, [phone]);
-        return rows[0] || null;
-    }
-
-    // Lấy danh sách bệnh nhân
-    static async findAll(page = 1, limit = 10, search = '', gender = null) {
-        const pageInt = parseInt(page) || 1;
-        const limitInt = parseInt(limit) || 10;
-        const offset = (pageInt - 1) * limitInt;
-
-        let query = `
-      SELECT 
-        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
-        ten_benh_nhan,
-        gioi_tinh_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan,
-        hinh_anh_benh_nhan
-      FROM bang_benh_nhan
-    `;
-
-        const params = [];
-        const conditions = [];
-
-        if (search) {
-            conditions.push('(ten_benh_nhan LIKE ? OR so_dien_thoai_benh_nhan LIKE ?)');
-            params.push(`%${search}%`, `%${search}%`);
-        }
-
-        if (gender !== null && gender !== undefined) {
-            conditions.push('gioi_tinh_benh_nhan = ?');
-            params.push(parseInt(gender));
-        }
-
-        if (conditions.length > 0) {
-            query += ' WHERE ' + conditions.join(' AND ');
-        }
-
-        query += ` ORDER BY ten_benh_nhan ASC LIMIT ${offset}, ${limitInt}`;
-
-        const [rows] = await db.execute(query, params);
-
-        // Đếm tổng số
-        let countQuery = 'SELECT COUNT(*) as total FROM bang_benh_nhan';
-        if (conditions.length > 0) {
-            countQuery += ' WHERE ' + conditions.join(' AND ');
-        }
-
-        const [countResult] = await db.execute(countQuery, params);
-
-        return {
-            data: rows,
-            pagination: {
-                total: countResult[0].total,
-                page: pageInt,
-                limit: limitInt,
-                totalPages: Math.ceil(countResult[0].total / limitInt)
-            }
-        };
-    }
-
-    // Tìm bệnh nhân theo ID
-    static async findById(patientId) {
-        const query = `
-      SELECT 
-        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
-        ten_benh_nhan,
-        gioi_tinh_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan,
-        hinh_anh_benh_nhan
-      FROM bang_benh_nhan
-      WHERE ma_benh_nhan = ?
-    `;
+            SELECT 
+                BIN_TO_UUID(bn.ma_benh_nhan) as ma_benh_nhan,
+                BIN_TO_UUID(bn.ma_nguoi_dung_benh_nhan) as ma_nguoi_dung_benh_nhan,
+                bn.ten_benh_nhan,
+                bn.ho_benh_nhan,
+                bn.so_dien_thoai_benh_nhan,
+                bn.email_benh_nhan,
+                bn.ngay_sinh_benh_nhan,
+                bn.gioi_tinh_benh_nhan,
+                bn.chieu_cao_benh_nhan,
+                bn.can_nang_benh_nhan,
+                bn.dia_chi_benh_nhan
+            FROM bang_benh_nhan bn
+            WHERE bn.ma_benh_nhan = ?
+        `;
 
         const [rows] = await db.execute(query, [UUIDUtil.toBinary(patientId)]);
         return rows[0] || null;
     }
 
-    // Tìm bệnh nhân theo số điện thoại
+    // ============ FIND BY PHONE ============
     static async findByPhone(phone) {
         const query = `
-      SELECT 
-        BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
-        ten_benh_nhan,
-        gioi_tinh_benh_nhan,
-        so_dien_thoai_benh_nhan,
-        chieu_cao_benh_nhan,
-        can_nang_benh_nhan
-      FROM bang_benh_nhan
-      WHERE so_dien_thoai_benh_nhan = ?
-    `;
+            SELECT 
+                BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+                BIN_TO_UUID(ma_nguoi_dung_benh_nhan) as ma_nguoi_dung_benh_nhan,
+                ten_benh_nhan,
+                ho_benh_nhan,
+                so_dien_thoai_benh_nhan,
+                email_benh_nhan,
+                ngay_sinh_benh_nhan,
+                gioi_tinh_benh_nhan,
+                dia_chi_benh_nhan
+            FROM bang_benh_nhan
+            WHERE so_dien_thoai_benh_nhan = ?
+        `;
 
         const [rows] = await db.execute(query, [phone]);
         return rows[0] || null;
     }
 
-    // Cập nhật bệnh nhân
+    // ============ FIND BY EMAIL ============
+    static async findByEmail(email) {
+        const query = `
+            SELECT 
+                BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+                BIN_TO_UUID(ma_nguoi_dung_benh_nhan) as ma_nguoi_dung_benh_nhan,
+                ten_benh_nhan,
+                ho_benh_nhan,
+                so_dien_thoai_benh_nhan,
+                email_benh_nhan,
+                ngay_sinh_benh_nhan,
+                gioi_tinh_benh_nhan
+            FROM bang_benh_nhan
+            WHERE email_benh_nhan = ?
+        `;
+
+        const [rows] = await db.execute(query, [email]);
+        return rows[0] || null;
+    }
+
+    // ============ FIND BY USER ID ============
+    static async findByUserId(userId) {
+        const query = `
+            SELECT 
+                BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+                BIN_TO_UUID(ma_nguoi_dung_benh_nhan) as ma_nguoi_dung_benh_nhan,
+                ten_benh_nhan,
+                ho_benh_nhan,
+                so_dien_thoai_benh_nhan,
+                email_benh_nhan,
+                ngay_sinh_benh_nhan,
+                gioi_tinh_benh_nhan,
+                chieu_cao_benh_nhan,
+                can_nang_benh_nhan,
+                dia_chi_benh_nhan
+            FROM bang_benh_nhan
+            WHERE ma_nguoi_dung_benh_nhan = ?
+        `;
+
+        const [rows] = await db.execute(query, [UUIDUtil.toBinary(userId)]);
+        return rows[0] || null;
+    }
+
+
+    // ============ SEARCH ============
+    static async search(searchTerm) {
+        const query = `
+            SELECT 
+                BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+                ten_benh_nhan,
+                ho_benh_nhan,
+                so_dien_thoai_benh_nhan,
+                email_benh_nhan,
+                ngay_sinh_benh_nhan,
+                gioi_tinh_benh_nhan,
+                dia_chi_benh_nhan
+            FROM bang_benh_nhan
+            WHERE 
+                ten_benh_nhan LIKE ? OR 
+                ho_benh_nhan LIKE ? OR 
+                so_dien_thoai_benh_nhan LIKE ? OR
+                email_benh_nhan LIKE ?
+            ORDER BY ten_benh_nhan
+            LIMIT 20
+        `;
+
+        const searchPattern = `%${searchTerm}%`;
+        const [rows] = await db.execute(query, [
+            searchPattern,
+            searchPattern,
+            searchPattern,
+            searchPattern
+        ]);
+
+        return rows;
+    }
+
+    // ============ UPDATE ============
     static async update(patientId, updateData) {
         const {
             ten_benh_nhan,
-            gioi_tinh_benh_nhan,
+            ho_benh_nhan,
             so_dien_thoai_benh_nhan,
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
+            gioi_tinh_benh_nhan,
             chieu_cao_benh_nhan,
             can_nang_benh_nhan,
-            hinh_anh_benh_nhan
+            dia_chi_benh_nhan
         } = updateData;
 
         const fields = [];
@@ -196,30 +194,37 @@ class PatientModel {
             fields.push('ten_benh_nhan = ?');
             values.push(ten_benh_nhan);
         }
-
-        if (gioi_tinh_benh_nhan !== undefined) {
-            fields.push('gioi_tinh_benh_nhan = ?');
-            values.push(gioi_tinh_benh_nhan);
+        if (ho_benh_nhan !== undefined) {
+            fields.push('ho_benh_nhan = ?');
+            values.push(ho_benh_nhan);
         }
-
         if (so_dien_thoai_benh_nhan !== undefined) {
             fields.push('so_dien_thoai_benh_nhan = ?');
             values.push(so_dien_thoai_benh_nhan);
         }
-
+        if (email_benh_nhan !== undefined) {
+            fields.push('email_benh_nhan = ?');
+            values.push(email_benh_nhan);
+        }
+        if (ngay_sinh_benh_nhan !== undefined) {
+            fields.push('ngay_sinh_benh_nhan = ?');
+            values.push(ngay_sinh_benh_nhan);
+        }
+        if (gioi_tinh_benh_nhan !== undefined) {
+            fields.push('gioi_tinh_benh_nhan = ?');
+            values.push(gioi_tinh_benh_nhan);
+        }
         if (chieu_cao_benh_nhan !== undefined) {
             fields.push('chieu_cao_benh_nhan = ?');
             values.push(chieu_cao_benh_nhan);
         }
-
         if (can_nang_benh_nhan !== undefined) {
             fields.push('can_nang_benh_nhan = ?');
             values.push(can_nang_benh_nhan);
         }
-
-        if (hinh_anh_benh_nhan !== undefined) {
-            fields.push('hinh_anh_benh_nhan = ?');
-            values.push(hinh_anh_benh_nhan);
+        if (dia_chi_benh_nhan !== undefined) {
+            fields.push('dia_chi_benh_nhan = ?');
+            values.push(dia_chi_benh_nhan);
         }
 
         if (fields.length === 0) {
@@ -229,14 +234,105 @@ class PatientModel {
         values.push(UUIDUtil.toBinary(patientId));
 
         const query = `
-      UPDATE bang_benh_nhan 
-      SET ${fields.join(', ')}
-      WHERE ma_benh_nhan = ?
-    `;
+            UPDATE bang_benh_nhan 
+            SET ${fields.join(', ')}
+            WHERE ma_benh_nhan = ?
+        `;
 
         const [result] = await db.execute(query, values);
         return result.affectedRows > 0;
     }
+
+    // ============ FIND ALL ============
+    static async findAll(page = 1, limit = 10, search = null, gender = null) {
+        page = parseInt(page, 10);
+        limit = parseInt(limit, 10);
+
+        if (isNaN(page) || page < 1) page = 1;
+        if (isNaN(limit) || limit < 1) limit = 10;
+
+        const offset = (page - 1) * limit;
+
+        let sql = `
+        SELECT 
+            BIN_TO_UUID(ma_benh_nhan) as ma_benh_nhan,
+            BIN_TO_UUID(ma_nguoi_dung_benh_nhan) as ma_nguoi_dung_benh_nhan,
+            ten_benh_nhan,
+            ho_benh_nhan,
+            so_dien_thoai_benh_nhan,
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
+            gioi_tinh_benh_nhan,
+            dia_chi_benh_nhan
+        FROM bang_benh_nhan
+        WHERE 1=1
+    `;
+
+        const params = [];
+
+        if (search) {
+            sql += `
+            AND (
+                ten_benh_nhan LIKE ?
+                OR ho_benh_nhan LIKE ?
+                OR so_dien_thoai_benh_nhan LIKE ?
+                OR email_benh_nhan LIKE ?
+            )
+        `;
+            const keyword = `%${search}%`;
+            params.push(keyword, keyword, keyword, keyword);
+        }
+
+        if (gender !== null && gender !== undefined) {
+            sql += ` AND gioi_tinh_benh_nhan = ? `;
+            params.push(gender);
+        }
+
+        // ⚠️ LIMIT & OFFSET GẮN TRỰC TIẾP
+        sql += `
+        ORDER BY ten_benh_nhan
+        LIMIT ${limit} OFFSET ${offset}
+    `;
+
+        const [rows] = await db.execute(sql, params);
+
+        // COUNT
+        let countSql = `SELECT COUNT(*) as total FROM bang_benh_nhan WHERE 1=1`;
+        const countParams = [];
+
+        if (search) {
+            countSql += `
+            AND (
+                ten_benh_nhan LIKE ?
+                OR ho_benh_nhan LIKE ?
+                OR so_dien_thoai_benh_nhan LIKE ?
+                OR email_benh_nhan LIKE ?
+            )
+        `;
+            const keyword = `%${search}%`;
+            countParams.push(keyword, keyword, keyword, keyword);
+        }
+
+        if (gender !== null && gender !== undefined) {
+            countSql += ` AND gioi_tinh_benh_nhan = ? `;
+            countParams.push(gender);
+        }
+
+        const [countResult] = await db.execute(countSql, countParams);
+
+        return {
+            data: rows,
+            pagination: {
+                total: countResult[0].total,
+                page,
+                limit,
+                totalPages: Math.ceil(countResult[0].total / limit)
+            }
+        };
+    }
+
+
+    // ============ DELETE ============
 
     // Xóa bệnh nhân
     static async delete(patientId) {
@@ -338,29 +434,29 @@ class PatientModel {
         const offset = (pageInt - 1) * limitInt;
 
         let query = `
-      SELECT 
-        BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
-        BIN_TO_UUID(lh.ma_bac_si) as ma_bac_si,
-        nd.ten_nguoi_dung as ten_bac_si,
-        nd.ho_nguoi_dung as ho_bac_si,
-        ck.ten_chuyen_khoa,
-        dv.ten_dich_vu,
-        lh.trang_thai_lich_hen,
-        lh.ly_do_kham_lich_hen,
-        lh.ngay_tao_lich_hen,
-        lh.thoi_gian_xac_nhan,
-        lh.thoi_gian_vao_kham,
-        lh.thoi_gian_hoan_thanh,
-        tg.ngay,
-        tg.thoi_gian_bat_dau,
-        tg.thoi_gian_ket_thuc
-      FROM bang_lich_hen lh
-      INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
-      INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-      LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
-      LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
-      LEFT JOIN bang_thoi_gian_chi_tiet tg ON lh.ma_lich_hen = tg.ma_lich_hen
-      WHERE lh.ma_benh_nhan = ?
+        SELECT 
+            BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
+            BIN_TO_UUID(lh.ma_bac_si) as ma_bac_si,
+            nd.ten_nguoi_dung as ten_bac_si,
+            nd.ho_nguoi_dung as ho_bac_si,
+            ck.ten_chuyen_khoa,
+            dv.ten_dich_vu,
+            lh.trang_thai_lich_hen,
+            lh.ly_do_kham_lich_hen,
+            lh.ngay_tao_lich_hen,
+            lh.thoi_gian_xac_nhan,
+            lh.thoi_gian_vao_kham,
+            lh.thoi_gian_hoan_thanh,
+            lh.ngay_hen,  -- ✅ ĐỔI (từ tg.ngay)
+            lh.gio_bat_dau,  -- ✅ ĐỔI (từ tg.thoi_gian_bat_dau)
+            lh.gio_ket_thuc  -- ✅ ĐỔI (từ tg.thoi_gian_ket_thuc)
+        FROM bang_lich_hen lh
+        INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
+        INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+        LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
+        -- ❌ XÓA: LEFT JOIN bang_thoi_gian_chi_tiet tg ON lh.ma_lich_hen = tg.ma_lich_hen
+        WHERE lh.ma_benh_nhan = ?
     `;
 
         const params = [UUIDUtil.toBinary(patientId)];
@@ -370,7 +466,7 @@ class PatientModel {
             params.push(parseInt(status));
         }
 
-        query += ` ORDER BY lh.ngay_tao_lich_hen DESC LIMIT ${offset}, ${limitInt}`;
+        query += ` ORDER BY lh.ngay_hen DESC, lh.gio_bat_dau DESC LIMIT ${offset}, ${limitInt}`; //✅ ĐỔI
 
         const [rows] = await db.execute(query, params);
 

@@ -6,22 +6,24 @@ const SpecialtyModel = require('../models/specialty.model');
 const ServiceModel = require('../models/service.model');
 
 class AppointmentService {
-    // Đặt lịch (khách vãng lai)
     static async createGuest(appointmentData) {
         const {
             ten_benh_nhan,
+            ho_benh_nhan,  // ✅ THÊM
             so_dien_thoai_benh_nhan,
+            email_benh_nhan,  // ✅ THÊM
+            ngay_sinh_benh_nhan,  // ✅ THÊM
             gioi_tinh_benh_nhan,
             ma_bac_si,
             ma_chuyen_khoa,
             ma_dich_vu_lich_hen,
             ly_do_kham_lich_hen,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc
+            ngay_hen,  // ✅ ĐỔI TÊN (từ ngay)
+            gio_bat_dau,  // ✅ ĐỔI TÊN (từ thoi_gian_bat_dau)
+            gio_ket_thuc  // ✅ ĐỔI TÊN (từ thoi_gian_ket_thuc)
         } = appointmentData;
 
-        console.log('Creating guest appointment:', appointmentData); // Debug
+        console.log('Creating guest appointment:', appointmentData);
 
         // 1. Kiểm tra bác sĩ có tồn tại
         const doctor = await DoctorModel.findById(ma_bac_si);
@@ -50,50 +52,58 @@ class AppointmentService {
         // 4. Kiểm tra slot có available không
         const isAvailable = await AppointmentModel.isSlotAvailable(
             ma_bac_si,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc
+            ngay_hen,
+            gio_bat_dau,
+            gio_ket_thuc
         );
 
         if (!isAvailable) {
             throw new Error('Khung giờ này đã có người đặt, vui lòng chọn khung giờ khác');
         }
 
-        // 5. Tìm hoặc tạo bệnh nhân
+        // 5. Parse ho + ten nếu thiếu ho_benh_nhan
+        let ho = ho_benh_nhan;
+        let ten = ten_benh_nhan;
+
+        if (!ho_benh_nhan && ten_benh_nhan) {
+            const parts = ten_benh_nhan.trim().split(' ');
+            if (parts.length > 1) {
+                ten = parts.pop();
+                ho = parts.join(' ');
+            }
+        }
+
+        // 6. Tìm hoặc tạo bệnh nhân
         const patient = await PatientService.findOrCreate({
-            ten_benh_nhan,
+            ten_benh_nhan: ten,
+            ho_benh_nhan: ho,
             so_dien_thoai_benh_nhan,
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan
         });
 
-        console.log('Patient created/found:', patient.ma_benh_nhan); // Debug
+        console.log('Patient created/found:', patient.ma_benh_nhan);
 
-        // 6. Tạo lịch hẹn
-        const appointmentId = await AppointmentModel.create({
-            ma_nguoi_tao_lich_hen: null, // Khách vãng lai
+        // 7. Tạo lịch hẹn
+        const appointmentId = await AppointmentModel.create({  // ✅ SỬA TÊN
+            ma_nguoi_tao_lich_hen: null,
             ma_bac_si,
             ma_benh_nhan: patient.ma_benh_nhan,
             ma_chuyen_khoa,
             ma_dich_vu_lich_hen,
-            trang_thai_lich_hen: 0, // PENDING
+            trang_thai_lich_hen: 0,
             ly_do_kham_lich_hen,
             gia_dich_vu_lich_hen: serviceFee,
-            tong_gia_lich_hen: serviceFee
+            tong_gia_lich_hen: serviceFee,
+            ngay_hen,  // ✅ THÊM
+            gio_bat_dau,  // ✅ THÊM
+            gio_ket_thuc  // ✅ THÊM
         });
 
-        console.log('Appointment created:', appointmentId); // Debug
+        console.log('Appointment created:', appointmentId);
 
-        // 7. Tạo thời gian chi tiết
-        await AppointmentModel.createTimeSlot({
-            ma_lich_hen: appointmentId,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc,
-            so_thu_tu: 1,
-            duoc_chap_nhan: 0
-        });
-
-        console.log('Time slot created'); // Debug
+        // ❌ XÓA: Không cần createTimeSlot nữa
 
         return await AppointmentModel.findById(appointmentId);
     }
@@ -105,9 +115,9 @@ class AppointmentService {
             ma_chuyen_khoa,
             ma_dich_vu_lich_hen,
             ly_do_kham_lich_hen,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc
+            ngay_hen,  // ✅ ĐỔI TÊN
+            gio_bat_dau,  // ✅ ĐỔI TÊN
+            gio_ket_thuc  // ✅ ĐỔI TÊN
         } = appointmentData;
 
         // 1. Kiểm tra bác sĩ
@@ -137,9 +147,9 @@ class AppointmentService {
         // 4. Kiểm tra slot
         const isAvailable = await AppointmentModel.isSlotAvailable(
             ma_bac_si,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc
+            ngay_hen,
+            gio_bat_dau,
+            gio_ket_thuc
         );
 
         if (!isAvailable) {
@@ -153,11 +163,19 @@ class AppointmentService {
             throw new Error('User không tồn tại');
         }
 
+        // Parse ho + ten
+        const parts = user.ten_nguoi_dung.trim().split(' ');
+        const ten = parts.pop();
+        const ho = parts.join(' ') || user.ho_nguoi_dung;
+
         // Tìm hoặc tạo bệnh nhân
         const patient = await PatientService.findOrCreate({
-            ten_benh_nhan: user.ten_nguoi_dung,
+            ten_benh_nhan: ten,
+            ho_benh_nhan: ho,
             so_dien_thoai_benh_nhan: user.so_dien_thoai_nguoi_dung,
-            gioi_tinh_benh_nhan: user.gioi_tinh_nguoi_dung
+            email_benh_nhan: user.email_nguoi_dung,
+            gioi_tinh_benh_nhan: user.gioi_tinh_nguoi_dung,
+            ma_nguoi_dung_benh_nhan: userId  // ✅ Link to user
         });
 
         // 6. Tạo lịch hẹn
@@ -167,28 +185,22 @@ class AppointmentService {
             ma_benh_nhan: patient.ma_benh_nhan,
             ma_chuyen_khoa,
             ma_dich_vu_lich_hen,
-            trang_thai_lich_hen: 0, // PENDING
+            trang_thai_lich_hen: 0,
             ly_do_kham_lich_hen,
             gia_dich_vu_lich_hen: serviceFee,
-            tong_gia_lich_hen: serviceFee
+            tong_gia_lich_hen: serviceFee,
+            ngay_hen,  // ✅ THÊM
+            gio_bat_dau,  // ✅ THÊM
+            gio_ket_thuc  // ✅ THÊM
         });
 
-        // 7. Tạo thời gian chi tiết
-        await AppointmentModel.createTimeSlot({
-            ma_lich_hen: appointmentId,
-            ngay,
-            thoi_gian_bat_dau,
-            thoi_gian_ket_thuc,
-            so_thu_tu: 1,
-            duoc_chap_nhan: 0
-        });
+        // ❌ XÓA: Không cần createTimeSlot nữa
 
         return await AppointmentModel.findById(appointmentId);
     }
 
     // Lấy available slots
     static async getAvailableSlots(doctorId, date, slotDuration = 30) {
-        // Kiểm tra bác sĩ
         const doctor = await DoctorModel.findById(doctorId);
         if (!doctor) {
             throw new Error('Bác sĩ không tồn tại');
@@ -257,7 +269,7 @@ class AppointmentService {
             throw new Error('User không tồn tại');
         }
 
-        let patient = await PatientModel.findByPhone(user.so_dien_thoai_nguoi_dung);
+        let patient = await PatientModel.findByUserId(userId);  // ✅ SỬA: Dùng findByUserId thay vì findByPhone
         if (!patient) {
             return {
                 data: [],
@@ -275,6 +287,7 @@ class AppointmentService {
 
     // Xác nhận lịch hẹn (Lễ tân)
     static async confirm(appointmentId, userId) {
+        console.log('Confirming appointment:', appointmentId, 'by user:', userId);
         const appointment = await AppointmentModel.findById(appointmentId);
         if (!appointment) {
             throw new Error('Không tìm thấy lịch hẹn');
@@ -286,7 +299,8 @@ class AppointmentService {
 
         const updated = await AppointmentModel.update(appointmentId, {
             trang_thai_lich_hen: 1,
-            thoi_gian_xac_nhan: new Date()
+            thoi_gian_xac_nhan: new Date(),
+            ma_nguoi_xac_nhan: userId  // ✅ THÊM
         });
 
         if (!updated) {
@@ -309,7 +323,7 @@ class AppointmentService {
 
         const updateData = {
             trang_thai_lich_hen: 2,
-            thoi_gian_vao_kham: new Date()
+            thoi_gian_check_in: new Date()  // ✅ SỬA: Dùng thoi_gian_check_in thay vì thoi_gian_vao_kham
         };
 
         if (roomId) {
@@ -336,7 +350,7 @@ class AppointmentService {
         }
 
         const updated = await AppointmentModel.update(appointmentId, {
-            trang_thai_lich_hen: 4,
+            trang_thai_lich_hen: 5,  // ✅ SỬA: 5 = CANCELLED (không phải 4)
             ly_do_huy_lich_hen: reason
         });
 
@@ -360,6 +374,54 @@ class AppointmentService {
         }
 
         return true;
+    }
+
+    // Dashboard cho bác sĩ
+    static async getDoctorDashboard(userId) {
+        // 1. Lấy bác sĩ từ user
+        const doctor = await DoctorModel.findByUserId(userId);
+        if (!doctor) {
+            throw new Error('Không tìm thấy bác sĩ');
+        }
+
+        const doctorId = doctor.ma_bac_si;
+
+        // 2. Ngày hôm nay
+        const today = new Date().toISOString().split('T')[0];
+
+        // 3. Lấy lịch hẹn hôm nay của bác sĩ
+        const appointments = await AppointmentModel.findByDoctorAndDate(
+            doctorId,
+            today
+        );
+
+        // 4. Thống kê
+        const totalToday = appointments.length;
+        const checkedIn = appointments.filter(a => a.trang_thai_lich_hen === 2).length;
+        const waiting = appointments.filter(a => a.trang_thai_lich_hen === 1).length;
+
+        return {
+            totalToday,
+            checkedIn,
+            waiting,
+            appointments
+        };
+    }
+    /**
+         * Lấy lịch hẹn hôm nay
+         * @param {String} userId - ID người dùng
+         * @param {String} role - Vai trò (Bác sĩ, Lễ tân, Admin)
+         */
+    static async getTodayAppointments(userId, role) {
+        try {
+            // Call Model method
+            const appointments = await AppointmentModel.getTodayAppointments(userId, role);
+
+            return appointments;
+        } catch (error) {
+            console.error('Service - Get today appointments error:', error);
+            throw error;
+        }
     }
 }
 
