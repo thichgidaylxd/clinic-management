@@ -128,29 +128,58 @@ function Step2DateTime({ service, specialty, onNext, onBack }) {
     /**
      * Generate all possible time slots (8:00 - 17:00, 30min each)
      */
-    const generateTimeSlots = () => {
+    const generateTimeSlots = (date = new Date()) => {
         const slots = [];
-        const startHour = 8;
+        const defaultStartHour = 8;
         const endHour = 17;
         const slotDuration = 30;
 
+        const now = new Date();
+        const isToday =
+            date.getFullYear() === now.getFullYear() &&
+            date.getMonth() === now.getMonth() &&
+            date.getDate() === now.getDate();
+
+        let startHour = defaultStartHour;
+        let skipFirstHalf = false;
+
+        if (isToday) {
+            startHour = now.getHours();
+            // Nếu phút >= 30 thì bỏ slot :00–:30 của giờ hiện tại
+            if (now.getMinutes() >= 30) {
+                skipFirstHalf = true;
+            }
+        }
+
         for (let hour = startHour; hour < endHour; hour++) {
             for (let minute = 0; minute < 60; minute += slotDuration) {
-                const startTime = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                // Nếu là giờ hiện tại và cần bỏ slot đầu tiên
+                if (skipFirstHalf && hour === startHour && minute === 0) {
+                    continue;
+                }
+
+                const startTime = `${String(hour).padStart(2, "0")}:${String(
+                    minute
+                ).padStart(2, "0")}`;
 
                 const endMinute = minute + slotDuration;
-                const endHour = endMinute >= 60 ? hour + 1 : hour;
-                const endTime = `${String(endHour).padStart(2, '0')}:${String(endMinute % 60).padStart(2, '0')}`;
+                const endHourCalc = endMinute >= 60 ? hour + 1 : hour;
+                const endTime = `${String(endHourCalc).padStart(2, "0")}:${String(
+                    endMinute % 60
+                ).padStart(2, "0")}`;
 
                 slots.push({
                     start: startTime,
-                    end: endTime
+                    end: endTime,
                 });
             }
         }
 
         return slots;
     };
+
+
+
 
     const getMinDate = () => {
         const today = new Date();
@@ -218,7 +247,7 @@ function Step2DateTime({ service, specialty, onNext, onBack }) {
             </p>
 
             {/* Info Alert */}
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+            <div div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3" >
                 <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <p className="text-blue-700 text-sm">
                     Hệ thống sẽ kiểm tra tất cả khung giờ từ 8:00 - 17:00 để tìm giờ trống cho bạn
@@ -230,7 +259,8 @@ function Step2DateTime({ service, specialty, onNext, onBack }) {
                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <p className="text-red-600 text-sm">{error}</p>
                 </div>
-            )}
+            )
+            }
 
             {/* Date Picker */}
             <div className="mb-6">
@@ -255,99 +285,103 @@ function Step2DateTime({ service, specialty, onNext, onBack }) {
             </div>
 
             {/* Time Slots */}
-            {selectedDate && (
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                        <Clock className="w-5 h-5 inline mr-2" />
-                        Chọn Giờ Khả Dụng
-                    </label>
+            {
+                selectedDate && (
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                            <Clock className="w-5 h-5 inline mr-2" />
+                            Chọn Giờ Khả Dụng
+                        </label>
 
-                    {/* Loading State with Progress */}
-                    {loading && (
-                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                            <Loader2 className="w-10 h-10 text-teal-600 animate-spin" />
-                            <div className="text-center space-y-2">
-                                <p className="text-gray-700 font-medium">Đang tìm giờ trống...</p>
-                                <p className="text-sm text-gray-500">Đang kiểm tra lịch bác sĩ</p>
+                        {/* Loading State with Progress */}
+                        {loading && (
+                            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                                <Loader2 className="w-10 h-10 text-teal-600 animate-spin" />
+                                <div className="text-center space-y-2">
+                                    <p className="text-gray-700 font-medium">Đang tìm giờ trống...</p>
+                                    <p className="text-sm text-gray-500">Đang kiểm tra lịch bác sĩ</p>
 
-                                {/* Progress Bar */}
-                                <div className="w-64 mx-auto mt-4">
-                                    <div className="flex justify-between text-xs text-gray-600 mb-1">
-                                        <span>Tiến độ</span>
-                                        <span>{loadingProgress}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-200 rounded-full h-2">
-                                        <div
-                                            className="bg-teal-600 h-2 rounded-full transition-all duration-300"
-                                            style={{ width: `${loadingProgress}%` }}
-                                        />
+                                    {/* Progress Bar */}
+                                    <div className="w-64 mx-auto mt-4">
+                                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                                            <span>Tiến độ</span>
+                                            <span>{loadingProgress}%</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-teal-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${loadingProgress}%` }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Available Slots */}
-                    {!loading && availableSlots.length > 0 && (
-                        <div>
-                            <div className="mb-3 flex items-center justify-between">
-                                <span className="text-sm text-gray-600">
-                                    Tìm thấy <span className="font-bold text-teal-700 text-lg">{availableSlots.length}</span> khung giờ trống
-                                </span>
-                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                    30 phút/slot
-                                </span>
-                            </div>
-                            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-96 overflow-y-auto p-3 border-2 border-gray-200 rounded-xl bg-gray-50">
-                                {availableSlots.map((slot, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleTimeSelect(slot)}
-                                        className={`
+                        {/* Available Slots */}
+                        {!loading && availableSlots.length > 0 && (
+                            <div>
+                                <div className="mb-3 flex items-center justify-between">
+                                    <span className="text-sm text-gray-600">
+                                        Tìm thấy <span className="font-bold text-teal-700 text-lg">{availableSlots.length}</span> khung giờ trống
+                                    </span>
+                                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                        30 phút/slot
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-96 overflow-y-auto p-3 border-2 border-gray-200 rounded-xl bg-gray-50">
+                                    {availableSlots.map((slot, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleTimeSelect(slot)}
+                                            className={`
                                             relative px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium
                                             ${selectedTime.start === slot.start
-                                                ? 'border-teal-600 bg-teal-600 text-white shadow-lg scale-105'
-                                                : 'border-gray-300 bg-white hover:border-teal-400 hover:bg-teal-50 text-gray-700 hover:shadow-md'
-                                            }
+                                                    ? 'border-teal-600 bg-teal-600 text-white shadow-lg scale-105'
+                                                    : 'border-gray-300 bg-white hover:border-teal-400 hover:bg-teal-50 text-gray-700 hover:shadow-md'
+                                                }
                                         `}
-                                    >
-                                        <div className="font-semibold">{formatTimeSlot(slot.start, slot.end)}</div>
-                                        {slot.doctorCount && (
-                                            <div className={`text-xs mt-1 ${selectedTime.start === slot.start ? 'text-teal-100' : 'text-gray-500'}`}>
-                                                {slot.doctorCount} bác sĩ
-                                            </div>
-                                        )}
-                                    </button>
-                                ))}
+                                        >
+                                            <div className="font-semibold">{formatTimeSlot(slot.start, slot.end)}</div>
+                                            {slot.doctorCount && (
+                                                <div className={`text-xs mt-1 ${selectedTime.start === slot.start ? 'text-teal-100' : 'text-gray-500'}`}>
+                                                    {slot.doctorCount} bác sĩ
+                                                </div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* Empty State */}
-                    {!loading && availableSlots.length === 0 && (
-                        <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                            <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 mb-2 font-medium text-lg">Không có giờ trống</p>
-                            <p className="text-sm text-gray-400">Vui lòng chọn ngày khác để tìm giờ phù hợp</p>
-                        </div>
-                    )}
-                </div>
-            )}
+                        {/* Empty State */}
+                        {!loading && availableSlots.length === 0 && (
+                            <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                                <Clock className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                <p className="text-gray-600 mb-2 font-medium text-lg">Không có giờ trống</p>
+                                <p className="text-sm text-gray-400">Vui lòng chọn ngày khác để tìm giờ phù hợp</p>
+                            </div>
+                        )}
+                    </div>
+                )
+            }
 
             {/* Selected Summary */}
-            {selectedDate && selectedTime.start && !loading && (
-                <div className="mt-6 p-5 bg-gradient-to-r from-teal-50 to-blue-50 border-2 border-teal-300 rounded-xl shadow-sm">
-                    <p className="text-sm text-gray-600 mb-2 font-medium">✓ Bạn đã chọn:</p>
-                    <div className="space-y-1">
-                        <p className="font-bold text-gray-900 text-lg">
-                            📅 {formatDate(selectedDate)}
-                        </p>
-                        <p className="font-bold text-teal-700 text-lg">
-                            🕐 {selectedTime.start} - {selectedTime.end}
-                        </p>
+            {
+                selectedDate && selectedTime.start && !loading && (
+                    <div className="mt-6 p-5 bg-gradient-to-r from-teal-50 to-blue-50 border-2 border-teal-300 rounded-xl shadow-sm">
+                        <p className="text-sm text-gray-600 mb-2 font-medium">✓ Bạn đã chọn:</p>
+                        <div className="space-y-1">
+                            <p className="font-bold text-gray-900 text-lg">
+                                📅 {formatDate(selectedDate)}
+                            </p>
+                            <p className="font-bold text-teal-700 text-lg">
+                                🕐 {selectedTime.start} - {selectedTime.end}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Action Buttons */}
             <div className="flex justify-between gap-4 mt-6">
@@ -367,7 +401,7 @@ function Step2DateTime({ service, specialty, onNext, onBack }) {
                     Tiếp tục
                 </button>
             </div>
-        </div>
+        </div >
     );
 }
 

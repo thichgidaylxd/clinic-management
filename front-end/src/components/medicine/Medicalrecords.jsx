@@ -73,16 +73,6 @@ function MedicalRecords() {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-teal-600" />
-                    Hồ Sơ Bệnh Án
-                </h1>
-                <p className="text-gray-600 mt-1">
-                    Quản lý hồ sơ bệnh án của bệnh nhân
-                </p>
-            </div>
 
             {/* Search & Filter */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

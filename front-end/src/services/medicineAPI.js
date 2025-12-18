@@ -12,6 +12,24 @@ const getAuthHeader = () => {
  */
 const medicineAPI = {
     /**
+ * Lấy danh sách tất cả thuốc (có phân trang, search, status)
+ */
+    getAll: async (params = {}) => {
+        try {
+            const response = await axios.get(
+                `${API_URL}/medicines`,
+                {
+                    params,
+                    headers: getAuthHeader()
+                }
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || error.message;
+        }
+    },
+
+    /**
      * Tìm kiếm thuốc
      */
     search: async (keyword, params = {}) => {

@@ -13,7 +13,6 @@ const getAuthHeaders = () => {
     };
 };
 
-// ⭐ FIX: Redirect về trang chủ thay vì /login (không tồn tại)
 const redirectToLogin = () => {
     console.log('⚠️ Session expired - logging out');
     localStorage.removeItem('token');

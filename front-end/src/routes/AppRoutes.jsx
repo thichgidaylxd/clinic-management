@@ -34,9 +34,9 @@ import ReceptionistDashboard from "../pages/receptionist/ReceptionistDashboard";
 
 // Doctor Pages
 import DoctorLayout from "../pages/doctor/DoctorLayout";
-import DoctorDashboard from "../pages/doctor/DoctorDashboard";
-import DoctorSchedule from "../pages/doctor/Schedule";
-import DoctorExamination from "../pages/doctor/Examination";
+// import DoctorDashboard from "../pages/doctor/DoctorDashboard";
+// import DoctorSchedule from "../pages/doctor/Schedule";
+// import DoctorExamination from "../pages/doctor/Examination";
 
 // ⭐ NEW: Prescription & Medical Records Pages
 
@@ -47,6 +47,8 @@ import PrescriptionPage from "../pages/doctor/PrescriptionPages";
 import InvoiceViewPage from "../pages/doctor/InvoiceViewPage";
 import MedicalRecordDetail from "../components/medicine/MedicalRecordDetail";
 import MedicalRecords from "../components/medicine/Medicalrecords";
+import ReceptionistInvoices from "../pages/receptionist/ReceptionistInvoices";
+import Examination from "../components/examination/Examination";
 
 function AppRoutes() {
     return (
@@ -97,6 +99,7 @@ function AppRoutes() {
                 <Route path="patients" element={<ReceptionistPatients />} />
                 <Route path="walk-in" element={<ReceptionistWalkIn />} />
                 <Route path="queue" element={<ReceptionistQueue />} />
+                <Route path="invoices" element={<ReceptionistInvoices />} />
             </Route>
 
             {/* =================== DOCTOR ROUTES =================== */}
@@ -105,10 +108,10 @@ function AppRoutes() {
                     <DoctorLayout />
                 </ProtectedRoute>
             }>
-                <Route index element={<Navigate to="/doctor/dashboard" replace />} />
-                <Route path="dashboard" element={<DoctorDashboard />} />
-                <Route path="schedule" element={<DoctorSchedule />} />
-                <Route path="examination" element={<DoctorExamination />} />
+                <Route index element={<Navigate to="/doctor/examination" replace />} />
+                {/* <Route path="dashboard" element={<DoctorDashboard />} /> */}
+                {/* <Route path="schedule" element={<DoctorSchedule />} /> */}
+                <Route path="examination" element={<Examination />} />
 
                 {/* ⭐ NEW: Prescription routes */}
                 <Route path="prescription/:appointmentId" element={<PrescriptionPage />} />

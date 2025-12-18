@@ -13,9 +13,9 @@ export default function Home() {
                     {/* Left Content */}
                     <div className='px-10'>
                         <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight lg:leading-tight">
-                            Sức Khỏe Của Bạn<br />
+                            Nụ cười của bạn<br />
                             Xứng Đáng Có <span className="italic font-serif text-teal-700">chuyên gia</span><br />
-                            <span className="italic font-serif text-teal-700">phù hợp</span>
+                            <span className="italic font-serif text-teal-700">chăm sóc</span>
                         </h1>
                         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                             Kết nối với các bác sĩ hàng đầu, những người lắng nghe<br />

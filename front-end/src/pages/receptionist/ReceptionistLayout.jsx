@@ -9,7 +9,8 @@ import {
     Menu,
     X,
     LogOut,
-    ClipboardList
+    ClipboardList,
+    FileText
 } from 'lucide-react';
 
 function ReceptionistLayout() {
@@ -70,7 +71,13 @@ function ReceptionistLayout() {
             path: '/receptionist/walk-in',
             label: 'Khám trực tiếp',
             icon: <UserPlus className="w-5 h-5" />
+        },
+        {
+            path: '/receptionist/invoices',
+            label: 'Hóa đơn',
+            icon: <FileText className="w-5 h-5" />
         }
+
     ];
 
     if (!user) {
@@ -113,8 +120,8 @@ function ReceptionistLayout() {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${isActive
-                                        ? 'bg-teal-50 text-teal-600 font-medium'
-                                        : 'text-gray-600 hover:bg-gray-50'
+                                    ? 'bg-teal-50 text-teal-600 font-medium'
+                                    : 'text-gray-600 hover:bg-gray-50'
                                     }`}
                             >
                                 {item.icon}
