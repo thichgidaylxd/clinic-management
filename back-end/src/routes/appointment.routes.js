@@ -687,32 +687,6 @@ router.get(
     AppointmentController.getStatsByStatus
 );
 
-/**
- * @swagger
- * /appointments/doctor/by-date:
- *   get:
- *     summary: Lấy lịch hẹn của bác sĩ theo ngày (Bác sĩ)
- *     tags: [Appointments]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: date
- *         required: true
- *         schema:
- *           type: string
- *           format: date
- *         description: Ngày cần xem (YYYY-MM-DD)
- *     responses:
- *       200:
- *         description: Lấy danh sách thành công
- */
-router.get(
-    '/doctor/by-date',
-    AuthMiddleware.authenticate,
-    AuthMiddleware.authorize(CONSTANTS.ROLES.DOCTOR),
-    AppointmentController.getDoctorAppointmentsByDate
-);
 
 /**
  * @swagger

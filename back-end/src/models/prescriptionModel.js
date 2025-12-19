@@ -9,7 +9,117 @@ class PrescriptionModel {
      * @param {Object} prescriptionData 
      * @returns {String} ma_hoa_don
      */
-    static async create(prescriptionData) {
+    // static async create(prescriptionData) {
+    //     const connection = await db.getConnection();
+
+    //     try {
+    //         await connection.beginTransaction();
+
+    //         const {
+    //             ma_benh_nhan,
+    //             ma_chuyen_khoa,
+    //             ma_nguoi_dung_hoa_don,
+    //             gia_dich_vu,
+    //             medicines, // Array of { ma_thuoc, so_luong, ghi_chu }
+    //             ghi_chu_hoa_don
+    //         } = prescriptionData;
+
+    //         // Step 1: Tính tổng tiền thuốc
+    //         let tongTienThuoc = 0;
+    //         for (const medicine of medicines) {
+    //             // Get medicine price
+    //             const [medicineData] = await connection.execute(
+    //                 'SELECT don_gia_thuoc FROM bang_thuoc WHERE ma_thuoc = UUID_TO_BIN(?)',
+    //                 [medicine.ma_thuoc]
+    //             );
+
+    //             if (medicineData.length === 0) {
+    //                 throw new Error(`Không tìm thấy thuốc ${medicine.ma_thuoc}`);
+    //             }
+
+    //             tongTienThuoc += medicineData[0].don_gia_thuoc * medicine.so_luong;
+    //         }
+
+    //         const tongThanhTien = parseFloat(gia_dich_vu || 0) + tongTienThuoc;
+
+    //         // Step 2: Tạo hóa đơn
+    //         const ma_hoa_don = UUIDUtil.generate();
+
+    //         const invoiceQuery = `
+    //             INSERT INTO bang_hoa_don (
+    //                 ma_hoa_don,
+    //                 ma_chuyen_khoa_hoa_don,
+    //                 ma_benh_nhan_hoa_don,
+    //                 ma_nguoi_dung_hoa_don,
+    //                 tong_thanh_tien_hoa_don,
+    //                 trang_thai_hoa_don,
+    //                 ghi_chu_hoa_don,
+    //                 ngay_tao_hoa_don
+    //             ) VALUES (?, ?, ?, ?, ?, 0, ?, CURRENT_TIMESTAMP)
+    //         `;
+
+    //         await connection.execute(invoiceQuery, [
+    //             UUIDUtil.toBinary(ma_hoa_don),
+    //             ma_chuyen_khoa ? UUIDUtil.toBinary(ma_chuyen_khoa) : null,
+    //             UUIDUtil.toBinary(ma_benh_nhan),
+    //             ma_nguoi_dung_hoa_don ? UUIDUtil.toBinary(ma_nguoi_dung_hoa_don) : null,
+    //             tongThanhTien,
+    //             ghi_chu_hoa_don || null
+    //         ]);
+
+    //         // Step 3: Thêm chi tiết thuốc vào hóa đơn
+    //         for (const medicine of medicines) {
+    //             const ma_thuoc_hoa_don = UUIDUtil.generate();
+
+    //             const itemQuery = `
+    //                 INSERT INTO bang_thuoc_hoa_don (
+    //                     ma_thuoc_hoa_don,
+    //                     ma_hoa_don,
+    //                     ma_thuoc,
+    //                     so_luong_thuoc_hoa_don,
+    //                     ghi_chu_thuoc
+    //                 ) VALUES (?, ?, ?, ?, ?)
+    //             `;
+
+    //             await connection.execute(itemQuery, [
+    //                 UUIDUtil.toBinary(ma_thuoc_hoa_don),
+    //                 UUIDUtil.toBinary(ma_hoa_don),
+    //                 UUIDUtil.toBinary(medicine.ma_thuoc),
+    //                 medicine.so_luong,
+    //                 medicine.ghi_chu || null
+    //             ]);
+
+    //             // Step 4: Trừ tồn kho
+    //             const updateStockQuery = `
+    //                 UPDATE bang_thuoc 
+    //                 SET so_luong_thuoc_ton_thuoc = so_luong_thuoc_ton_thuoc - ?
+    //                 WHERE ma_thuoc = UUID_TO_BIN(?)
+    //                     AND so_luong_thuoc_ton_thuoc >= ?
+    //             `;
+
+    //             const [updateResult] = await connection.execute(updateStockQuery, [
+    //                 medicine.so_luong,
+    //                 medicine.ma_thuoc,
+    //                 medicine.so_luong
+    //             ]);
+
+    //             if (updateResult.affectedRows === 0) {
+    //                 throw new Error(`Thuốc ${medicine.ma_thuoc} không đủ tồn kho`);
+    //             }
+    //         }
+
+    //         await connection.commit();
+    //         return ma_hoa_don;
+
+    //     } catch (error) {
+    //         await connection.rollback();
+    //         throw error;
+    //     } finally {
+    //         connection.release();
+    //     }
+    // }
+
+    static async create(data) {
         const connection = await db.getConnection();
 
         try {
@@ -20,91 +130,81 @@ class PrescriptionModel {
                 ma_chuyen_khoa,
                 ma_nguoi_dung_hoa_don,
                 gia_dich_vu,
-                medicines, // Array of { ma_thuoc, so_luong, ghi_chu }
+                medicines,
                 ghi_chu_hoa_don
-            } = prescriptionData;
+            } = data;
 
-            // Step 1: Tính tổng tiền thuốc
+            // ===== TÍNH TIỀN THUỐC =====
             let tongTienThuoc = 0;
-            for (const medicine of medicines) {
-                // Get medicine price
-                const [medicineData] = await connection.execute(
-                    'SELECT don_gia_thuoc FROM bang_thuoc WHERE ma_thuoc = UUID_TO_BIN(?)',
-                    [medicine.ma_thuoc]
+
+            for (const m of medicines) {
+                const [rows] = await connection.execute(
+                    `SELECT don_gia_thuoc
+                 FROM bang_thuoc
+                 WHERE ma_thuoc = UUID_TO_BIN(?)`,
+                    [m.ma_thuoc]
                 );
 
-                if (medicineData.length === 0) {
-                    throw new Error(`Không tìm thấy thuốc ${medicine.ma_thuoc}`);
-                }
-
-                tongTienThuoc += medicineData[0].don_gia_thuoc * medicine.so_luong;
+                tongTienThuoc += rows[0].don_gia_thuoc * m.so_luong;
             }
 
-            const tongThanhTien = parseFloat(gia_dich_vu || 0) + tongTienThuoc;
+            const tongThanhTien = Number(gia_dich_vu || 0) + tongTienThuoc;
 
-            // Step 2: Tạo hóa đơn
+            // ===== TẠO HÓA ĐƠN =====
             const ma_hoa_don = UUIDUtil.generate();
 
-            const invoiceQuery = `
-                INSERT INTO bang_hoa_don (
-                    ma_hoa_don,
-                    ma_chuyen_khoa_hoa_don,
-                    ma_benh_nhan_hoa_don,
-                    ma_nguoi_dung_hoa_don,
-                    tong_thanh_tien_hoa_don,
-                    trang_thai_hoa_don,
-                    ghi_chu_hoa_don,
-                    ngay_tao_hoa_don
-                ) VALUES (?, ?, ?, ?, ?, 0, ?, CURRENT_TIMESTAMP)
-            `;
+            await connection.execute(
+                `INSERT INTO bang_hoa_don (
+                ma_hoa_don,
+                ma_chuyen_khoa_hoa_don,
+                ma_benh_nhan_hoa_don,
+                ma_nguoi_dung_hoa_don,
+                tong_thanh_tien_hoa_don,
+                trang_thai_hoa_don,
+                ghi_chu_hoa_don
+            ) VALUES (?, ?, ?, ?, ?, 0, ?)`,
+                [
+                    UUIDUtil.toBinary(ma_hoa_don),
+                    ma_chuyen_khoa ? UUIDUtil.toBinary(ma_chuyen_khoa) : null,
+                    UUIDUtil.toBinary(ma_benh_nhan),
+                    ma_nguoi_dung_hoa_don ? UUIDUtil.toBinary(ma_nguoi_dung_hoa_don) : null,
+                    tongThanhTien,
+                    ghi_chu_hoa_don || null
+                ]
+            );
 
-            await connection.execute(invoiceQuery, [
-                UUIDUtil.toBinary(ma_hoa_don),
-                ma_chuyen_khoa ? UUIDUtil.toBinary(ma_chuyen_khoa) : null,
-                UUIDUtil.toBinary(ma_benh_nhan),
-                ma_nguoi_dung_hoa_don ? UUIDUtil.toBinary(ma_nguoi_dung_hoa_don) : null,
-                tongThanhTien,
-                ghi_chu_hoa_don || null
-            ]);
-
-            // Step 3: Thêm chi tiết thuốc vào hóa đơn
-            for (const medicine of medicines) {
+            // ===== CHI TIẾT THUỐC =====
+            for (const m of medicines) {
                 const ma_thuoc_hoa_don = UUIDUtil.generate();
 
-                const itemQuery = `
-                    INSERT INTO bang_thuoc_hoa_don (
-                        ma_thuoc_hoa_don,
-                        ma_hoa_don,
-                        ma_thuoc,
-                        so_luong_thuoc_hoa_don,
-                        ghi_chu_thuoc
-                    ) VALUES (?, ?, ?, ?, ?)
-                `;
+                await connection.execute(
+                    `INSERT INTO bang_thuoc_hoa_don (
+                    ma_thuoc_hoa_don,
+                    ma_hoa_don,
+                    ma_thuoc,
+                    so_luong_thuoc_hoa_don,
+                    ghi_chu_thuoc
+                ) VALUES (?, ?, ?, ?, ?)`,
+                    [
+                        UUIDUtil.toBinary(ma_thuoc_hoa_don),
+                        UUIDUtil.toBinary(ma_hoa_don),
+                        UUIDUtil.toBinary(m.ma_thuoc),
+                        m.so_luong,
+                        m.ghi_chu || null
+                    ]
+                );
 
-                await connection.execute(itemQuery, [
-                    UUIDUtil.toBinary(ma_thuoc_hoa_don),
-                    UUIDUtil.toBinary(ma_hoa_don),
-                    UUIDUtil.toBinary(medicine.ma_thuoc),
-                    medicine.so_luong,
-                    medicine.ghi_chu || null
-                ]);
+                // ===== TRỪ TỒN KHO =====
+                const [update] = await connection.execute(
+                    `UPDATE bang_thuoc
+                 SET so_luong_thuoc_ton_thuoc = so_luong_thuoc_ton_thuoc - ?
+                 WHERE ma_thuoc = UUID_TO_BIN(?)
+                   AND so_luong_thuoc_ton_thuoc >= ?`,
+                    [m.so_luong, m.ma_thuoc, m.so_luong]
+                );
 
-                // Step 4: Trừ tồn kho
-                const updateStockQuery = `
-                    UPDATE bang_thuoc 
-                    SET so_luong_thuoc_ton_thuoc = so_luong_thuoc_ton_thuoc - ?
-                    WHERE ma_thuoc = UUID_TO_BIN(?)
-                        AND so_luong_thuoc_ton_thuoc >= ?
-                `;
-
-                const [updateResult] = await connection.execute(updateStockQuery, [
-                    medicine.so_luong,
-                    medicine.ma_thuoc,
-                    medicine.so_luong
-                ]);
-
-                if (updateResult.affectedRows === 0) {
-                    throw new Error(`Thuốc ${medicine.ma_thuoc} không đủ tồn kho`);
+                if (update.affectedRows === 0) {
+                    throw new Error('Thuốc không đủ tồn kho');
                 }
             }
 

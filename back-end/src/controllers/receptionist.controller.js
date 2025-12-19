@@ -18,7 +18,7 @@ class ReceptionistController {
             const { doctorId, status, search } = req.query;
             const filters = { doctorId, status, search };
 
-            const appointments = await ReceptionistService.getTodayAppointments(filters);
+            const appointments = await ReceptionistService.getTodayAppointmentsWithFilter(filters);
             return ResponseUtil.success(res, appointments, 'Lấy danh sách thành công');
         } catch (error) {
             next(error);

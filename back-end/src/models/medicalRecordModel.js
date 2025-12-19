@@ -1,6 +1,7 @@
 const db = require('../config/database');
 const UUIDUtil = require('../utils/uuid.util');
 
+
 class MedicalRecordModel {
     /**
      * Tạo hồ sơ bệnh án mới
@@ -58,6 +59,108 @@ class MedicalRecordModel {
 
         return ma_ho_so_benh_an;
     }
+
+    /**
+     * Lấy danh sách hồ sơ bệnh án của bác sĩ hiện tại (phân trang + tìm kiếm)
+     * @param {string} doctorId - ma_bac_si của bác sĩ
+     * @param {Object} options - { page, limit, search, specialty }
+     */
+    // src/models/medicalRecordModel.js
+
+    static async getAllForDoctor(
+        doctorId,
+        { page = 1, limit = 10, search = '', specialty = 'all' } = {}
+    ) {
+        // ❗ ÉP KIỂU CHUẨN
+        const pageNum = Number(page);
+        const limitNum = Number(limit);
+        const offset = Number((pageNum - 1) * limitNum);
+
+        if (
+            !Number.isInteger(pageNum) ||
+            !Number.isInteger(limitNum) ||
+            pageNum < 1 ||
+            limitNum <= 0
+        ) {
+            throw new Error('page/limit không hợp lệ');
+        }
+
+        if (!doctorId) {
+            throw new Error('Thiếu doctorId');
+        }
+
+        const whereConditions = [];
+        const params = [];
+
+        // ✅ UUID_TO_BIN CHUẨN
+        whereConditions.push('hsba.ma_bac_si = UUID_TO_BIN(?)');
+        params.push(doctorId);
+
+        if (search.trim()) {
+            whereConditions.push(`
+            (
+                bn.ten_benh_nhan LIKE ?
+                OR bn.ho_benh_nhan LIKE ?
+                OR hsba.chuan_doan LIKE ?
+            )
+        `);
+            params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        }
+
+        if (specialty && specialty !== 'all') {
+            whereConditions.push('ck.ten_chuyen_khoa = ?');
+            params.push(specialty);
+        }
+
+        const whereClause = `WHERE ${whereConditions.join(' AND ')}`;
+
+        const query = `
+        SELECT 
+            BIN_TO_UUID(hsba.ma_ho_so_benh_an) AS ma_ho_so_benh_an,
+            BIN_TO_UUID(hsba.ma_benh_nhan) AS ma_benh_nhan,
+            BIN_TO_UUID(hsba.ma_bac_si) AS ma_bac_si,
+            BIN_TO_UUID(hsba.ma_chuyen_khoa) AS ma_chuyen_khoa,
+            hsba.chuan_doan,
+            hsba.ngay_tao_ho_so,
+            bn.ho_benh_nhan,
+            bn.ten_benh_nhan,
+            ck.ten_chuyen_khoa
+        FROM bang_ho_so_benh_an hsba
+        INNER JOIN bang_benh_nhan bn 
+            ON hsba.ma_benh_nhan = bn.ma_benh_nhan
+        LEFT JOIN bang_chuyen_khoa ck 
+            ON hsba.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        ${whereClause}
+        ORDER BY hsba.ngay_tao_ho_so DESC
+        LIMIT ${limitNum} OFFSET ${offset}
+    `;
+
+        // ⚠️ LIMIT/OFFSET đưa thẳng vào string → an toàn & không lỗi
+        const [rows] = await db.query(query, params);
+
+        const countQuery = `
+        SELECT COUNT(*) AS total
+        FROM bang_ho_so_benh_an hsba
+        INNER JOIN bang_benh_nhan bn 
+            ON hsba.ma_benh_nhan = bn.ma_benh_nhan
+        LEFT JOIN bang_chuyen_khoa ck 
+            ON hsba.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        ${whereClause}
+    `;
+
+        const [[count]] = await db.query(countQuery, params);
+
+        return {
+            data: rows,
+            pagination: {
+                total: count.total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(count.total / limitNum),
+            },
+        };
+    }
+
 
     /**
      * Lấy hồ sơ bệnh án theo ID

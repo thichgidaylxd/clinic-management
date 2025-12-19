@@ -1,11 +1,13 @@
-const AppointmentModel = require('../models/appointment.model');
+
 const PatientModel = require('../models/patient.model');
 const PatientService = require('./patient.service');
 const DoctorModel = require('../models/doctor.model');
 const SpecialtyModel = require('../models/specialty.model');
 const ServiceModel = require('../models/service.model');
+const AppointmentModel = require('../models/appointment.model');
 
 class AppointmentService {
+    // Đặt lịch (bệnh nhân chưa đăng nhập)
     static async createGuest(appointmentData) {
         const {
             ten_benh_nhan,
@@ -407,6 +409,7 @@ class AppointmentService {
             appointments
         };
     }
+
     /**
          * Lấy lịch hẹn hôm nay
          * @param {String} userId - ID người dùng

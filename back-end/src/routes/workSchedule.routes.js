@@ -42,6 +42,19 @@ const validateStatsQuery = (req, res, next) => {
     next();
 };
 
+
+/**
+ * @route   GET /api/v1/work-schedules/my
+ * @desc    Bác sĩ xem lịch làm việc của mình
+ * @access  Doctor
+ */
+router.get(
+    '/my',
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.DOCTOR),
+    WorkScheduleController.getMySchedule
+);
+
 /**
  * @swagger
  * /work-schedules:

@@ -511,7 +511,7 @@ class AppointmentModel {
     // Lấy lịch hẹn hôm nay (cho dashboard)
     static async getTodayAppointments(userId = null, role = null) {
         const today = new Date().toISOString().split('T')[0];
-
+        console.log(userId, role);
         let query = `
         SELECT 
             BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
@@ -519,17 +519,25 @@ class AppointmentModel {
             BIN_TO_UUID(lh.ma_benh_nhan) as ma_benh_nhan,
             BIN_TO_UUID(lh.ma_chuyen_khoa) as ma_chuyen_khoa,
             BIN_TO_UUID(lh.ma_phong_kham) as ma_phong_kham,
+            BIN_TO_UUID(lh.ma_dich_vu_lich_hen) as ma_dich_vu,
             lh.ngay_hen,
             lh.gio_bat_dau,
             lh.gio_ket_thuc,
             lh.trang_thai_lich_hen,
             lh.ly_do_kham_lich_hen,
+            lh.ghi_chu_lich_hen,
+            lh.gia_dich_vu_lich_hen,
+            lh.tong_gia_lich_hen,
+            lh.thoi_gian_check_in,
+            lh.thoi_gian_xac_nhan,
+            lh.thoi_gian_hoan_thanh,
             lh.ngay_tao_lich_hen,
             -- Patient info
             bn.ten_benh_nhan,
             bn.ho_benh_nhan,
             bn.so_dien_thoai_benh_nhan,
             bn.gioi_tinh_benh_nhan,
+            bn.ngay_sinh_benh_nhan,
             -- Doctor info
             nd.ten_nguoi_dung as ten_bac_si,
             nd.ho_nguoi_dung as ho_bac_si,
@@ -538,15 +546,18 @@ class AppointmentModel {
             -- Room
             pk.ten_phong_kham,
             pk.so_phong_kham,
+            -- Service
+            dv.ten_dich_vu,
+            dv.don_gia_dich_vu,
             -- Status text
             CASE 
                 WHEN lh.trang_thai_lich_hen = 0 THEN 'Chờ xác nhận'
                 WHEN lh.trang_thai_lich_hen = 1 THEN 'Đã xác nhận'
                 WHEN lh.trang_thai_lich_hen = 2 THEN 'Đã check-in'
-                WHEN lh.trang_thai_lich_hen = 3 THEN 'Đang khám'
                 WHEN lh.trang_thai_lich_hen = 4 THEN 'Hoàn thành'
                 WHEN lh.trang_thai_lich_hen = 5 THEN 'Đã hủy'
                 WHEN lh.trang_thai_lich_hen = 6 THEN 'Không đến'
+                ELSE 'Không xác định'
             END as trang_thai_text
         FROM bang_lich_hen lh
         INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
@@ -554,18 +565,23 @@ class AppointmentModel {
         INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
         LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
         LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+        LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
         WHERE lh.ngay_hen = ?
     `;
 
         const params = [today];
 
-        // Nếu là Bác sĩ, chỉ lấy lịch hẹn của mình
+        // Nếu là Bác sĩ → chỉ lấy lịch của mình + đã xác nhận / đã check-in
         if (role === 'Bác sĩ' && userId) {
-            query += ' AND bs.ma_nguoi_dung_bac_si = UUID_TO_BIN(?)';
+            query += `
+        AND bs.ma_nguoi_dung_bac_si = UUID_TO_BIN(?)
+        AND lh.trang_thai_lich_hen IN (1, 2)
+    `;
             params.push(userId);
         }
 
-        query += ' ORDER BY lh.gio_bat_dau ASC';
+
+        query += ' ORDER BY lh.gio_bat_dau ASC, lh.trang_thai_lich_hen ASC';
 
         const [rows] = await db.execute(query, params);
         return rows;
@@ -711,8 +727,8 @@ class AppointmentModel {
         return updated;
     }
 
-    // Lấy lịch hẹn hôm nay (tất cả)
-    static async getTodayAppointments(filters = {}) {
+    // // Lấy lịch hẹn hôm nay (tất cả)
+    static async getTodayAppointmentsWithFilter(filters = {}) {
         const {
             doctorId,
             status,
@@ -1018,6 +1034,40 @@ class AppointmentModel {
     `;
 
         const [rows] = await db.execute(query, [doctorId, date]);
+        return rows;
+    }
+
+    static async getTodayQueue(doctorId) {
+        const query = `
+      SELECT
+        BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
+        lh.ngay_hen,
+        lh.gio_bat_dau,
+        lh.gio_ket_thuc,
+        lh.trang_thai_lich_hen,
+        lh.ly_do_kham_lich_hen,
+        lh.thoi_gian_check_in,
+        lh.thoi_gian_vao_kham,
+        BIN_TO_UUID(bn.ma_benh_nhan) as ma_benh_nhan,
+        CONCAT(bn.ho_benh_nhan, ' ', bn.ten_benh_nhan) as ten_benh_nhan,
+        bn.gioi_tinh_benh_nhan,
+        bn.ngay_sinh_benh_nhan,
+        bn.so_dien_thoai_benh_nhan,
+        dv.ten_dich_vu,
+        lh.gia_dich_vu_lich_hen,
+        pk.ten_phong_kham,
+        pk.so_phong_kham,
+        ROW_NUMBER() OVER (ORDER BY lh.thoi_gian_check_in) as stt
+      FROM bang_lich_hen lh
+      INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
+      LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
+      LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+      WHERE lh.ma_bac_si = UUID_TO_BIN(?)
+        AND lh.ngay_hen = CURDATE()
+        AND lh.trang_thai_lich_hen IN (2, 3)
+      ORDER BY lh.thoi_gian_check_in ASC
+    `;
+        const [rows] = await db.execute(query, [doctorId]);
         return rows;
     }
 

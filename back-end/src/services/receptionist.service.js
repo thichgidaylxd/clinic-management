@@ -14,8 +14,8 @@ class ReceptionistService {
     }
 
     // Lấy lịch hẹn hôm nay
-    static async getTodayAppointments(filters) {
-        const appointments = await AppointmentModel.getTodayAppointments(filters);
+    static async getTodayAppointmentsWithFilter(filters) {
+        const appointments = await AppointmentModel.getTodayAppointmentsWithFilter(filters);
         return appointments;
     }
 

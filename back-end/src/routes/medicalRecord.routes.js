@@ -5,6 +5,7 @@ const MedicalRecordController = require('../controllers/medicalRecord.controller
 const MedicalRecordValidator = require('../validators/medicalRecord.validator');
 const validate = require('../middlewares/validate.middleware');
 const AuthMiddleware = require('../middlewares/auth.middleware');
+const CONSTANTS = require('../config/constants');
 
 /**
  * @swagger
@@ -15,11 +16,13 @@ const AuthMiddleware = require('../middlewares/auth.middleware');
  */
 router.post(
     '/',
-    AuthMiddleware.protect,
-    AuthMiddleware.authorize('Bác sĩ'),
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.DOCTOR),
     validate(MedicalRecordValidator.create()),
     MedicalRecordController.create
 );
+// Lấy danh sách hồ sơ của bác sĩ hiện tại (trang MedicalRecords.jsx)
+router.get('/', AuthMiddleware.authenticate, AuthMiddleware.authorize(CONSTANTS.ROLES.DOCTOR), MedicalRecordController.getAllForDoctor);
 
 /**
  * @swagger
@@ -30,7 +33,7 @@ router.post(
  */
 router.get(
     '/:id',
-    AuthMiddleware.protect,
+    AuthMiddleware.authenticate,
     MedicalRecordController.getById
 );
 
@@ -43,7 +46,7 @@ router.get(
  */
 router.get(
     '/patient/:patientId',
-    AuthMiddleware.protect,
+    AuthMiddleware.authenticate,
     MedicalRecordController.getByPatient
 );
 
@@ -56,8 +59,8 @@ router.get(
  */
 router.put(
     '/:id',
-    AuthMiddleware.protect,
-    AuthMiddleware.authorize('Bác sĩ'),
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.DOCTOR),
     validate(MedicalRecordValidator.update()),
     MedicalRecordController.update
 );
@@ -71,8 +74,8 @@ router.put(
  */
 router.delete(
     '/:id',
-    AuthMiddleware.protect,
-    AuthMiddleware.authorize('Admin'),
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
     MedicalRecordController.delete
 );
 

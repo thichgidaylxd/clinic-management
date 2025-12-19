@@ -59,7 +59,7 @@ router.get(
     '/',
     validateQuery,
     AuthMiddleware.authenticate,
-    AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
+    AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.RECEPTIONIST, CONSTANTS.ROLES.DOCTOR),
     MedicineController.getAll,
 );
 
