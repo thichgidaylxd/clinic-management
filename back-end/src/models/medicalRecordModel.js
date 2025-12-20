@@ -11,11 +11,6 @@ class MedicalRecordModel {
             ma_benh_nhan,
             ma_bac_si,
             ma_chuyen_khoa,
-            chieu_cao,
-            can_nang,
-            huyet_ap,
-            nhiet_do,
-            nhip_tim,
             trieu_chung,
             chuan_doan,
             phuong_phap_dieu_tri
@@ -29,17 +24,12 @@ class MedicalRecordModel {
                 ma_benh_nhan,
                 ma_bac_si,
                 ma_chuyen_khoa,
-                chieu_cao,
-                can_nang,
-                huyet_ap,
-                nhiet_do,
-                nhip_tim,
                 trieu_chung,
                 chuan_doan,
                 phuong_phap_dieu_tri,
                 ngay_tao_ho_so,
                 ngay_cap_nhat_ho_so
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `;
 
         await db.execute(query, [
@@ -47,11 +37,6 @@ class MedicalRecordModel {
             UUIDUtil.toBinary(ma_benh_nhan),
             UUIDUtil.toBinary(ma_bac_si),
             ma_chuyen_khoa ? UUIDUtil.toBinary(ma_chuyen_khoa) : null,
-            chieu_cao || null,
-            can_nang || null,
-            huyet_ap || null,
-            nhiet_do || null,
-            nhip_tim || null,
             trieu_chung || null,
             chuan_doan || null,
             phuong_phap_dieu_tri || null
@@ -172,11 +157,6 @@ class MedicalRecordModel {
                 BIN_TO_UUID(hsba.ma_benh_nhan) as ma_benh_nhan,
                 BIN_TO_UUID(hsba.ma_bac_si) as ma_bac_si,
                 BIN_TO_UUID(hsba.ma_chuyen_khoa) as ma_chuyen_khoa,
-                hsba.chieu_cao,
-                hsba.can_nang,
-                hsba.huyet_ap,
-                hsba.nhiet_do,
-                hsba.nhip_tim,
                 hsba.trieu_chung,
                 hsba.chuan_doan,
                 hsba.phuong_phap_dieu_tri,
@@ -256,11 +236,6 @@ class MedicalRecordModel {
         const values = [];
 
         const allowedFields = [
-            'chieu_cao',
-            'can_nang',
-            'huyet_ap',
-            'nhiet_do',
-            'nhip_tim',
             'trieu_chung',
             'chuan_doan',
             'phuong_phap_dieu_tri'

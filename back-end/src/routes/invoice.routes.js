@@ -7,6 +7,16 @@ const CONSTANTS = require('../config/constants');
 
 router.use(AuthMiddleware.authenticate);
 
+
+// ==============================
+// HÓA ĐƠN CỦA TÔI (BỆNH NHÂN)
+// ==============================
+router.get(
+    '/my',
+    AuthMiddleware.authorize(CONSTANTS.ROLES.PATIENT),
+    InvoiceController.getMyInvoices
+);
+
 // Admin / Lễ tân
 router.get(
     '/',
@@ -30,6 +40,5 @@ router.get(
     AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN, CONSTANTS.ROLES.RECEPTIONIST),
     InvoiceController.print
 );
-
 
 module.exports = router;

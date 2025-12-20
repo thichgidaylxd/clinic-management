@@ -12,8 +12,6 @@ class PatientModel {
             email_benh_nhan = null,  // ✅ THÊM
             ngay_sinh_benh_nhan = null,  // ✅ THÊM
             gioi_tinh_benh_nhan = null,
-            chieu_cao_benh_nhan = null,
-            can_nang_benh_nhan = null,
             dia_chi_benh_nhan = null  // ✅ THÊM
         } = patientData;
 
@@ -29,10 +27,8 @@ class PatientModel {
                 email_benh_nhan,
                 ngay_sinh_benh_nhan,
                 gioi_tinh_benh_nhan,
-                chieu_cao_benh_nhan,
-                can_nang_benh_nhan,
                 dia_chi_benh_nhan
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         await db.execute(query, [
@@ -44,8 +40,6 @@ class PatientModel {
             email_benh_nhan,
             ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan,
-            chieu_cao_benh_nhan,
-            can_nang_benh_nhan,
             dia_chi_benh_nhan
         ]);
 
@@ -64,8 +58,7 @@ class PatientModel {
                 bn.email_benh_nhan,
                 bn.ngay_sinh_benh_nhan,
                 bn.gioi_tinh_benh_nhan,
-                bn.chieu_cao_benh_nhan,
-                bn.can_nang_benh_nhan,
+
                 bn.dia_chi_benh_nhan
             FROM bang_benh_nhan bn
             WHERE bn.ma_benh_nhan = ?
@@ -128,8 +121,6 @@ class PatientModel {
                 email_benh_nhan,
                 ngay_sinh_benh_nhan,
                 gioi_tinh_benh_nhan,
-                chieu_cao_benh_nhan,
-                can_nang_benh_nhan,
                 dia_chi_benh_nhan
             FROM bang_benh_nhan
             WHERE ma_nguoi_dung_benh_nhan = ?
@@ -182,8 +173,6 @@ class PatientModel {
             email_benh_nhan,
             ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan,
-            chieu_cao_benh_nhan,
-            can_nang_benh_nhan,
             dia_chi_benh_nhan
         } = updateData;
 
@@ -213,14 +202,6 @@ class PatientModel {
         if (gioi_tinh_benh_nhan !== undefined) {
             fields.push('gioi_tinh_benh_nhan = ?');
             values.push(gioi_tinh_benh_nhan);
-        }
-        if (chieu_cao_benh_nhan !== undefined) {
-            fields.push('chieu_cao_benh_nhan = ?');
-            values.push(chieu_cao_benh_nhan);
-        }
-        if (can_nang_benh_nhan !== undefined) {
-            fields.push('can_nang_benh_nhan = ?');
-            values.push(can_nang_benh_nhan);
         }
         if (dia_chi_benh_nhan !== undefined) {
             fields.push('dia_chi_benh_nhan = ?');
@@ -388,11 +369,6 @@ class PatientModel {
         nd.ten_nguoi_dung as ten_bac_si,
         nd.ho_nguoi_dung as ho_bac_si,
         ck.ten_chuyen_khoa,
-        hs.chieu_cao,
-        hs.can_nang,
-        hs.huyet_ap,
-        hs.nhiet_do,
-        hs.nhip_tim,
         hs.trieu_chung,
         hs.chuan_doan,
         hs.phuong_phap_dieu_tri,

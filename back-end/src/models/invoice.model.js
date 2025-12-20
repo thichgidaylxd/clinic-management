@@ -99,6 +99,43 @@ class InvoiceModel {
         return result.affectedRows > 0;
     }
 
+    // ==============================
+    // HÓA ĐƠN CỦA BỆNH NHÂN (MY INVOICES)
+    // ==============================
+    static async findByPatientId(patientId) {
+        const [rows] = await db.execute(
+            `
+        SELECT
+            BIN_TO_UUID(hd.ma_hoa_don) AS ma_hoa_don,
+            hd.tong_thanh_tien_hoa_don,
+            hd.trang_thai_hoa_don,
+            hd.ngay_tao_hoa_don
+        FROM bang_hoa_don hd
+        WHERE hd.ma_benh_nhan_hoa_don = UUID_TO_BIN(?)
+        ORDER BY hd.ngay_tao_hoa_don DESC
+        `,
+            [patientId]
+        );
+
+        return rows;
+    }
+
+    // models/patient.model.js
+    static async findByUserId(userId) {
+        const [rows] = await db.execute(
+            `
+        SELECT BIN_TO_UUID(ma_benh_nhan) AS ma_benh_nhan
+        FROM bang_benh_nhan
+        WHERE ma_nguoi_dung_benh_nhan = UUID_TO_BIN(?)
+        `,
+            [userId]
+        );
+
+        return rows[0] || null;
+    }
+
+
+
 }
 
 module.exports = InvoiceModel;

@@ -394,27 +394,61 @@ class AppointmentModel {
             lh.gio_bat_dau,
             lh.gio_ket_thuc,
             lh.trang_thai_lich_hen,
-            lh.ly_do_kham_lich_hen,
+
+            -- ===== LÝ DO & GHI CHÚ =====
+            lh.ly_do_kham_lich_hen AS ly_do_kham,
             lh.ghi_chu_lich_hen,
 
+            -- ===== THỜI GIAN =====
+            lh.thoi_gian_check_in,
+            lh.thoi_gian_vao_kham,
+            lh.thoi_gian_hoan_thanh,
+
+            -- ===== BÁC SĨ =====
             BIN_TO_UUID(lh.ma_bac_si) AS ma_bac_si,
             nd.ho_nguoi_dung AS ho_bac_si,
             nd.ten_nguoi_dung AS ten_bac_si,
 
+            -- ===== BỆNH NHÂN =====
             BIN_TO_UUID(lh.ma_benh_nhan) AS ma_benh_nhan,
             bn.ho_benh_nhan,
             bn.ten_benh_nhan,
             bn.so_dien_thoai_benh_nhan,
 
+            -- ===== CHUYÊN KHOA =====
             ck.ten_chuyen_khoa,
-            pk.ten_phong_kham
+
+            -- ===== PHÒNG KHÁM =====
+            pk.ten_phong_kham,
+            pk.so_phong_kham,
+
+            -- ===== DỊCH VỤ =====
+            BIN_TO_UUID(lh.ma_dich_vu_lich_hen) AS ma_dich_vu,
+            dv.ten_dich_vu,
+            lh.gia_dich_vu_lich_hen AS gia_dich_vu,
+            lh.tong_gia_lich_hen
 
         FROM bang_lich_hen lh
-        INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
-        INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-        INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
-        LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
-        LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+
+        INNER JOIN bang_bac_si bs 
+            ON lh.ma_bac_si = bs.ma_bac_si
+
+        INNER JOIN bang_nguoi_dung nd 
+            ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+
+        INNER JOIN bang_benh_nhan bn 
+            ON lh.ma_benh_nhan = bn.ma_benh_nhan
+
+        LEFT JOIN bang_chuyen_khoa ck 
+            ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
+
+        LEFT JOIN bang_phong_kham pk 
+            ON lh.ma_phong_kham = pk.ma_phong_kham
+
+        -- ✅ JOIN ĐÚNG DỊCH VỤ
+        LEFT JOIN bang_dich_vu dv
+            ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
+
         WHERE lh.ngay_hen = ?
     `;
 
@@ -431,7 +465,7 @@ class AppointmentModel {
             params.push(UUIDUtil.toBinary(patientId));
         }
 
-        if (status !== null && status !== undefined) {
+        if (status !== null && status !== undefined && status !== '') {
             conditions.push('lh.trang_thai_lich_hen = ?');
             params.push(status);
         }
@@ -447,8 +481,9 @@ class AppointmentModel {
     }
 
 
+
     // Tìm lịch hẹn theo ID
-    static async findById(appointmentId) {
+    static async findById(ma_lich_hen) {
         const query = `
         SELECT 
             BIN_TO_UUID(lh.ma_lich_hen) as ma_lich_hen,
@@ -503,7 +538,9 @@ class AppointmentModel {
         WHERE lh.ma_lich_hen = ?
     `;
 
-        const [rows] = await db.execute(query, [UUIDUtil.toBinary(appointmentId)]);
+
+        const [rows] = await db.execute(query, [UUIDUtil.toBinary(ma_lich_hen)]);
+
         return rows[0] || null;
     }
 
@@ -662,7 +699,6 @@ class AppointmentModel {
           WHEN lh.trang_thai_lich_hen = 4 THEN 'Đã hủy'
         END as trang_thai_text
       FROM bang_lich_hen lh
-      LEFT JOIN bang_thoi_gian_chi_tiet tg ON lh.ma_lich_hen = tg.ma_lich_hen
     `;
 
         const params = [];

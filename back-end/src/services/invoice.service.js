@@ -1,4 +1,5 @@
 const InvoiceModel = require('../models/invoice.model');
+const PatientModel = require('../models/patient.model');
 
 class InvoiceService {
 
@@ -28,7 +29,27 @@ class InvoiceService {
         await InvoiceModel.pay(invoiceId);
         return true;
     }
+    // ==============================
+    // HÓA ĐƠN CỦA TÔI
+    // ==============================
+    static async getMyInvoices(userId) {
+        // 1. Lấy bệnh nhân theo user đăng nhập
+        const patient = await PatientModel.findByUserId(userId);
 
+        console.log(patient);
+        if (!patient) {
+            throw new Error('Không tìm thấy bệnh nhân');
+        }
+
+        // 2. Lấy danh sách hoá đơn
+        const invoices = await InvoiceModel.findByPatientId(
+            patient.ma_benh_nhan
+        );
+
+        console.log(invoices);
+
+        return invoices;
+    }
 
 }
 

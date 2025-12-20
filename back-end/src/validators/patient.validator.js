@@ -27,25 +27,7 @@ class PatientValidator {
                     'string.pattern.base': 'Số điện thoại phải có 10 chữ số'
                 }),
 
-            chieu_cao_benh_nhan: Joi.number()
-                .min(0)
-                .max(300)
-                .allow(null)
-                .messages({
-                    'number.base': 'Chiều cao phải là số',
-                    'number.min': 'Chiều cao phải lớn hơn 0',
-                    'number.max': 'Chiều cao không hợp lệ'
-                }),
 
-            can_nang_benh_nhan: Joi.number()
-                .min(0)
-                .max(500)
-                .allow(null)
-                .messages({
-                    'number.base': 'Cân nặng phải là số',
-                    'number.min': 'Cân nặng phải lớn hơn 0',
-                    'number.max': 'Cân nặng không hợp lệ'
-                }),
 
             hinh_anh_benh_nhan: Joi.string()
                 .allow('', null)
@@ -78,25 +60,7 @@ class PatientValidator {
                     'string.pattern.base': 'Số điện thoại phải có 10 chữ số'
                 }),
 
-            chieu_cao_benh_nhan: Joi.number()
-                .min(0)
-                .max(300)
-                .allow(null)
-                .messages({
-                    'number.base': 'Chiều cao phải là số',
-                    'number.min': 'Chiều cao phải lớn hơn 0',
-                    'number.max': 'Chiều cao không hợp lệ'
-                }),
 
-            can_nang_benh_nhan: Joi.number()
-                .min(0)
-                .max(500)
-                .allow(null)
-                .messages({
-                    'number.base': 'Cân nặng phải là số',
-                    'number.min': 'Cân nặng phải lớn hơn 0',
-                    'number.max': 'Cân nặng không hợp lệ'
-                }),
 
             hinh_anh_benh_nhan: Joi.string()
                 .allow('', null)
