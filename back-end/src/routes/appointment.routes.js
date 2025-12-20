@@ -25,6 +25,27 @@ const validateQuery = (req, res, next) => {
     next();
 };
 
+const validateQueryV2 = (schema) => (req, res, next) => {
+    const { error, value } = schema.validate(req.query, {
+        abortEarly: false
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            message: 'Dữ liệu không hợp lệ',
+            errors: error.details.map(d => ({
+                field: d.path.join('.'),
+                message: d.message
+            }))
+        });
+    }
+
+    req.query = value;
+    next();
+};
+
+
 const validateAvailableSlotsQuery = (req, res, next) => {
     const { error, value } = AppointmentValidator.queryAvailableSlots().validate(req.query);
     if (error) {
@@ -41,6 +62,8 @@ const validateAvailableSlotsQuery = (req, res, next) => {
     req.query = value;
     next();
 };
+
+
 
 /**
  * @swagger
@@ -110,6 +133,71 @@ router.get(
 
 /**
  * @swagger
+ * /appointments/available-slots:
+ *   get:
+ *     summary: Lấy danh sách khung giờ khả dụng (Public)
+ *     tags: [Appointments]
+ *     parameters:
+ *       - in: query
+ *         name: doctorId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: Mã bác sĩ
+ *       - in: query
+ *         name: date
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Ngày khám (YYYY-MM-DD)
+ *       - in: query
+ *         name: slotDuration
+ *         schema:
+ *           type: integer
+ *           enum: [15, 30, 45, 60]
+ *           default: 30
+ *         description: Thời lượng mỗi slot (phút)
+ *     responses:
+ *       200:
+ *         description: Lấy danh sách khung giờ thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     doctorInfo:
+ *                       type: object
+ *                     workSchedules:
+ *                       type: array
+ *                     availableSlots:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           start:
+ *                             type: string
+ *                           end:
+ *                             type: string
+ *                           status:
+ *                             type: string
+ *                             enum: [available, booked]
+ *                     summary:
+ *                       type: object
+ */
+router.get(
+    '/available-slots/v2',
+    validateQueryV2(AppointmentValidator.queryAvailableSlotsV2()),
+    AppointmentController.getAvailableSlotsV2
+);
+/**
+ * @swagger
  * /appointments/check-availability:
  *   post:
  *     summary: Kiểm tra khung giờ có khả dụng không (Public)
@@ -149,6 +237,24 @@ router.post(
     validate(AppointmentValidator.checkAvailability()),
     AppointmentController.checkAvailability
 );
+
+router.get(
+    '/by-date',
+    (req, res, next) => {
+        const { error, value } = AppointmentValidator.getByDate().validate(req.query);
+        if (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.details[0].message
+            });
+        }
+        req.query = value;
+        next();
+    },
+    AppointmentController.getByDate
+);
+
+
 
 /**
  * @swagger
@@ -329,6 +435,7 @@ router.get(
     validateQuery,
     AppointmentController.getAll
 );
+
 
 
 /**

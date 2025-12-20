@@ -18,6 +18,26 @@ class AppointmentController {
         }
     }
 
+    static async getAvailableSlotsV2(req, res, next) {
+        try {
+            const { date, specialtyId } = req.query;
+
+            if (!date) {
+                return ResponseUtil.error(res, 'Ngày là bắt buộc', 400);
+            }
+
+            const slots = await AppointmentService.getAvailableSlotsV2(date, specialtyId);
+
+            return ResponseUtil.success(
+                res,
+                slots,
+                'Lấy danh sách slot thành công'
+            );
+        } catch (err) {
+            next(err);
+        }
+    }
+
     // Đặt lịch (bệnh nhân đã đăng nhập)
     static async createAuthenticated(req, res, next) {
         try {
@@ -77,6 +97,21 @@ class AppointmentController {
             next(error);
         }
     }
+
+    // Lấy danh sách lịch hẹn theo ngày
+    static async getByDate(req, res, next) {
+        try {
+            const appointments = await AppointmentService.getAppointmentsByDate(req.query);
+            return ResponseUtil.success(
+                res,
+                appointments,
+                'Lấy danh sách lịch hẹn theo ngày thành công'
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
 
     // Lấy danh sách lịch hẹn (Lễ tân, Admin)
     static async getAll(req, res, next) {

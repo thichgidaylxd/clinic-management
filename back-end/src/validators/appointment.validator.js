@@ -296,6 +296,27 @@ class AppointmentValidator {
         });
     }
 
+    // ✅ CHỈ DÙNG CHO /available-slots/v2
+    static queryAvailableSlotsV2() {
+        return Joi.object({
+            date: Joi.string()
+                .isoDate()
+                .required()
+                .messages({
+                    'any.required': 'Ngày là bắt buộc',
+                    'string.isoDate': 'Ngày không hợp lệ'
+                }),
+
+            specialtyId: Joi.string()
+                .uuid()
+                .optional()
+                .messages({
+                    'string.uuid': 'Mã chuyên khoa không hợp lệ'
+                })
+        });
+    }
+
+
     // ==========================================================
     // CHECK AVAILABILITY
     // ==========================================================
@@ -342,6 +363,24 @@ class AppointmentValidator {
                 })
         });
     }
+
+    static getByDate() {
+        return Joi.object({
+            date: Joi.string()
+                .pattern(/^\d{4}-\d{2}-\d{2}$/)
+                .required()
+                .messages({
+                    'string.pattern.base': 'Date phải có định dạng YYYY-MM-DD',
+                    'any.required': 'Date là bắt buộc'
+                }),
+
+            doctorId: Joi.string().guid().allow(null),
+            patientId: Joi.string().guid().allow(null),
+            status: Joi.number().integer().allow(null),
+            search: Joi.string().allow('', null)
+        });
+    }
+
 }
 
 module.exports = AppointmentValidator;

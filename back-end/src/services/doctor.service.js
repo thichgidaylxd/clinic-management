@@ -274,29 +274,54 @@ class DoctorService {
         return true;
     }
 
+
+
     // Lấy bác sĩ available theo ngày giờ
+    // DoctorService.js
     static async getAvailableDoctors(date, startTime, endTime, specialtyId = null) {
         console.log('Getting available doctors for', date, startTime, endTime, specialtyId);
-        // 1. Lấy tất cả bác sĩ có lịch làm việc trong ngày
-        const doctors = await DoctorModel.findByWorkSchedule(date, specialtyId);
-        // 2. Filter bác sĩ có slot available
-        const availableDoctors = [];
 
-        for (const doctor of doctors) {
+        const schedules = await DoctorModel.findByWorkSchedule(date, specialtyId);
+
+        const startMin = this.toMinutes(startTime);
+        const endMin = this.toMinutes(endTime);
+
+        const doctorMap = new Map(); // key = ma_bac_si
+
+        for (const ws of schedules) {
+            const wsStart = this.toMinutes(ws.thoi_gian_bat_dau_lich_lam_viec);
+            const wsEnd = this.toMinutes(ws.thoi_gian_ket_thuc_lich_lam_viec);
+
+            // ❌ Slot không nằm trong ca → loại
+            if (startMin < wsStart || endMin > wsEnd) {
+                continue;
+            }
+
+            // ❌ Slot đã có lịch hẹn → loại
             const isAvailable = await AppointmentModel.isSlotAvailable(
-                doctor.ma_bac_si,
+                ws.ma_bac_si,
                 date,
                 startTime,
                 endTime
             );
 
-            if (isAvailable) {
-                availableDoctors.push(doctor);
+            if (!isAvailable) continue;
+
+            // ✅ Gộp theo bác sĩ (1 bác sĩ chỉ xuất hiện 1 lần)
+            if (!doctorMap.has(ws.ma_bac_si)) {
+                doctorMap.set(ws.ma_bac_si, ws);
             }
         }
 
-        return availableDoctors;
+        return Array.from(doctorMap.values());
     }
+
+    // helper
+    static toMinutes(time) {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+    }
+
 
     // Lấy đánh giá của bác sĩ
     static async getDoctorRatings(doctorId, page, limit) {

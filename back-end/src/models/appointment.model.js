@@ -386,6 +386,67 @@ class AppointmentModel {
         };
     }
 
+    static async findByDate({ date, doctorId, patientId, status }) {
+        let query = `
+        SELECT 
+            BIN_TO_UUID(lh.ma_lich_hen) AS ma_lich_hen,
+            lh.ngay_hen,
+            lh.gio_bat_dau,
+            lh.gio_ket_thuc,
+            lh.trang_thai_lich_hen,
+            lh.ly_do_kham_lich_hen,
+            lh.ghi_chu_lich_hen,
+
+            BIN_TO_UUID(lh.ma_bac_si) AS ma_bac_si,
+            nd.ho_nguoi_dung AS ho_bac_si,
+            nd.ten_nguoi_dung AS ten_bac_si,
+
+            BIN_TO_UUID(lh.ma_benh_nhan) AS ma_benh_nhan,
+            bn.ho_benh_nhan,
+            bn.ten_benh_nhan,
+            bn.so_dien_thoai_benh_nhan,
+
+            ck.ten_chuyen_khoa,
+            pk.ten_phong_kham
+
+        FROM bang_lich_hen lh
+        INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
+        INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+        INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
+        LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
+        LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
+        WHERE lh.ngay_hen = ?
+    `;
+
+        const params = [date];
+        const conditions = [];
+
+        if (doctorId) {
+            conditions.push('lh.ma_bac_si = ?');
+            params.push(UUIDUtil.toBinary(doctorId));
+        }
+
+        if (patientId) {
+            conditions.push('lh.ma_benh_nhan = ?');
+            params.push(UUIDUtil.toBinary(patientId));
+        }
+
+        if (status !== null && status !== undefined) {
+            conditions.push('lh.trang_thai_lich_hen = ?');
+            params.push(status);
+        }
+
+        if (conditions.length > 0) {
+            query += ' AND ' + conditions.join(' AND ');
+        }
+
+        query += ' ORDER BY lh.gio_bat_dau ASC';
+
+        const [rows] = await db.execute(query, params);
+        return rows;
+    }
+
+
     // Tìm lịch hẹn theo ID
     static async findById(appointmentId) {
         const query = `
