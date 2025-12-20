@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight, User } from "lucide-react";
 import { Stethoscope, Layers, Briefcase, Info, BookOpen } from "lucide-react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+
+    const navigate = useNavigate();
+
     useEffect(() => {
         const storedUser = localStorage.getItem('user');
 
@@ -29,6 +32,7 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                         src="/clinic_logo_no_bg.png"
                         alt="Clinic Logo"
                         className="w-auto h-12"
+                        onClick={() => navigate('/')}
                     />
                     <span className="text-2xl font-semibold text-gray-800">Health</span>
                 </div>
@@ -85,7 +89,7 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                                         {user.ten_nguoi_dung}
                                     </div>
                                     <a
-                                        href="#profile"
+                                        href="/patient/profile"
                                         className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
                                     >
                                         Profile
@@ -94,7 +98,13 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                                         href="/patient/appointments"
                                         className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
                                     >
-                                        Lịch sử
+                                        Lịch sử đặt lịch
+                                    </a>
+                                    <a
+                                        href="/patient/my-invoices"
+                                        className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                                    >
+                                        Hoá đơn của tôi
                                     </a>
                                     {isAdmin && (
                                         <a

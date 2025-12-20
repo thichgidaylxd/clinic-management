@@ -79,7 +79,6 @@ export const bookingAPI = {
         return handleResponse(response);
     },
 
-
     // Check availability
     checkAvailability: async (data) => {
         const response = await fetch(`${API_BASE_URL}/appointments/check-availability`, {
@@ -150,6 +149,34 @@ export const bookingAPI = {
                 'Authorization': `Bearer ${token}`
             }
         });
+        return handleResponse(response);
+    },
+
+    // ========== REVIEWS ========== ✅ NEW
+    // Tạo đánh giá bác sĩ
+    createReview: async (data, token) => {
+        console.log('createReview - Request data:', data);
+
+        const response = await fetch(`${API_BASE_URL}/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+        return handleResponse(response);
+    },
+
+    // Lấy đánh giá của bác sĩ
+    getDoctorReviews: async (doctorId) => {
+        const response = await fetch(`${API_BASE_URL}/reviews/doctor/${doctorId}`);
+        return handleResponse(response);
+    },
+
+    // Lấy thống kê đánh giá bác sĩ
+    getDoctorReviewStats: async (doctorId) => {
+        const response = await fetch(`${API_BASE_URL}/reviews/doctor/${doctorId}/stats`);
         return handleResponse(response);
     }
 };

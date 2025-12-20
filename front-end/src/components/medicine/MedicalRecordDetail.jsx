@@ -157,69 +157,7 @@ function MedicalRecordDetail() {
                         </div>
                     </div>
 
-                    {/* Vital Signs */}
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <Activity className="w-5 h-5 text-teal-600" />
-                            Sinh Hiệu
-                        </h3>
 
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            {record.chieu_cao && (
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-xs text-gray-600 mb-1">Chiều cao</p>
-                                    <p className="text-lg font-bold text-gray-900">
-                                        {record.chieu_cao} <span className="text-sm font-normal">cm</span>
-                                    </p>
-                                </div>
-                            )}
-
-                            {record.can_nang && (
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-xs text-gray-600 mb-1">Cân nặng</p>
-                                    <p className="text-lg font-bold text-gray-900">
-                                        {record.can_nang} <span className="text-sm font-normal">kg</span>
-                                    </p>
-                                </div>
-                            )}
-
-                            {record.huyet_ap && (
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-xs text-gray-600 mb-1 flex items-center gap-1">
-                                        <Heart className="w-3 h-3" />
-                                        Huyết áp
-                                    </p>
-                                    <p className="text-lg font-bold text-gray-900">
-                                        {record.huyet_ap} <span className="text-sm font-normal">mmHg</span>
-                                    </p>
-                                </div>
-                            )}
-
-                            {record.nhiet_do && (
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-xs text-gray-600 mb-1 flex items-center gap-1">
-                                        <Thermometer className="w-3 h-3" />
-                                        Nhiệt độ
-                                    </p>
-                                    <p className="text-lg font-bold text-gray-900">
-                                        {record.nhiet_do} <span className="text-sm font-normal">°C</span>
-                                    </p>
-                                </div>
-                            )}
-
-                            {record.nhip_tim && (
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <p className="text-xs text-gray-600 mb-1 flex items-center gap-1">
-                                        <Heart className="w-3 h-3" />
-                                        Nhịp tim
-                                    </p>
-                                    <p className="text-lg font-bold text-gray-900">
-                                        {record.nhip_tim} <span className="text-sm font-normal">bpm</span>
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
 
                     {/* Medical Information */}
                     <div>

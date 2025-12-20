@@ -40,7 +40,30 @@ function PatientInfo({ appointment }) {
                         </p>
                     </div>
                 </div>
+
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="p-4 bg-yellow-50 rounded-lg border">
+                    <p className="text-xs text-gray-600 mb-1">Lý do khám</p>
+                    <p className="font-medium text-gray-900">
+                        {appointment.ly_do_kham_lich_hen || '—'}
+                    </p>
+                </div>
+
+                <div className="p-4 bg-indigo-50 rounded-lg border">
+                    <p className="text-xs text-gray-600 mb-1">Dịch vụ khám</p>
+                    <p className="font-medium text-gray-900">
+                        {appointment.ten_dich_vu}
+                    </p>
+                    <p className="text-sm text-indigo-700 mt-1">
+                        {new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(appointment.gia_dich_vu_lich_hen)}
+                    </p>
+                </div>
+            </div>
+
         </div>
     );
 }

@@ -69,7 +69,30 @@ function AppointmentList({
                                                 {appt.ten_chuyen_khoa}
                                             </span>
                                         </div>
+                                        {/* Lý do khám */}
+                                        {appt.ly_do_kham_lich_hen && (
+                                            <p className="mt-2 text-sm text-gray-600 italic">
+                                                “{appt.ly_do_kham_lich_hen}”
+                                            </p>
+                                        )}
+
+                                        {/* Dịch vụ */}
+                                        {appt.ten_dich_vu && (
+                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                                                    {appt.ten_dich_vu}
+                                                </span>
+                                                <span className="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                                                    {new Intl.NumberFormat('vi-VN', {
+                                                        style: 'currency',
+                                                        currency: 'VND'
+                                                    }).format(appt.gia_dich_vu_lich_hen)}
+                                                </span>
+                                            </div>
+                                        )}
+
                                     </div>
+
                                 </div>
                             </div>
                         ))

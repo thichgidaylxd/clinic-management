@@ -55,7 +55,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
 
             let response;
 
-            if (user && token && token.ten_vai_tro !== 'Lễ tân') {
+            if (user && token && user.ten_vai_tro !== 'Lễ tân') {
                 // Authenticated booking
                 response = await bookingAPI.createAuthAppointment(appointmentData, token);
             } else {
@@ -71,9 +71,8 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
                 };
 
                 console.log('Guest booking data:', guestData);
-
                 response = await bookingAPI.createGuestAppointment(guestData);
-                receptionistAPI.confirmAppointment(response.ma_lich_hen);
+                setTimeout(() => { receptionistAPI.confirmAppointment(response.data.ma_lich_hen); }, 2000);
             }
 
             onSuccess(response.data);
