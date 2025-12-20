@@ -80,6 +80,28 @@ class WorkScheduleService {
         }
 
         return await WorkScheduleModel.findAll(page, limit, filters);
+
+    }
+
+    static async getMySchedule(user, query) {
+        if (!user?.ma_nguoi_dung) {
+            throw new Error('Không xác định được người dùng');
+        }
+
+        // 🔑 LẤY BÁC SĨ TỪ USER
+        const doctor = await DoctorModel.findByUserId(user.ma_nguoi_dung);
+
+        if (!doctor) {
+            throw new Error('Người dùng không phải là bác sĩ');
+        }
+
+        const { fromDate, toDate } = query;
+
+        return WorkScheduleModel.getByDoctor(
+            doctor.ma_bac_si,
+            fromDate || null,
+            toDate || null
+        );
     }
 
     // Lấy thông tin lịch làm việc theo ID

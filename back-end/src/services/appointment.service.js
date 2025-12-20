@@ -1,11 +1,13 @@
-const AppointmentModel = require('../models/appointment.model');
+
 const PatientModel = require('../models/patient.model');
 const PatientService = require('./patient.service');
 const DoctorModel = require('../models/doctor.model');
 const SpecialtyModel = require('../models/specialty.model');
 const ServiceModel = require('../models/service.model');
+const AppointmentModel = require('../models/appointment.model');
 
 class AppointmentService {
+    // Đặt lịch (bệnh nhân chưa đăng nhập)
     static async createGuest(appointmentData) {
         const {
             ten_benh_nhan,
@@ -107,6 +109,12 @@ class AppointmentService {
 
         return await AppointmentModel.findById(appointmentId);
     }
+
+    // Lấy danh sách lịch hẹn theo ngày
+    static async getAppointmentsByDate(filters) {
+        return await AppointmentModel.findByDate(filters);
+    }
+
 
     // Đặt lịch (bệnh nhân đã đăng nhập)
     static async createAuthenticated(appointmentData, userId) {
@@ -223,6 +231,73 @@ class AppointmentService {
                 bookedCount: result.availableSlots.filter(s => s.status === 'booked').length
             }
         };
+    }
+
+    static SLOT_MINUTES = 30;
+
+    static async getAvailableSlotsV2(date, specialtyId = null) {
+        const schedules = await DoctorModel.findByWorkSchedule(date, specialtyId);
+        if (schedules.length === 0) return [];
+
+        const slotMap = new Map();
+
+        for (const ws of schedules) {
+            const startMin = this.toMinutes(ws.thoi_gian_bat_dau_lich_lam_viec);
+            const endMin = this.toMinutes(ws.thoi_gian_ket_thuc_lich_lam_viec);
+
+            for (let cur = startMin; cur + this.SLOT_MINUTES <= endMin; cur += this.SLOT_MINUTES) {
+                const start = this.toTime(cur);
+                const end = this.toTime(cur + this.SLOT_MINUTES);
+                const key = `${start}-${end}`;
+
+                if (!slotMap.has(key)) {
+                    slotMap.set(key, {
+                        start,
+                        end,
+                        doctorIds: []
+                    });
+                }
+
+                slotMap.get(key).doctorIds.push(ws.ma_bac_si);
+            }
+        }
+
+        const result = [];
+
+        for (const slot of slotMap.values()) {
+            let count = 0;
+
+            for (const doctorId of slot.doctorIds) {
+                const free = await AppointmentModel.isSlotAvailable(
+                    doctorId,
+                    date,
+                    slot.start,
+                    slot.end
+                );
+                if (free) count++;
+            }
+
+            if (count > 0) {
+                result.push({
+                    start: slot.start,
+                    end: slot.end,
+                    doctorCount: count
+                });
+            }
+        }
+
+        return result.sort((a, b) => a.start.localeCompare(b.start));
+    }
+
+    static toMinutes(time) {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    static toTime(min) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     }
 
     // Check availability
@@ -407,6 +482,7 @@ class AppointmentService {
             appointments
         };
     }
+
     /**
          * Lấy lịch hẹn hôm nay
          * @param {String} userId - ID người dùng

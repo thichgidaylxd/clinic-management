@@ -1,3 +1,4 @@
+const pool = require('../config/database');
 const db = require('../config/database');
 const UUIDUtil = require('../utils/uuid.util');
 
@@ -42,6 +43,43 @@ class WorkScheduleModel {
 
     return ma_lich_lam_viec;
   }
+
+  /**
+ * Lấy lịch làm việc của bác sĩ theo userId (nguoi_dung)
+ */
+  static async getByDoctor(doctorId, fromDate, toDate) {
+    let sql = `
+        SELECT
+            BIN_TO_UUID(ls.ma_lich_lam_viec) AS ma_lich_lam_viec,
+            ls.ngay_lich_lam_viec,
+            ls.thoi_gian_bat_dau_lich_lam_viec,
+            ls.thoi_gian_ket_thuc_lich_lam_viec,
+            ls.trang_thai_lich_lam_viec,
+            pk.ten_phong_kham
+        FROM bang_lich_lam_viec ls
+        INNER JOIN bang_phong_kham pk 
+            ON ls.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
+        WHERE ls.ma_bac_si_lich_lam_viec = UUID_TO_BIN(?)
+    `;
+
+    const params = [doctorId];
+
+    if (fromDate) {
+      sql += ` AND ls.ngay_lich_lam_viec >= ?`;
+      params.push(fromDate);
+    }
+
+    if (toDate) {
+      sql += ` AND ls.ngay_lich_lam_viec <= ?`;
+      params.push(toDate);
+    }
+
+    sql += ` ORDER BY ls.ngay_lich_lam_viec, ls.thoi_gian_bat_dau_lich_lam_viec`;
+
+    const [rows] = await pool.execute(sql, params);
+    return rows;
+  }
+
 
   // Trong method findAll - XÓA JOIN với bang_chuyen_khoa
   static async findAll(page = 1, limit = 10, filters = {}) {

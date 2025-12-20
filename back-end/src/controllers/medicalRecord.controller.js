@@ -24,6 +24,30 @@ class MedicalRecordController {
     }
 
     /**
+         * @desc    Lấy danh sách hồ sơ của bác sĩ hiện tại
+         * @route   GET /api/v1/medical-records
+         * @access  Doctor only
+         */
+    static async getAllForDoctor(req, res, next) {
+        try {
+
+            const userId = req.user.ma_nguoi_dung; // Lấy từ middleware authDoctor
+            const { page = 1, limit = 10, search = '', specialty = 'all' } = req.query;
+
+            const result = await MedicalRecordService.getAllForDoctor(userId, {
+                page,
+                limit,
+                search,
+                specialty
+            });
+
+            return ResponseUtil.success(res, result, 'Lấy danh sách hồ sơ thành công');
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
      * @desc    Lấy hồ sơ bệnh án theo ID
      * @route   GET /api/v1/medical-records/:id
      * @access  Doctor, Patient

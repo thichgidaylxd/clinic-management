@@ -26,7 +26,6 @@ class DoctorController {
             if (!date || !startTime || !endTime) {
                 return ResponseUtil.error(res, 'Ngày và giờ là bắt buộc', 400);
             }
-
             const doctors = await DoctorService.getAvailableDoctors(
                 date,
                 startTime,

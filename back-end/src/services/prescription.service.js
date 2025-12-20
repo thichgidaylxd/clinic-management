@@ -1,17 +1,113 @@
-const PrescriptionModel = require('../models/prescription.model');
-const AppointmentModel = require('../models/appointment.model');
-const MedicalRecordModel = require('../models/medicalRecord.model');
-const ApiError = require('../utils/ApiError');
 
+const AppointmentModel = require('../models/appointment.model');
+const MedicalRecordModel = require('../models/medicalRecordModel');
+const PrescriptionModel = require('../models/prescriptionModel');
 class PrescriptionService {
     /**
      * Kê đơn thuốc hoàn chỉnh (Hồ sơ + Đơn thuốc + Hoàn thành lịch hẹn)
      */
+    // static async createPrescription(data) {
+    //     const {
+    //         ma_lich_hen,
+    //         ma_bac_si,
+    //         // Medical record data
+    //         chieu_cao,
+    //         can_nang,
+    //         huyet_ap,
+    //         nhiet_do,
+    //         nhip_tim,
+    //         trieu_chung,
+    //         chuan_doan,
+    //         phuong_phap_dieu_tri,
+    //         // Medicines
+    //         medicines, // [{ ma_thuoc, so_luong, ghi_chu }]
+    //         ghi_chu_hoa_don
+    //     } = data;
+
+    //     // Validate
+    //     if (!ma_lich_hen || !ma_bac_si) {
+    //         throw new Error(400, 'Thiếu thông tin bắt buộc');
+    //     }
+
+    //     if (!chuan_doan || !chuan_doan.trim()) {
+    //         throw new Error(400, 'Chẩn đoán không được để trống');
+    //     }
+
+    //     if (!medicines || medicines.length === 0) {
+    //         throw new Error(400, 'Phải có ít nhất 1 loại thuốc');
+    //     }
+
+    //     // Get appointment
+    //     const appointment = await AppointmentModel.findById(ma_lich_hen);
+    //     if (!appointment) {
+    //         throw new Error(404, 'Không tìm thấy lịch hẹn');
+    //     }
+
+    //     // Check appointment status
+    //     if (appointment.trang_thai_lich_hen === 4) {
+    //         throw new Error(400, 'Lịch hẹn đã hoàn thành');
+    //     }
+
+    //     // Check medicines stock
+    //     const stockCheck = await PrescriptionModel.checkMedicineStock(medicines);
+    //     const unavailable = stockCheck.filter(m => !m.available);
+
+    //     if (unavailable.length > 0) {
+    //         const errors = unavailable.map(m => `${m.ten_thuoc}: ${m.reason}`).join(', ');
+    //         throw new Error(400, `Không thể kê đơn: ${errors}`);
+    //     }
+
+    //     // Step 1: Tạo hồ sơ bệnh án
+    //     const recordData = {
+    //         ma_benh_nhan: appointment.ma_benh_nhan,
+    //         ma_bac_si,
+    //         ma_chuyen_khoa: appointment.ma_chuyen_khoa,
+    //         chieu_cao,
+    //         can_nang,
+    //         huyet_ap,
+    //         nhiet_do,
+    //         nhip_tim,
+    //         trieu_chung,
+    //         chuan_doan,
+    //         phuong_phap_dieu_tri
+    //     };
+
+    //     const ma_ho_so_benh_an = await MedicalRecordModel.create(recordData);
+
+    //     // Step 2: Tạo hóa đơn + Chi tiết thuốc
+    //     const prescriptionData = {
+    //         ma_benh_nhan: appointment.ma_benh_nhan,
+    //         ma_chuyen_khoa: appointment.ma_chuyen_khoa,
+    //         ma_nguoi_dung_hoa_don: ma_bac_si,
+    //         gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
+    //         medicines,
+    //         ghi_chu_hoa_don
+    //     };
+
+    //     const ma_hoa_don = await PrescriptionModel.create(prescriptionData);
+
+    //     // Step 3: Hoàn thành lịch hẹn
+    //     await AppointmentModel.update(ma_lich_hen, {
+    //         trang_thai_lich_hen: 4, // COMPLETED
+    //         thoi_gian_hoan_thanh: new Date()
+    //     });
+
+    //     // Get invoice details
+    //     const invoice = await PrescriptionModel.getInvoiceDetails(ma_hoa_don);
+
+    //     return {
+    //         ma_ho_so_benh_an,
+    //         ma_hoa_don,
+    //         invoice
+    //     };
+    // }
+
     static async createPrescription(data) {
         const {
             ma_lich_hen,
             ma_bac_si,
-            // Medical record data
+
+            // bệnh án
             chieu_cao,
             can_nang,
             huyet_ap,
@@ -20,46 +116,40 @@ class PrescriptionService {
             trieu_chung,
             chuan_doan,
             phuong_phap_dieu_tri,
-            // Medicines
+
+            // thuốc
             medicines, // [{ ma_thuoc, so_luong, ghi_chu }]
             ghi_chu_hoa_don
         } = data;
 
-        // Validate
+        // ===== VALIDATE =====
         if (!ma_lich_hen || !ma_bac_si) {
-            throw new ApiError(400, 'Thiếu thông tin bắt buộc');
+            throw new Error('Thiếu thông tin bắt buộc');
         }
 
-        if (!chuan_doan || !chuan_doan.trim()) {
-            throw new ApiError(400, 'Chẩn đoán không được để trống');
+        if (!chuan_doan?.trim()) {
+            throw new Error('Chẩn đoán không được để trống');
         }
 
-        if (!medicines || medicines.length === 0) {
-            throw new ApiError(400, 'Phải có ít nhất 1 loại thuốc');
+        if (!Array.isArray(medicines) || medicines.length === 0) {
+            throw new Error('Phải chọn ít nhất 1 loại thuốc');
         }
 
-        // Get appointment
+        // ===== LẤY LỊCH HẸN =====
         const appointment = await AppointmentModel.findById(ma_lich_hen);
         if (!appointment) {
-            throw new ApiError(404, 'Không tìm thấy lịch hẹn');
+            throw new Error('Không tìm thấy lịch hẹn');
         }
 
-        // Check appointment status
         if (appointment.trang_thai_lich_hen === 4) {
-            throw new ApiError(400, 'Lịch hẹn đã hoàn thành');
+            throw new Error('Lịch hẹn đã hoàn thành');
         }
 
-        // Check medicines stock
-        const stockCheck = await PrescriptionModel.checkMedicineStock(medicines);
-        const unavailable = stockCheck.filter(m => !m.available);
+        // ===== KIỂM TRA TỒN KHO =====
+        await PrescriptionModel.checkMedicineStock(medicines);
 
-        if (unavailable.length > 0) {
-            const errors = unavailable.map(m => `${m.ten_thuoc}: ${m.reason}`).join(', ');
-            throw new ApiError(400, `Không thể kê đơn: ${errors}`);
-        }
-
-        // Step 1: Tạo hồ sơ bệnh án
-        const recordData = {
+        // ===== 1. TẠO HỒ SƠ BỆNH ÁN =====
+        const ma_ho_so_benh_an = await MedicalRecordModel.create({
             ma_benh_nhan: appointment.ma_benh_nhan,
             ma_bac_si,
             ma_chuyen_khoa: appointment.ma_chuyen_khoa,
@@ -71,35 +161,30 @@ class PrescriptionService {
             trieu_chung,
             chuan_doan,
             phuong_phap_dieu_tri
-        };
+        });
 
-        const ma_ho_so_benh_an = await MedicalRecordModel.create(recordData);
-
-        // Step 2: Tạo hóa đơn + Chi tiết thuốc
-        const prescriptionData = {
+        // ===== 2. TẠO HÓA ĐƠN + THUỐC =====
+        const ma_hoa_don = await PrescriptionModel.create({
             ma_benh_nhan: appointment.ma_benh_nhan,
             ma_chuyen_khoa: appointment.ma_chuyen_khoa,
-            ma_nguoi_dung_hoa_don: ma_bac_si,
+
+            // ✅ user bệnh nhân (nullable)
+            ma_nguoi_dung_hoa_don: appointment.ma_nguoi_dung_benh_nhan || null,
+
             gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
             medicines,
             ghi_chu_hoa_don
-        };
+        });
 
-        const ma_hoa_don = await PrescriptionModel.create(prescriptionData);
-
-        // Step 3: Hoàn thành lịch hẹn
+        // ===== 3. HOÀN THÀNH LỊCH HẸN =====
         await AppointmentModel.update(ma_lich_hen, {
-            trang_thai_lich_hen: 4, // COMPLETED
+            trang_thai_lich_hen: 4,
             thoi_gian_hoan_thanh: new Date()
         });
 
-        // Get invoice details
-        const invoice = await PrescriptionModel.getInvoiceDetails(ma_hoa_don);
-
         return {
             ma_ho_so_benh_an,
-            ma_hoa_don,
-            invoice
+            ma_hoa_don
         };
     }
 
@@ -116,17 +201,17 @@ class PrescriptionService {
 
         // Validate
         if (!ma_lich_hen || !ma_bac_si) {
-            throw new ApiError(400, 'Thiếu thông tin bắt buộc');
+            throw new Error('Thiếu thông tin bắt buộc');
         }
 
         if (!medicines || medicines.length === 0) {
-            throw new ApiError(400, 'Phải có ít nhất 1 loại thuốc');
+            throw new Error('Phải có ít nhất 1 loại thuốc');
         }
 
         // Get appointment
         const appointment = await AppointmentModel.findById(ma_lich_hen);
         if (!appointment) {
-            throw new ApiError(404, 'Không tìm thấy lịch hẹn');
+            throw new Error('Không tìm thấy lịch hẹn');
         }
 
         // Check medicines stock
@@ -135,7 +220,7 @@ class PrescriptionService {
 
         if (unavailable.length > 0) {
             const errors = unavailable.map(m => `${m.ten_thuoc}: ${m.reason}`).join(', ');
-            throw new ApiError(400, `Không thể kê đơn: ${errors}`);
+            throw new Error(`Không thể kê đơn: ${errors}`);
         }
 
         // Create prescription
@@ -172,7 +257,7 @@ class PrescriptionService {
         const invoice = await PrescriptionModel.getInvoiceDetails(invoiceId);
 
         if (!invoice) {
-            throw new ApiError(404, 'Không tìm thấy hóa đơn');
+            throw new Error('Không tìm thấy hóa đơn');
         }
 
         return invoice;
@@ -185,17 +270,17 @@ class PrescriptionService {
         const invoice = await PrescriptionModel.getInvoiceDetails(invoiceId);
 
         if (!invoice) {
-            throw new ApiError(404, 'Không tìm thấy hóa đơn');
+            throw new Error('Không tìm thấy hóa đơn');
         }
 
         if (invoice.trang_thai_hoa_don === 1) {
-            throw new ApiError(400, 'Hóa đơn đã được thanh toán');
+            throw new Error('Hóa đơn đã được thanh toán');
         }
 
         const updated = await PrescriptionModel.updatePaymentStatus(invoiceId, paymentData);
 
         if (!updated) {
-            throw new ApiError(500, 'Thanh toán thất bại');
+            throw new Error('Thanh toán thất bại');
         }
 
         // Get updated invoice
@@ -207,7 +292,7 @@ class PrescriptionService {
      */
     static async checkStock(medicines) {
         if (!medicines || medicines.length === 0) {
-            throw new ApiError(400, 'Danh sách thuốc trống');
+            throw new Error('Danh sách thuốc trống');
         }
 
         return await PrescriptionModel.checkMedicineStock(medicines);

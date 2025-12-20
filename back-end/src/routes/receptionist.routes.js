@@ -4,6 +4,10 @@ const router = express.Router();
 const ReceptionistController = require('../controllers/receptionist.controller');
 const AuthMiddleware = require('../middlewares/auth.middleware');
 const CONSTANTS = require('../config/constants');
+const validate = require('../middlewares/validate.middleware');
+const ReceptionistAppointmentValidator = require('../validators/receptionist.appointment.validator');
+const ReceptionistAppointmentController = require('../controllers/receptionist.appointment.controller');
+
 
 // Middleware: Chỉ Receptionist & Admin
 const receptionistAuth = [
@@ -14,6 +18,7 @@ const receptionistAuth = [
     )
 
 ];
+
 
 /**
  * @swagger
@@ -46,6 +51,13 @@ router.get(
     ReceptionistController.getDashboardStats
 );
 
+
+router.post(
+    '/appointments',
+    ...receptionistAuth,
+    validate(ReceptionistAppointmentValidator.create()),
+    ReceptionistAppointmentController.create
+);
 // ===================== APPOINTMENTS =====================
 
 /**

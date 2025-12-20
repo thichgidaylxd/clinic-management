@@ -117,99 +117,6 @@ class DoctorService {
 
         return doctor;
     }
-    // static async createDoctor(doctorData) {
-    //     const {
-    //         // User fields
-    //         ten_nguoi_dung,
-    //         ho_nguoi_dung,
-    //         ten_dang_nhap_nguoi_dung,
-    //         email_nguoi_dung,
-    //         so_dien_thoai_nguoi_dung,
-    //         mat_khau_nguoi_dung,
-    //         gioi_tinh_nguoi_dung,
-    //         // Doctor fields
-    //         ma_chuc_vu_bac_si,
-    //         so_nam_kinh_nghiem_bac_si,
-    //         bang_cap_bac_si
-    //     } = doctorData;
-
-    //     // 1. Kiểm tra username đã tồn tại
-    //     const existingUsername = await UserModel.findByUsername(ten_dang_nhap_nguoi_dung);
-    //     if (existingUsername) {
-    //         throw new Error('Tên đăng nhập đã tồn tại');
-    //     }
-
-    //     // 2. Kiểm tra email đã tồn tại
-    //     const existingEmail = await UserModel.findByEmail(email_nguoi_dung);
-    //     if (existingEmail) {
-    //         throw new Error('Email đã tồn tại');
-    //     }
-
-    //     // 3. Kiểm tra số điện thoại đã tồn tại
-    //     const existingPhone = await UserModel.findByPhone(so_dien_thoai_nguoi_dung);
-    //     if (existingPhone) {
-    //         throw new Error('Số điện thoại đã tồn tại');
-    //     }
-
-    //     // 4. Lấy role "Bác sĩ"
-    //     const doctorRole = await RoleModel.findByName(CONSTANTS.ROLES.DOCTOR);
-    //     if (!doctorRole) {
-    //         throw new Error('Vai trò Bác sĩ không tồn tại trong hệ thống');
-    //     }
-
-    //     // 5. Kiểm tra chức vụ (nếu có)
-    //     if (ma_chuc_vu_bac_si) {
-    //         const position = await PositionModel.findById(ma_chuc_vu_bac_si);
-    //         if (!position) {
-    //             throw new Error('Chức vụ không tồn tại');
-    //         }
-    //     }
-
-    //     // 6. Hash password
-    //     const hashedPassword = await bcrypt.hash(mat_khau_nguoi_dung, 10);
-
-    //     // 7. Tạo User
-    //     const userId = await UserModel.create({
-    //         ten_nguoi_dung,
-    //         ho_nguoi_dung,
-    //         ten_dang_nhap_nguoi_dung,
-    //         email_nguoi_dung,
-    //         so_dien_thoai_nguoi_dung,
-    //         mat_khau_nguoi_dung: hashedPassword,
-    //         gioi_tinh_nguoi_dung,
-    //         ma_vai_tro: doctorRole.ma_vai_tro
-    //     });
-
-    //     console.log('✅ Created user:', userId);
-
-    //     // 8. Xử lý bằng cấp base64 nếu có
-    //     let processedBangCap = null;
-    //     if (bang_cap_bac_si) {
-    //         const base64Data = bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-    //         processedBangCap = Buffer.from(base64Data, 'base64');
-    //     }
-
-    //     // 9. Tạo Doctor
-    //     const doctorId = await DoctorModel.create({
-    //         ma_nguoi_dung_bac_si: userId,
-    //         ma_chuc_vu_bac_si: ma_chuc_vu_bac_si || null,
-    //         so_nam_kinh_nghiem_bac_si: so_nam_kinh_nghiem_bac_si || null,
-    //         bang_cap_bac_si: processedBangCap,
-    //         dang_hoat_dong_bac_si: 1
-    //     });
-
-    //     console.log('✅ Created doctor:', doctorId);
-
-    //     // 10. Lấy thông tin đầy đủ
-    //     const doctor = await DoctorModel.findById(doctorId);
-
-    //     // 11. Chuyển BLOB sang base64
-    //     if (doctor.bang_cap_bac_si) {
-    //         doctor.bang_cap_bac_si = doctor.bang_cap_bac_si.toString('base64');
-    //     }
-
-    //     return doctor;
-    // }
 
     // Lấy danh sách bác sĩ
     static async getAllDoctors(page, limit, search, status, positionId) {
@@ -345,55 +252,6 @@ class DoctorService {
 
         return await this.getDoctorById(doctorId);
     }
-    // static async updateDoctor(doctorId, updateData) {
-    //     const doctor = await DoctorModel.findById(doctorId);
-    //     if (!doctor) {
-    //         throw new Error('Không tìm thấy bác sĩ');
-    //     }
-
-    //     // Tách data User và Doctor
-    //     const userUpdateData = {};
-    //     const doctorUpdateData = {};
-
-    //     // User fields
-    //     if (updateData.ten_nguoi_dung !== undefined) userUpdateData.ten_nguoi_dung = updateData.ten_nguoi_dung;
-    //     if (updateData.ho_nguoi_dung !== undefined) userUpdateData.ho_nguoi_dung = updateData.ho_nguoi_dung;
-    //     if (updateData.email_nguoi_dung !== undefined) userUpdateData.email_nguoi_dung = updateData.email_nguoi_dung;
-    //     if (updateData.so_dien_thoai_nguoi_dung !== undefined) userUpdateData.so_dien_thoai_nguoi_dung = updateData.so_dien_thoai_nguoi_dung;
-    //     if (updateData.gioi_tinh_nguoi_dung !== undefined) userUpdateData.gioi_tinh_nguoi_dung = updateData.gioi_tinh_nguoi_dung;
-
-    //     // Doctor fields
-    //     if (updateData.ma_chuyen_khoa_bac_si !== undefined) doctorUpdateData.ma_chuyen_khoa_bac_si = updateData.ma_chuyen_khoa_bac_si;
-    //     if (updateData.ma_chuc_vu_bac_si !== undefined) doctorUpdateData.ma_chuc_vu_bac_si = updateData.ma_chuc_vu_bac_si;
-    //     if (updateData.so_nam_kinh_nghiem_bac_si !== undefined) doctorUpdateData.so_nam_kinh_nghiem_bac_si = updateData.so_nam_kinh_nghiem_bac_si;
-    //     if (updateData.dang_hoat_dong_bac_si !== undefined) doctorUpdateData.dang_hoat_dong_bac_si = updateData.dang_hoat_dong_bac_si;
-
-    //     // Xử lý bằng cấp base64
-    //     if (updateData.bang_cap_bac_si) {
-    //         const base64Data = updateData.bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-    //         doctorUpdateData.bang_cap_bac_si = Buffer.from(base64Data, 'base64');
-    //     }
-
-    //     // Kiểm tra chức vụ
-    //     if (doctorUpdateData.ma_chuc_vu_bac_si) {
-    //         const position = await PositionModel.findById(doctorUpdateData.ma_chuc_vu_bac_si);
-    //         if (!position) {
-    //             throw new Error('Chức vụ không tồn tại');
-    //         }
-    //     }
-
-    //     // Update User (nếu có)
-    //     if (Object.keys(userUpdateData).length > 0) {
-    //         await UserModel.update(doctor.ma_nguoi_dung_bac_si, userUpdateData);
-    //     }
-
-    //     // Update Doctor (nếu có)
-    //     if (Object.keys(doctorUpdateData).length > 0) {
-    //         await DoctorModel.update(doctorId, doctorUpdateData);
-    //     }
-
-    //     return await this.getDoctorById(doctorId);
-    // }
 
     // Xóa bác sĩ
     static async deleteDoctor(doctorId) {
@@ -416,29 +274,54 @@ class DoctorService {
         return true;
     }
 
+
+
     // Lấy bác sĩ available theo ngày giờ
+    // DoctorService.js
     static async getAvailableDoctors(date, startTime, endTime, specialtyId = null) {
         console.log('Getting available doctors for', date, startTime, endTime, specialtyId);
-        // 1. Lấy tất cả bác sĩ có lịch làm việc trong ngày
-        const doctors = await DoctorModel.findByWorkSchedule(date, specialtyId);
-        // 2. Filter bác sĩ có slot available
-        const availableDoctors = [];
 
-        for (const doctor of doctors) {
+        const schedules = await DoctorModel.findByWorkSchedule(date, specialtyId);
+
+        const startMin = this.toMinutes(startTime);
+        const endMin = this.toMinutes(endTime);
+
+        const doctorMap = new Map(); // key = ma_bac_si
+
+        for (const ws of schedules) {
+            const wsStart = this.toMinutes(ws.thoi_gian_bat_dau_lich_lam_viec);
+            const wsEnd = this.toMinutes(ws.thoi_gian_ket_thuc_lich_lam_viec);
+
+            // ❌ Slot không nằm trong ca → loại
+            if (startMin < wsStart || endMin > wsEnd) {
+                continue;
+            }
+
+            // ❌ Slot đã có lịch hẹn → loại
             const isAvailable = await AppointmentModel.isSlotAvailable(
-                doctor.ma_bac_si,
+                ws.ma_bac_si,
                 date,
                 startTime,
                 endTime
             );
 
-            if (isAvailable) {
-                availableDoctors.push(doctor);
+            if (!isAvailable) continue;
+
+            // ✅ Gộp theo bác sĩ (1 bác sĩ chỉ xuất hiện 1 lần)
+            if (!doctorMap.has(ws.ma_bac_si)) {
+                doctorMap.set(ws.ma_bac_si, ws);
             }
         }
 
-        return availableDoctors;
+        return Array.from(doctorMap.values());
     }
+
+    // helper
+    static toMinutes(time) {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+    }
+
 
     // Lấy đánh giá của bác sĩ
     static async getDoctorRatings(doctorId, page, limit) {

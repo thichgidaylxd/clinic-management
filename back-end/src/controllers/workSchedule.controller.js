@@ -18,6 +18,31 @@ class WorkScheduleController {
         }
     }
 
+    /**
+    * Bác sĩ xem lịch làm việc của mình
+    */
+    static async getMySchedule(req, res) {
+        try {
+
+            const schedules = await WorkScheduleService.getMySchedule(
+                req.user,
+                req.query
+            );
+
+
+            res.json({
+                success: true,
+                data: schedules
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({
+                success: false,
+                message: 'Lỗi lấy lịch làm việc'
+            });
+        }
+    }
+
     // Lấy danh sách lịch làm việc
     static async getAll(req, res, next) {
         try {

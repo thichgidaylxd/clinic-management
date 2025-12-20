@@ -14,6 +14,10 @@ const appointmentRoutes = require('./appointment.routes');
 const userRoutes = require('./user.routes');
 const roleRoutes = require('./role.routes');
 const receptionistRoutes = require('./receptionist.routes'); // ✅ Thêm
+const prescriptionRoutes = require('./prescription.routes'); // ✅ Thêm
+const invoiceRoutes = require('./invoice.routes'); // ✅ Thêm
+const medicalRecordRoutes = require('./medicalRecord.routes'); // ✅ Thêm
+
 
 // Route mặc định
 router.get('/', (req, res) => {
@@ -53,6 +57,7 @@ router.use('/appointments', appointmentRoutes);
 router.use('/users', userRoutes);
 router.use('/roles', roleRoutes);
 router.use('/receptionist', receptionistRoutes); // ✅ Thêm
-
-
+router.use('/prescriptions', prescriptionRoutes); // ✅ Thêm
+router.use('/invoices', invoiceRoutes); // ✅ Thêm
+router.use('/medical-records', medicalRecordRoutes); // ✅ Thêm
 module.exports = router;
