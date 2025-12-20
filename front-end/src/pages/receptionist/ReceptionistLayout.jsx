@@ -48,19 +48,9 @@ function ReceptionistLayout() {
 
     const menuItems = [
         {
-            path: '/receptionist/dashboard',
-            label: 'Tổng quan',
-            icon: <LayoutDashboard className="w-5 h-5" />
-        },
-        {
             path: '/receptionist/appointments',
-            label: 'Lịch hẹn hôm nay',
+            label: 'Lịch hẹn',
             icon: <Calendar className="w-5 h-5" />
-        },
-        {
-            path: '/receptionist/queue',
-            label: 'Hàng đợi',
-            icon: <Clock className="w-5 h-5" />
         },
         {
             path: '/receptionist/patients',
@@ -68,15 +58,15 @@ function ReceptionistLayout() {
             icon: <Users className="w-5 h-5" />
         },
         {
-            path: '/receptionist/walk-in',
-            label: 'Khám trực tiếp',
-            icon: <UserPlus className="w-5 h-5" />
-        },
-        {
             path: '/receptionist/invoices',
             label: 'Hóa đơn',
             icon: <FileText className="w-5 h-5" />
-        }
+        },
+        {
+            path: '/receptionist/booking',
+            label: 'Đặt lịch',
+            icon: <FileText className="w-5 h-5" />
+        },
 
     ];
 

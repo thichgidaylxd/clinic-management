@@ -65,6 +65,20 @@ export const bookingAPI = {
         const response = await fetch(`${API_BASE_URL}/appointments/available-slots?${params}`);
         return handleResponse(response);
     },
+    getAvailableSlotsV2: async ({ date, specialtyId }) => {
+        const params = new URLSearchParams({ date });
+
+        if (specialtyId) {
+            params.append('specialtyId', specialtyId);
+        }
+
+        const response = await fetch(
+            `${API_BASE_URL}/appointments/available-slots/v2?${params}`
+        );
+
+        return handleResponse(response);
+    },
+
 
     // Check availability
     checkAvailability: async (data) => {

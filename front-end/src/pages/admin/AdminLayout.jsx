@@ -50,11 +50,6 @@ function AdminLayout() {
 
     const menuItems = [
         {
-            path: '/admin/dashboard',
-            label: 'Tổng quan',
-            icon: <LayoutDashboard className="w-5 h-5" />
-        },
-        {
             path: '/admin/specialties',
             label: 'Chuyên khoa',
             icon: <Stethoscope className="w-5 h-5" />

@@ -53,9 +53,6 @@ function MedicalRecordDetail() {
         });
     };
 
-    const handlePrint = () => {
-        window.print();
-    };
 
     if (loading) {
         return (
@@ -99,14 +96,6 @@ function MedicalRecordDetail() {
                         Chi Tiết Hồ Sơ Bệnh Án
                     </h1>
                 </div>
-
-                <button
-                    onClick={handlePrint}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-                >
-                    <Printer className="w-5 h-5" />
-                    In hồ sơ
-                </button>
             </div>
 
             {/* Main Content */}

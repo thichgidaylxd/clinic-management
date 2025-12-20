@@ -80,6 +80,21 @@ export const receptionistAPI = {
         return safeFetch(`${API_BASE_URL}/receptionist/dashboard/stats`);
     },
 
+    // Lấy lịch hẹn theo ngày (cho lễ tân)
+    getAppointmentsByDate: async (date, filters = {}) => {
+        const params = new URLSearchParams();
+
+        if (date) params.append('date', date);
+        if (filters.doctorId) params.append('doctorId', filters.doctorId);
+        if (filters.status !== undefined && filters.status !== '') {
+            params.append('status', filters.status);
+        }
+        if (filters.search) params.append('search', filters.search);
+
+        return safeFetch(`${API_BASE_URL}/appointments/by-date?${params.toString()}`);
+    },
+
+
     // Appointments
     getTodayAppointments: async (filters = {}) => {
         const params = new URLSearchParams();
@@ -152,6 +167,15 @@ export const receptionistAPI = {
 
     getPatientByPhone: async (phone) => {
         return safeFetch(`${API_BASE_URL}/patients/phone/${phone}`);
+    },
+
+    createAppointment: async (data) => {
+        const res = await fetch(`${API_BASE_URL}/receptionist/appointments`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        });
+        return handleResponse(res);
     },
 
 

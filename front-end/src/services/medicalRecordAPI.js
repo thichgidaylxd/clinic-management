@@ -1,18 +1,16 @@
+// src/services/medicalRecordAPI.js
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/v1';
+const API_URL = 'http://localhost:5000/api/v1'; // Hoặc dùng biến môi trường
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('token');
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-/**
- * API service cho hồ sơ bệnh án
- */
 const medicalRecordAPI = {
     /**
-     * Tạo hồ sơ bệnh án
+     * Tạo hồ sơ bệnh án mới
      */
     create: async (data) => {
         try {
@@ -23,7 +21,31 @@ const medicalRecordAPI = {
             );
             return response.data;
         } catch (error) {
-            throw error.response?.data || error.message;
+            throw error.response?.data || { message: error.message };
+        }
+    },
+
+    /**
+     * Lấy danh sách hồ sơ của bác sĩ hiện tại (dùng cho trang MedicalRecords)
+     * @param {Object} params - { page, limit, search, specialty }
+     */
+    getAllForDoctor: async (params = {}) => {
+        try {
+            const response = await axios.get(
+                `${API_URL}/medical-records`,
+                {
+                    params: {
+                        page: params.page || 1,
+                        limit: params.limit || 10,
+                        search: params.search || '',
+                        specialty: params.specialty || 'all'
+                    },
+                    headers: getAuthHeader()
+                }
+            );
+            return response.data; // Trả về { success: true, data: [...], total, totalPages }
+        } catch (error) {
+            throw error.response?.data || { message: error.message };
         }
     },
 
@@ -38,7 +60,7 @@ const medicalRecordAPI = {
             );
             return response.data;
         } catch (error) {
-            throw error.response?.data || error.message;
+            throw error.response?.data || { message: error.message };
         }
     },
 
@@ -56,7 +78,7 @@ const medicalRecordAPI = {
             );
             return response.data;
         } catch (error) {
-            throw error.response?.data || error.message;
+            throw error.response?.data || { message: error.message };
         }
     },
 
@@ -72,7 +94,7 @@ const medicalRecordAPI = {
             );
             return response.data;
         } catch (error) {
-            throw error.response?.data || error.message;
+            throw error.response?.data || { message: error.message };
         }
     },
 
@@ -87,7 +109,7 @@ const medicalRecordAPI = {
             );
             return response.data;
         } catch (error) {
-            throw error.response?.data || error.message;
+            throw error.response?.data || { message: error.message };
         }
     }
 };

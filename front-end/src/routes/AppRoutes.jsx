@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 // Public Components
 import Home from "../pages/Home";
-import Booking from "../pages/Booking";
 import Layout from "../components/layout/Layout";
 
 // Protected Components
@@ -28,9 +27,6 @@ import AdminUsers from "../pages/admin/Users";
 import ReceptionistLayout from "../pages/receptionist/ReceptionistLayout";
 import ReceptionistAppointments from "../pages/receptionist/Appointments";
 import ReceptionistPatients from "../pages/receptionist/Patients";
-import ReceptionistWalkIn from "../pages/receptionist/WalkIn";
-import ReceptionistQueue from "../pages/receptionist/Queue";
-import ReceptionistDashboard from "../pages/receptionist/ReceptionistDashboard";
 
 // Doctor Pages
 import DoctorLayout from "../pages/doctor/DoctorLayout";
@@ -43,12 +39,12 @@ import DoctorLayout from "../pages/doctor/DoctorLayout";
 
 // Other
 import BookingV2 from "../pages/BookingV2";
-import PrescriptionPage from "../pages/doctor/PrescriptionPages";
 import InvoiceViewPage from "../pages/doctor/InvoiceViewPage";
 import MedicalRecordDetail from "../components/medicine/MedicalRecordDetail";
 import MedicalRecords from "../components/medicine/Medicalrecords";
 import ReceptionistInvoices from "../pages/receptionist/ReceptionistInvoices";
 import Examination from "../components/examination/Examination";
+import WorkSchedule from "../pages/doctor/Schedule";
 
 function AppRoutes() {
     return (
@@ -93,13 +89,11 @@ function AppRoutes() {
                     <ReceptionistLayout />
                 </ProtectedRoute>
             }>
-                <Route index element={<Navigate to="/receptionist/dashboard" replace />} />
-                <Route path="dashboard" element={<ReceptionistDashboard />} />
+                <Route index element={<Navigate to="/receptionist/appointments" replace />} />
                 <Route path="appointments" element={<ReceptionistAppointments />} />
                 <Route path="patients" element={<ReceptionistPatients />} />
-                <Route path="walk-in" element={<ReceptionistWalkIn />} />
-                <Route path="queue" element={<ReceptionistQueue />} />
                 <Route path="invoices" element={<ReceptionistInvoices />} />
+                <Route path="booking" element={<BookingV2 />} />
             </Route>
 
             {/* =================== DOCTOR ROUTES =================== */}
@@ -110,11 +104,11 @@ function AppRoutes() {
             }>
                 <Route index element={<Navigate to="/doctor/examination" replace />} />
                 {/* <Route path="dashboard" element={<DoctorDashboard />} /> */}
-                {/* <Route path="schedule" element={<DoctorSchedule />} /> */}
+                <Route path="schedule" element={<WorkSchedule />} />
                 <Route path="examination" element={<Examination />} />
 
-                {/* ⭐ NEW: Prescription routes */}
-                <Route path="prescription/:appointmentId" element={<PrescriptionPage />} />
+                {/* ⭐ NEW: Prescription routes
+                <Route path="prescription/:appointmentId" element={<PrescriptionPage />} /> */}
 
                 {/* ⭐ NEW: Medical Records routes */}
                 <Route path="medical-records" element={<MedicalRecords />} />

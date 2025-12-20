@@ -89,6 +89,17 @@ export const doctorAPI = {
         return handleResponse(response);
     },
 
+    getMyWorkSchedule: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+
+        const response = await fetch(
+            `${API_BASE_URL}/work-schedules/my${query ? `?${query}` : ''}`,
+            { headers: getAuthHeaders() }
+        );
+
+        return handleResponse(response);
+    },
+
     getMyScheduleByRange: async (fromDate, toDate) => {
         const user = JSON.parse(localStorage.getItem('user'));
         const doctorId = user?.ma_bac_si;

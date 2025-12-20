@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Calendar, Clock, DollarSign, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { bookingAPI } from '../../services/api';
+import { receptionistAPI } from '../../services/receptionistAPI';
 
 function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSuccess }) {
     const [formData, setFormData] = useState({
@@ -54,7 +55,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
 
             let response;
 
-            if (user && token) {
+            if (user && token && token.ten_vai_tro !== 'Lễ tân') {
                 // Authenticated booking
                 response = await bookingAPI.createAuthAppointment(appointmentData, token);
             } else {
@@ -72,6 +73,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
                 console.log('Guest booking data:', guestData);
 
                 response = await bookingAPI.createGuestAppointment(guestData);
+                receptionistAPI.confirmAppointment(response.ma_lich_hen);
             }
 
             onSuccess(response.data);
@@ -133,7 +135,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
             </div>
 
             {/* Patient Form (only if not logged in) */}
-            {!user && (
+            {(!user || user.ten_vai_tro === 'Lễ tân') && (
                 <form onSubmit={handleSubmit} className="space-y-4 mb-6">
                     <h3 className="font-bold text-gray-900 mb-4">👤 Thông tin của bạn</h3>
 
@@ -266,7 +268,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
             )}
 
             {/* If logged in, just ask for reason */}
-            {user && (
+            {user && user.ten_vai_tro !== 'Lễ tân' && (
                 <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Lý do khám <span className="text-red-500">*</span>

@@ -29,15 +29,22 @@ function ReceptionistAppointments() {
     const [noteModal, setNoteModal] = useState(false);
     const [note, setNote] = useState('');
 
+    const [selectedDate, setSelectedDate] = useState(
+        new Date().toISOString().split('T')[0]
+    );
+
+
     useEffect(() => {
         loadData();
-    }, [filters]);
+    }, [filters, selectedDate]);
+
 
     const loadData = async () => {
         setLoading(true);
         try {
             const [appointmentsRes, doctorsRes] = await Promise.all([
-                receptionistAPI.getTodayAppointments(filters),
+                //receptionistAPI.getTodayAppointments(filters),
+                receptionistAPI.getAppointmentsByDate(selectedDate, filters),
                 adminAPI.getDoctors(1, 100)
             ]);
             setAppointments(appointmentsRes.data || []);
@@ -137,7 +144,10 @@ function ReceptionistAppointments() {
         <div className="p-8">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Lịch hẹn hôm nay</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    Lịch hẹn ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                </h1>
+
                 <p className="text-gray-600">
                     {new Date().toLocaleDateString('vi-VN', {
                         weekday: 'long',
@@ -150,7 +160,7 @@ function ReceptionistAppointments() {
 
             {/* Filters */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     {/* Search */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -162,6 +172,18 @@ function ReceptionistAppointments() {
                             className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
                         />
                     </div>
+
+                    {/* Date Filter */}
+                    <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
+                        />
+                    </div>
+
 
                     {/* Doctor Filter */}
                     <select

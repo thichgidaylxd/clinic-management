@@ -15,12 +15,19 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
     const [error, setError] = useState('');
 
     const isEdit = !!schedule;
-
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return '';
+        const d = new Date(dateString);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
     useEffect(() => {
         if (schedule) {
             setFormData({
                 ma_bac_si_lich_lam_viec: schedule.ma_bac_si_lich_lam_viec || '',
-                ngay_lich_lam_viec: schedule.ngay_lich_lam_viec?.split('T')[0] || '',
+                ngay_lich_lam_viec: formatDateForInput(schedule.ngay_lich_lam_viec),
                 thoi_gian_bat_dau_lich_lam_viec: schedule.thoi_gian_bat_dau_lich_lam_viec?.substring(0, 5) || '',
                 thoi_gian_ket_thuc_lich_lam_viec: schedule.thoi_gian_ket_thuc_lich_lam_viec?.substring(0, 5) || '',
                 ma_phong_kham_lich_lam_viec: schedule.ma_phong_kham_lich_lam_viec || '',
@@ -28,6 +35,7 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
             });
         }
     }, [schedule]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -49,8 +57,9 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
         }
     };
 
-    // Get today's date for min attribute
-    const today = new Date().toISOString().split('T')[0];
+    const today = formatDateForInput(new Date());
+
+
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">

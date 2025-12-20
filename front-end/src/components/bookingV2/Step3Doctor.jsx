@@ -28,6 +28,7 @@ function Step3Doctor({ specialty, date, timeSlot, onNext, onBack }) {
             console.log('Loading doctors with params:', params);
 
             const data = await bookingAPI.getAvailableDoctors(params);
+            console.log('API response for available doctors:', data);
 
             console.log('Available doctors:', data);
 

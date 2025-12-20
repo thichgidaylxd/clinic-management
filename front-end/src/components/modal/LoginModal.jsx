@@ -45,13 +45,13 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                     // Điều hướng theo role
                     const role = data.data.user.ten_vai_tro;
                     if (role === "Admin") {
-                        navigate("/admin/dashboard");
+                        navigate("/admin/specialties");
                     } else if (role === "Bác sĩ") {
-                        navigate("/doctor/dashboard");
+                        navigate("/doctor/examination");
                     } else if (role === "Lễ tân") {
-                        navigate("/receptionist/dashboard");
+                        navigate("/receptionist/appointments");
                     } else if (role === "Bệnh nhân") {
-                        navigate("/patient/appointments");
+                        navigate("/");
                     } else {
                         navigate("/"); // fallback
                     }

@@ -1,401 +1,282 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    Calendar as CalendarIcon,
+    Calendar,
     Clock,
-    User,
-    ChevronLeft,
-    ChevronRight,
-    Filter,
-    Search,
     MapPin,
-    Stethoscope,
-    AlertCircle,
-    CheckCircle,
+    Activity,
+    CheckCircle2,
     XCircle,
-    Loader2
+    Loader2,
+    CalendarDays,
+    Building2,
+    Filter,
+    ChevronRight
 } from 'lucide-react';
 import { doctorAPI } from '../../services/doctorAPI';
 
-function Schedule() {
-    const [loading, setLoading] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [appointments, setAppointments] = useState([]);
-    const [filterStatus, setFilterStatus] = useState('all');
-    const [searchKeyword, setSearchKeyword] = useState('');
+function WorkSchedule() {
+    const [schedules, setSchedules] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState('all'); // all, active, inactive
 
     useEffect(() => {
-        loadAppointments();
-    }, [selectedDate]);
+        fetchSchedule();
+    }, []);
 
-    const loadAppointments = async () => {
-        setLoading(true);
+    const fetchSchedule = async () => {
         try {
-            const dateStr = selectedDate.toISOString().split('T')[0];
-            const response = await doctorAPI.getDashboard();
-            console.log('Dashboard data:', response);
-            setAppointments(response || []);
+            const res = await doctorAPI.getMyWorkSchedule();
+            setSchedules(res.data || []);
         } catch (error) {
-            console.error('Load appointments error:', error);
+            console.error(error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Calendar helpers
-    const getDaysInMonth = (date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay();
-
-        const days = [];
-
-        // Previous month days
-        const prevMonthLastDay = new Date(year, month, 0).getDate();
-        for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-            days.push({
-                day: prevMonthLastDay - i,
-                isCurrentMonth: false,
-                date: new Date(year, month - 1, prevMonthLastDay - i)
-            });
-        }
-
-        // Current month days
-        for (let day = 1; day <= daysInMonth; day++) {
-            days.push({
-                day,
-                isCurrentMonth: true,
-                date: new Date(year, month, day)
-            });
-        }
-
-        // Next month days
-        const remainingDays = 42 - days.length; // 6 rows × 7 days
-        for (let day = 1; day <= remainingDays; day++) {
-            days.push({
-                day,
-                isCurrentMonth: false,
-                date: new Date(year, month + 1, day)
-            });
-        }
-
-        return days;
+    // Format date
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('vi-VN', options);
     };
 
-    const isToday = (date) => {
-        const today = new Date();
-        return date.toDateString() === today.toDateString();
+    const formatShortDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
 
-    const isSelected = (date) => {
-        return date.toDateString() === selectedDate.toDateString();
+    const getDayOfWeek = (dateString) => {
+        const date = new Date(dateString);
+        const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+        return days[date.getDay()];
     };
 
-    const hasAppointments = (date) => {
-        // TODO: Check if date has appointments
-        return false;
-    };
-
-    const previousMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-    };
-
-    const nextMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-    };
-
-    const goToToday = () => {
-        const today = new Date();
-        setCurrentMonth(today);
-        setSelectedDate(today);
-    };
-
-    const getStatusBadge = (status) => {
-        const statusMap = {
-            0: { label: 'Chờ xác nhận', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-            1: { label: 'Đã xác nhận', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
-            2: { label: 'Đã check-in', color: 'bg-teal-100 text-teal-700', icon: CheckCircle },
-            3: { label: 'Đang khám', color: 'bg-purple-100 text-purple-700', icon: Stethoscope },
-            4: { label: 'Hoàn thành', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-            5: { label: 'Đã hủy', color: 'bg-red-100 text-red-700', icon: XCircle },
-            6: { label: 'Không đến', color: 'bg-gray-100 text-gray-700', icon: AlertCircle }
-        };
-        const s = statusMap[status] || statusMap[0];
-        const Icon = s.icon;
-        return (
-            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${s.color}`}>
-                <Icon className="w-3 h-3" />
-                {s.label}
-            </span>
-        );
-    };
-
-    const formatTime = (timeString) => {
-        if (!timeString) return '';
-        return timeString.substring(0, 5);
-    };
-
-    const filteredAppointments = appointments.filter(apt => {
-        const matchStatus = filterStatus === 'all' || apt.trang_thai_lich_hen === parseInt(filterStatus);
-        const matchSearch = searchKeyword === '' ||
-            apt.ten_benh_nhan?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-            apt.ho_benh_nhan?.toLowerCase().includes(searchKeyword.toLowerCase());
-        return matchStatus && matchSearch;
+    // Filter schedules
+    const filteredSchedules = schedules.filter(schedule => {
+        if (filter === 'active') return schedule.trang_thai_lich_lam_viec === 1;
+        if (filter === 'inactive') return schedule.trang_thai_lich_lam_viec === 0;
+        return true;
     });
 
-    const days = getDaysInMonth(currentMonth);
-    const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    const monthNames = [
-        'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-        'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
-    ];
+    // Group by date
+    const groupedSchedules = filteredSchedules.reduce((acc, schedule) => {
+        const date = formatShortDate(schedule.ngay_lich_lam_viec);
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(schedule);
+        return acc;
+    }, {});
+
+    // Statistics
+    const totalSchedules = schedules.length;
+    const activeSchedules = schedules.filter(s => s.trang_thai_lich_lam_viec === 1).length;
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <p className="text-gray-600">Đang tải lịch làm việc...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <CalendarIcon className="w-8 h-8 text-teal-600" />
-                    Lịch Làm Việc
-                </h1>
-                <p className="text-gray-600 mt-1">
-                    Quản lý lịch hẹn và thời gian làm việc
-                </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Calendar */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        {/* Calendar Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">
-                                {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-                            </h2>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={goToToday}
-                                    className="px-4 py-2 text-sm font-medium text-teal-600 hover:bg-teal-50 rounded-lg transition"
-                                >
-                                    Hôm nay
-                                </button>
-                                <button
-                                    onClick={previousMonth}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-                                <button
-                                    onClick={nextMonth}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition"
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
+        <div className="min-h-screen bg-gray-50 py-6">
+            <div className="max-w-7xl mx-auto px-4">
+                {/* Header */}
+                <div className="mb-6">
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                                    <CalendarDays className="w-8 h-8 text-blue-600" />
+                                    Lịch Làm Việc
+                                </h1>
+                                <p className="text-gray-600 mt-1">Quản lý lịch làm việc của bạn</p>
                             </div>
                         </div>
 
-                        {/* Calendar Grid */}
-                        <div className="grid grid-cols-7 gap-2">
-                            {/* Week days */}
-                            {weekDays.map(day => (
-                                <div key={day} className="text-center text-sm font-semibold text-gray-600 py-2">
-                                    {day}
+                        {/* Statistics Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-blue-500 p-3 rounded-lg">
+                                        <Calendar className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-blue-700 font-medium">Tổng ca làm</p>
+                                        <p className="text-2xl font-bold text-blue-900">{totalSchedules}</p>
+                                    </div>
                                 </div>
-                            ))}
-
-                            {/* Days */}
-                            {days.map((dayObj, index) => {
-                                const isCurrentMonth = dayObj.isCurrentMonth;
-                                const isTodayDate = isToday(dayObj.date);
-                                const isSelectedDate = isSelected(dayObj.date);
-                                const hasApts = hasAppointments(dayObj.date);
-
-                                return (
-                                    <button
-                                        key={index}
-                                        onClick={() => setSelectedDate(dayObj.date)}
-                                        className={`
-                                            aspect-square p-2 rounded-xl text-center transition relative
-                                            ${!isCurrentMonth ? 'text-gray-300' : 'text-gray-900'}
-                                            ${isTodayDate ? 'bg-teal-100 text-teal-900 font-bold' : ''}
-                                            ${isSelectedDate && !isTodayDate ? 'bg-teal-600 text-white font-bold' : ''}
-                                            ${!isSelectedDate && !isTodayDate ? 'hover:bg-gray-100' : ''}
-                                        `}
-                                    >
-                                        <span className="text-sm">{dayObj.day}</span>
-                                        {hasApts && (
-                                            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-teal-600 rounded-full"></div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div className="space-y-4">
-                    <div className="bg-gradient-to-br from-teal-600 to-blue-600 rounded-2xl p-6 text-white">
-                        <h3 className="text-lg font-bold mb-4">Tổng quan hôm nay</h3>
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-teal-100">Tổng lịch hẹn</span>
-                                <span className="text-2xl font-bold">0</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-teal-100">Đã hoàn thành</span>
-                                <span className="text-2xl font-bold">0</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-teal-100">Chờ khám</span>
-                                <span className="text-2xl font-bold">0</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">Ngày đã chọn</h3>
-                        <div className="space-y-2 text-sm">
-                            <p className="text-gray-600">
-                                {selectedDate.toLocaleDateString('vi-VN', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </p>
-                            <div className="pt-3 border-t">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-600">Lịch hẹn:</span>
-                                    <span className="font-semibold">{filteredAppointments.length}</span>
+                            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-green-500 p-3 rounded-lg">
+                                        <CheckCircle2 className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-green-700 font-medium">Đang hoạt động</p>
+                                        <p className="text-2xl font-bold text-green-900">{activeSchedules}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-purple-500 p-3 rounded-lg">
+                                        <Activity className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-purple-700 font-medium">Tỷ lệ hoạt động</p>
+                                        <p className="text-2xl font-bold text-purple-900">
+                                            {totalSchedules > 0 ? Math.round((activeSchedules / totalSchedules) * 100) : 0}%
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Appointments List */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-                <div className="p-6 border-b border-gray-100">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">
-                        Lịch hẹn ngày {selectedDate.toLocaleDateString('vi-VN')}
-                    </h2>
-
-                    {/* Filters */}
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <div className="flex-1">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type="text"
-                                    value={searchKeyword}
-                                    onChange={(e) => setSearchKeyword(e.target.value)}
-                                    placeholder="Tìm theo tên bệnh nhân..."
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="w-full md:w-64">
-                            <div className="relative">
-                                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <select
-                                    value={filterStatus}
-                                    onChange={(e) => setFilterStatus(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none appearance-none bg-white"
-                                >
-                                    <option value="all">Tất cả trạng thái</option>
-                                    <option value="0">Chờ xác nhận</option>
-                                    <option value="1">Đã xác nhận</option>
-                                    <option value="2">Đã check-in</option>
-                                    <option value="3">Đang khám</option>
-                                    <option value="4">Hoàn thành</option>
-                                    <option value="5">Đã hủy</option>
-                                </select>
-                            </div>
+                {/* Filter */}
+                <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+                    <div className="flex items-center gap-4">
+                        <Filter className="w-5 h-5 text-gray-600" />
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setFilter('all')}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Tất cả ({totalSchedules})
+                            </button>
+                            <button
+                                onClick={() => setFilter('active')}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'active'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Đang hoạt động ({activeSchedules})
+                            </button>
+                            <button
+                                onClick={() => setFilter('inactive')}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'inactive'
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                Ngừng hoạt động ({totalSchedules - activeSchedules})
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                {/* Appointments */}
-                <div className="p-6">
-                    {loading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
-                        </div>
-                    ) : filteredAppointments.length === 0 ? (
-                        <div className="text-center py-12">
-                            <CalendarIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                            <p className="text-gray-600 mb-2">
-                                {searchKeyword || filterStatus !== 'all'
-                                    ? 'Không tìm thấy lịch hẹn phù hợp'
-                                    : 'Không có lịch hẹn nào trong ngày này'
-                                }
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                Chọn ngày khác để xem lịch hẹn
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {filteredAppointments.map((apt) => (
-                                <div
-                                    key={apt.ma_lich_hen}
-                                    className="border border-gray-200 rounded-xl p-4 hover:border-teal-600 hover:bg-teal-50 transition"
-                                >
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div className="flex items-center gap-2 text-teal-700 font-semibold">
-                                                    <Clock className="w-4 h-4" />
-                                                    <span>
-                                                        {formatTime(apt.gio_bat_dau)} - {formatTime(apt.gio_ket_thuc)}
-                                                    </span>
-                                                </div>
-                                                {getStatusBadge(apt.trang_thai_lich_hen)}
-                                            </div>
-
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                                <div className="flex items-center gap-2 text-gray-700">
-                                                    <User className="w-4 h-4 text-gray-400" />
-                                                    <span className="font-medium">
-                                                        {apt.ho_benh_nhan} {apt.ten_benh_nhan}
-                                                    </span>
-                                                </div>
-
-                                                <div className="flex items-center gap-2 text-gray-700">
-                                                    <Stethoscope className="w-4 h-4 text-gray-400" />
-                                                    <span>{apt.ten_dich_vu}</span>
-                                                </div>
-
-                                                {apt.ten_phong_kham && (
-                                                    <div className="flex items-center gap-2 text-gray-700">
-                                                        <MapPin className="w-4 h-4 text-gray-400" />
-                                                        <span>{apt.ten_phong_kham}</span>
-                                                    </div>
-                                                )}
-
-                                                {apt.ly_do_kham_lich_hen && (
-                                                    <div className="flex items-center gap-2 text-gray-700">
-                                                        <AlertCircle className="w-4 h-4 text-gray-400" />
-                                                        <span className="text-sm">{apt.ly_do_kham_lich_hen}</span>
-                                                    </div>
-                                                )}
-                                            </div>
+                {/* Schedule List */}
+                {filteredSchedules.length === 0 ? (
+                    <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                        <CalendarDays className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                        <p className="text-gray-500 text-lg mb-2">Không có lịch làm việc</p>
+                        <p className="text-gray-400">
+                            {filter === 'active' && 'Không có ca làm việc đang hoạt động'}
+                            {filter === 'inactive' && 'Không có ca làm việc ngừng hoạt động'}
+                            {filter === 'all' && 'Chưa có lịch làm việc nào được tạo'}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-6">
+                        {Object.entries(groupedSchedules).map(([date, daySchedules]) => (
+                            <div key={date} className="bg-white rounded-lg shadow-md overflow-hidden">
+                                {/* Date Header */}
+                                <div className="bg-gradient-to-r from-blue-500 to-blue-400 p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-3">
+                                            <Calendar className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-semibold text-lg">
+                                                {formatDate(daySchedules[0].ngay_lich_lam_viec)}
+                                            </p>
+                                            <p className="text-blue-100 text-sm">
+                                                {daySchedules.length} ca làm việc
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+
+                                {/* Schedule Items */}
+                                <div className="divide-y divide-gray-200">
+                                    {daySchedules.map((schedule) => (
+                                        <div
+                                            key={schedule.ma_lich_lam_viec}
+                                            className="p-6 hover:bg-gray-50 transition-colors"
+                                        >
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1 space-y-3">
+                                                    {/* Time */}
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="bg-blue-100 p-2 rounded-lg">
+                                                            <Clock className="w-5 h-5 text-blue-600" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-600">Thời gian</p>
+                                                            <p className="font-semibold text-gray-900">
+                                                                {schedule.thoi_gian_bat_dau_lich_lam_viec} - {schedule.thoi_gian_ket_thuc_lich_lam_viec}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Room */}
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="bg-purple-100 p-2 rounded-lg">
+                                                            <Building2 className="w-5 h-5 text-purple-600" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm text-gray-600">Phòng khám</p>
+                                                            <p className="font-semibold text-gray-900">
+                                                                {schedule.ten_phong_kham}
+                                                                {schedule.so_phong_kham && (
+                                                                    <span className="text-gray-500 font-normal">
+                                                                        {' '}(Phòng {schedule.so_phong_kham})
+                                                                    </span>
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Status Badge */}
+                                                <div>
+                                                    {schedule.trang_thai_lich_lam_viec === 1 ? (
+                                                        <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full">
+                                                            <CheckCircle2 className="w-4 h-4" />
+                                                            <span className="font-medium text-sm">Đang hoạt động</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full">
+                                                            <XCircle className="w-4 h-4" />
+                                                            <span className="font-medium text-sm">Ngừng hoạt động</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
 
-export default Schedule;
+export default WorkSchedule;

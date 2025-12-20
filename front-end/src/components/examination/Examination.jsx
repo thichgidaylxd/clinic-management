@@ -10,6 +10,12 @@ import InvoiceSummary from './InvoiceSummary';
 import { doctorAPI } from '../../services/doctorAPI';
 import medicineAPI from '../../services/medicineAPI';
 import prescriptionAPI from '../../services/prescriptionAPI';
+function handleMedicalRecordChange(field, value) {
+    setMedicalRecord(prev => ({
+        ...prev,
+        [field]: value
+    }));
+}
 
 function Examination() {
     const [appointments, setAppointments] = useState([]);
@@ -210,11 +216,6 @@ function Examination() {
     );
 }
 
-function handleMedicalRecordChange(field, value) {
-    setMedicalRecord(prev => ({
-        ...prev,
-        [field]: value
-    }));
-}
+
 
 export default Examination;

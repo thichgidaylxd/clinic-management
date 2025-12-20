@@ -185,7 +185,7 @@ function Medicines() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="text-gray-900">
-                                                {medicine.don_vi_tinh_thuoc}
+                                                {medicine.don_vi_tinh}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">

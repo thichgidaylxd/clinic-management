@@ -179,7 +179,7 @@ function MyAppointments() {
                                             <div>
                                                 <div className="text-sm text-gray-500">Giờ khám</div>
                                                 <div className="font-medium text-gray-900">
-                                                    {appointment.thoi_gian_bat_dau} - {appointment.thoi_gian_ket_thuc}
+                                                    {appointment.gio_bat_dau.slice(0, 5)} - {appointment.gio_ket_thuc.slice(0, 5)}
                                                 </div>
                                             </div>
                                         </div>
