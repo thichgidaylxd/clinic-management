@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import Step1Specialty from '../compoments/booking/Step1Specialty';
-import Step2Doctor from '../compoments/booking/Step2Doctor';
-import Step3Service from '../compoments/booking/Step3Service';
-import Step4DateTime from '../compoments/booking/Step4DateTime';
-import Step5Confirm from '../compoments/booking/Step5Confirm';
-import StepIndicator from '../compoments/booking/StepIndicator';
-import SuccessModal from '../compoments/booking/SuccessModal';
+import Step1Specialty from '../components/booking/Step1Specialty';
+import Step2Doctor from '../components/booking/Step2Doctor';
+import Step3Service from '../components/booking/Step3Service';
+import Step4DateTime from '../components/booking/Step4DateTime';
+import Step5Confirm from '../components/booking/Step5Confirm';
+import StepIndicator from '../components/booking/StepIndicator';
+import SuccessModal from '../components/booking/SuccessModal';
 
 // Import components
 

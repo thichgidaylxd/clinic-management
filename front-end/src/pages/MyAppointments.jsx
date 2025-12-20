@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, MapPin, Phone, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { bookingAPI } from '../services/api';
-import CancelModal from '../compoments/appointments/CancelModal';
+import CancelModal from '../components/appointments/CancelModal';
 
 function MyAppointments() {
     const navigate = useNavigate();
@@ -179,7 +179,7 @@ function MyAppointments() {
                                             <div>
                                                 <div className="text-sm text-gray-500">Giờ khám</div>
                                                 <div className="font-medium text-gray-900">
-                                                    {appointment.thoi_gian_bat_dau} - {appointment.thoi_gian_ket_thuc}
+                                                    {appointment.gio_bat_dau.slice(0, 5)} - {appointment.gio_ket_thuc.slice(0, 5)}
                                                 </div>
                                             </div>
                                         </div>

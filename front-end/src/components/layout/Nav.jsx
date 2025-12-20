@@ -1,9 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight, User } from "lucide-react";
 import { Stethoscope, Layers, Briefcase, Info, BookOpen } from "lucide-react";
+import { Navigate } from "react-router-dom";
+
 function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+
+        const userData = JSON.parse(storedUser);
+
+        // Check if user is Admin
+        if (userData && userData.ten_vai_tro == 'Admin') {
+            setIsAdmin(true);
+        }
+
+    }, []);
+
 
     return (
         <nav className="container mx-auto px-6 py-2 left-0 w-full bg-white/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
@@ -40,7 +55,7 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                         </a>
                     ))}
                     <button
-                        onClick={() => navigate('/booking')}
+                        onClick={() => Navigate('/booking')}
                         className="flex items-center gap-2 relative text-gray-600 hover:text-teal-700 transition 
               after:content-[''] after:absolute after:left-1/2 after:bottom-0 
               after:w-0 after:h-[2px] after:bg-teal-700 after:transition-all after:duration-300 
@@ -76,11 +91,19 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                                         Profile
                                     </a>
                                     <a
-                                        href="/appointments"
+                                        href="/patient/appointments"
                                         className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
                                     >
                                         Lịch sử
                                     </a>
+                                    {isAdmin && (
+                                        <a
+                                            href="/admin/dashboard"
+                                            className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-100"
+                                        >
+                                            Admin
+                                        </a>)
+                                    }
                                     <button
                                         onClick={onLogout}
                                         className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"

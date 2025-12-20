@@ -24,7 +24,7 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             const response = await fetch("http://localhost:5000/api/v1/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(formData),
             });
 
             const data = await response.json();
@@ -35,16 +35,28 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                 localStorage.setItem("token", data.data.accessToken);
                 localStorage.setItem("user", JSON.stringify(data.data.user));
 
-
-
                 // chạy progress rồi mới navigate
                 NProgress.start();
                 NProgress.set(0.3);
                 setTimeout(() => NProgress.set(0.7), 300);
                 setTimeout(() => {
                     NProgress.done();
-                    window.location.reload();
+
+                    // Điều hướng theo role
+                    const role = data.data.user.ten_vai_tro;
+                    if (role === "Admin") {
+                        navigate("/admin/specialties");
+                    } else if (role === "Bác sĩ") {
+                        navigate("/doctor/examination");
+                    } else if (role === "Lễ tân") {
+                        navigate("/receptionist/appointments");
+                    } else if (role === "Bệnh nhân") {
+                        navigate("/");
+                    } else {
+                        navigate("/"); // fallback
+                    }
                 }, 600);
+
                 onClose();
             } else {
                 setError(data.message || "Đăng nhập thất bại");
@@ -56,6 +68,8 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             setLoading(false);
         }
     };
+
+
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
