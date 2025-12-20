@@ -41,6 +41,28 @@ class InvoiceController {
         }
     }
 
+    // ==============================
+    // GET /api/v1/invoices/my
+    // ==============================
+    static async getMyInvoices(req, res) {
+        try {
+            const userId = req.user.ma_nguoi_dung;
+
+            const invoices = await InvoiceService.getMyInvoices(userId);
+
+            return res.json({
+                success: true,
+                data: invoices
+            });
+        } catch (error) {
+            console.error('❌ Get my invoices error:', error);
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+
 
     // ==============================
     // IN HÓA ĐƠN

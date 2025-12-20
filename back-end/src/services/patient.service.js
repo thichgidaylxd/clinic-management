@@ -5,7 +5,7 @@ class PatientService {
     static async create(patientData) {
         const { so_dien_thoai_benh_nhan } = patientData;
 
-        // Kiểm tra số điện thoại đã tồn tại (nếu có)
+        // Kiểm tra số điện thoại đã tồn tại
         if (so_dien_thoai_benh_nhan) {
             const exists = await PatientModel.existsByPhone(so_dien_thoai_benh_nhan);
             if (exists) {
@@ -22,17 +22,8 @@ class PatientService {
         const patientId = await PatientModel.create(patientData);
         const patient = await PatientModel.findById(patientId);
 
-        // Chuyển BLOB sang base64
-        if (patient.hinh_anh_benh_nhan) {
+        if (patient?.hinh_anh_benh_nhan) {
             patient.hinh_anh_benh_nhan = patient.hinh_anh_benh_nhan.toString('base64');
-        }
-
-        // Tính BMI nếu có chiều cao và cân nặng
-        if (patient.chieu_cao_benh_nhan && patient.can_nang_benh_nhan) {
-            patient.bmi_info = PatientModel.calculateBMI(
-                patient.chieu_cao_benh_nhan,
-                patient.can_nang_benh_nhan
-            );
         }
 
         return patient;
@@ -42,47 +33,25 @@ class PatientService {
     static async getAll(page, limit, search, gender) {
         const result = await PatientModel.findAll(page, limit, search, gender);
 
-        // Chuyển BLOB sang base64 và tính BMI
-        result.data = result.data.map(patient => {
-            const patientData = {
-                ...patient,
-                hinh_anh_benh_nhan: patient.hinh_anh_benh_nhan
-                    ? patient.hinh_anh_benh_nhan.toString('base64')
-                    : null
-            };
-
-            // Tính BMI
-            if (patient.chieu_cao_benh_nhan && patient.can_nang_benh_nhan) {
-                patientData.bmi_info = PatientModel.calculateBMI(
-                    patient.chieu_cao_benh_nhan,
-                    patient.can_nang_benh_nhan
-                );
-            }
-
-            return patientData;
-        });
+        result.data = result.data.map(patient => ({
+            ...patient,
+            hinh_anh_benh_nhan: patient.hinh_anh_benh_nhan
+                ? patient.hinh_anh_benh_nhan.toString('base64')
+                : null
+        }));
 
         return result;
     }
 
-    // Lấy thông tin bệnh nhân theo ID
+    // Lấy bệnh nhân theo ID
     static async getById(patientId) {
         const patient = await PatientModel.findById(patientId);
         if (!patient) {
             throw new Error('Không tìm thấy bệnh nhân');
         }
 
-        // Chuyển BLOB sang base64
         if (patient.hinh_anh_benh_nhan) {
             patient.hinh_anh_benh_nhan = patient.hinh_anh_benh_nhan.toString('base64');
-        }
-
-        // Tính BMI
-        if (patient.chieu_cao_benh_nhan && patient.can_nang_benh_nhan) {
-            patient.bmi_info = PatientModel.calculateBMI(
-                patient.chieu_cao_benh_nhan,
-                patient.can_nang_benh_nhan
-            );
         }
 
         return patient;
@@ -94,15 +63,6 @@ class PatientService {
         if (!patient) {
             throw new Error('Không tìm thấy bệnh nhân với số điện thoại này');
         }
-
-        // Tính BMI
-        if (patient.chieu_cao_benh_nhan && patient.can_nang_benh_nhan) {
-            patient.bmi_info = PatientModel.calculateBMI(
-                patient.chieu_cao_benh_nhan,
-                patient.can_nang_benh_nhan
-            );
-        }
-
         return patient;
     }
 
@@ -113,7 +73,6 @@ class PatientService {
             throw new Error('Không tìm thấy bệnh nhân');
         }
 
-        // Kiểm tra số điện thoại mới có trùng không
         if (updateData.so_dien_thoai_benh_nhan) {
             const exists = await PatientModel.existsByPhone(
                 updateData.so_dien_thoai_benh_nhan,
@@ -124,7 +83,6 @@ class PatientService {
             }
         }
 
-        // Xử lý hình ảnh base64 nếu có
         if (updateData.hinh_anh_benh_nhan) {
             const base64Data = updateData.hinh_anh_benh_nhan.replace(/^data:.*?;base64,/, '');
             updateData.hinh_anh_benh_nhan = Buffer.from(base64Data, 'base64');
@@ -145,7 +103,6 @@ class PatientService {
             throw new Error('Không tìm thấy bệnh nhân');
         }
 
-        // Kiểm tra bệnh nhân có đang được sử dụng không
         const inUse = await PatientModel.isInUse(patientId);
         if (inUse) {
             throw new Error('Không thể xóa bệnh nhân đã có lịch hẹn hoặc hồ sơ bệnh án');
@@ -159,7 +116,7 @@ class PatientService {
         return true;
     }
 
-    // Lấy lịch sử khám bệnh
+    // Lịch sử khám
     static async getMedicalHistory(patientId, page, limit) {
         const patient = await PatientModel.findById(patientId);
         if (!patient) {
@@ -169,7 +126,7 @@ class PatientService {
         return await PatientModel.getMedicalHistory(patientId, page, limit);
     }
 
-    // Lấy lịch hẹn của bệnh nhân
+    // Lịch hẹn
     static async getAppointments(patientId, page, limit, status) {
         const patient = await PatientModel.findById(patientId);
         if (!patient) {
@@ -179,61 +136,41 @@ class PatientService {
         return await PatientModel.getAppointments(patientId, page, limit, status);
     }
 
-    // Thống kê bệnh nhân theo giới tính
+    // Thống kê
     static async getStatsByGender() {
         return await PatientModel.getStatsByGender();
     }
 
-    // Lấy bệnh nhân mới nhất
     static async getRecentPatients(limit = 10) {
         return await PatientModel.getRecentPatients(limit);
     }
 
-    // Tạo hoặc lấy bệnh nhân theo SĐT (cho chức năng đặt lịch)
+    // Tìm hoặc tạo bệnh nhân (đặt lịch)
     static async findOrCreate(patientData) {
         const {
             ten_benh_nhan,
-            ho_benh_nhan,  // ✅ THÊM
+            ho_benh_nhan,
             so_dien_thoai_benh_nhan,
-            email_benh_nhan,  // ✅ THÊM
-            ngay_sinh_benh_nhan,  // ✅ THÊM
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan,
-            ma_nguoi_dung_benh_nhan  // ✅ THÊM
+            ma_nguoi_dung_benh_nhan
         } = patientData;
 
-        console.log('🔍 Finding patient by phone:', so_dien_thoai_benh_nhan);
-
-        // 1. Tìm bệnh nhân theo SĐT
         let patient = await PatientModel.findByPhone(so_dien_thoai_benh_nhan);
-
-        if (patient) {
-            console.log('✅ Patient found:', patient.ma_benh_nhan);
-            return patient;
-        }
-
-        // 2. Nếu chưa có → Tạo mới
-        console.log('➕ Creating new patient...');
+        if (patient) return patient;
 
         const patientId = await PatientModel.create({
             ten_benh_nhan,
-            ho_benh_nhan,  // ✅ THÊM
+            ho_benh_nhan,
             so_dien_thoai_benh_nhan,
-            email_benh_nhan,  // ✅ THÊM
-            ngay_sinh_benh_nhan,  // ✅ THÊM
+            email_benh_nhan,
+            ngay_sinh_benh_nhan,
             gioi_tinh_benh_nhan,
-            ma_nguoi_dung_benh_nhan  // ✅ THÊM
+            ma_nguoi_dung_benh_nhan
         });
 
-        console.log('✅ Patient created:', patientId);
-
-        // 3. Lấy lại thông tin bệnh nhân vừa tạo
-        const newPatient = await PatientModel.findById(patientId);
-
-        if (!newPatient) {
-            throw new Error('Không thể tạo bệnh nhân');
-        }
-
-        return newPatient;
+        return await PatientModel.findById(patientId);
     }
 }
 

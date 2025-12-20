@@ -22,12 +22,6 @@ class PrescriptionValidator {
                     'any.required': 'Mã bác sĩ là bắt buộc'
                 }),
 
-            // Medical record fields
-            chieu_cao: Joi.number().min(0).max(300).allow(null),
-            can_nang: Joi.number().min(0).max(500).allow(null),
-            huyet_ap: Joi.number().min(0).max(300).allow(null),
-            nhiet_do: Joi.number().min(30).max(45).allow(null),
-            nhip_tim: Joi.number().min(0).max(300).allow(null),
 
             trieu_chung: Joi.string()
                 .max(5000)

@@ -306,12 +306,6 @@ router.get(
  *                 type: string
  *                 pattern: '^[0-9]{10}$'
  *                 example: "0123456789"
- *               chieu_cao_benh_nhan:
- *                 type: number
- *                 example: 170
- *               can_nang_benh_nhan:
- *                 type: number
- *                 example: 65
  *               hinh_anh_benh_nhan:
  *                 type: string
  *                 description: Hình ảnh dạng base64
@@ -357,10 +351,6 @@ router.post(
  *               so_dien_thoai_benh_nhan:
  *                 type: string
  *                 pattern: '^[0-9]{10}$'
- *               chieu_cao_benh_nhan:
- *                 type: number
- *               can_nang_benh_nhan:
- *                 type: number
  *               hinh_anh_benh_nhan:
  *                 type: string
  *     responses:

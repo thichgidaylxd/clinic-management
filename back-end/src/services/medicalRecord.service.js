@@ -11,11 +11,6 @@ class MedicalRecordService {
             ma_benh_nhan,
             ma_bac_si,
             ma_chuyen_khoa,
-            chieu_cao,
-            can_nang,
-            huyet_ap,
-            nhiet_do,
-            nhip_tim,
             trieu_chung,
             chuan_doan,
             phuong_phap_dieu_tri
@@ -35,11 +30,6 @@ class MedicalRecordService {
             ma_benh_nhan,
             ma_bac_si,
             ma_chuyen_khoa,
-            chieu_cao,
-            can_nang,
-            huyet_ap,
-            nhiet_do,
-            nhip_tim,
             trieu_chung,
             chuan_doan,
             phuong_phap_dieu_tri
