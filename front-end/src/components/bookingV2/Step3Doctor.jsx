@@ -49,13 +49,11 @@ function Step3Doctor({ specialty, date, timeSlot, onNext, onBack }) {
     const handleSelectDoctor = (doctor) => {
         setSelectedDoctor(doctor);
     };
-
     const handleNext = () => {
         if (!selectedDoctor) {
             setError('Vui lòng chọn bác sĩ');
             return;
         }
-
         onNext({ doctor: selectedDoctor });
     };
 

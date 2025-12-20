@@ -10,7 +10,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 
 // Patient Pages
 import MyAppointments from "../pages/MyAppointments";
-import AppointmentDetail from "../pages/patient/AppointmentDetail";
+import AppointmentDetail from "../components/AppointmentDetail";
+import RateDoctorPage from "../pages/RateDoctorPage"; // ⭐ NEW
 
 // Admin Pages
 import AdminLayout from "../pages/admin/AdminLayout";
@@ -30,12 +31,6 @@ import ReceptionistPatients from "../pages/receptionist/Patients";
 
 // Doctor Pages
 import DoctorLayout from "../pages/doctor/DoctorLayout";
-// import DoctorDashboard from "../pages/doctor/DoctorDashboard";
-// import DoctorSchedule from "../pages/doctor/Schedule";
-// import DoctorExamination from "../pages/doctor/Examination";
-
-// ⭐ NEW: Prescription & Medical Records Pages
-
 
 // Other
 import BookingV2 from "../pages/BookingV2";
@@ -45,6 +40,9 @@ import MedicalRecords from "../components/medicine/Medicalrecords";
 import ReceptionistInvoices from "../pages/receptionist/ReceptionistInvoices";
 import Examination from "../components/examination/Examination";
 import WorkSchedule from "../pages/doctor/Schedule";
+import Profile from "../components/Profile";
+import MyInvoices from "../pages/MyInvoices";
+
 
 function AppRoutes() {
     return (
@@ -64,6 +62,9 @@ function AppRoutes() {
                 <Route index element={<Navigate to="/patient/appointments" replace />} />
                 <Route path="appointments" element={<MyAppointments />} />
                 <Route path="appointments/:id" element={<AppointmentDetail />} />
+                <Route path="appointments/:id/rate" element={<RateDoctorPage />} /> {/* ⭐ NEW */}
+                <Route path="my-invoices" element={<MyInvoices />} />
+                <Route path="profile" element={<Profile />} />
             </Route>
 
             {/* =================== ADMIN ROUTES =================== */}
@@ -103,20 +104,13 @@ function AppRoutes() {
                 </ProtectedRoute>
             }>
                 <Route index element={<Navigate to="/doctor/examination" replace />} />
-                {/* <Route path="dashboard" element={<DoctorDashboard />} /> */}
                 <Route path="schedule" element={<WorkSchedule />} />
                 <Route path="examination" element={<Examination />} />
-
-                {/* ⭐ NEW: Prescription routes
-                <Route path="prescription/:appointmentId" element={<PrescriptionPage />} /> */}
-
-                {/* ⭐ NEW: Medical Records routes */}
                 <Route path="medical-records" element={<MedicalRecords />} />
                 <Route path="medical-records/:recordId" element={<MedicalRecordDetail />} />
             </Route>
 
             {/* =================== SHARED ROUTES (Multi-role) =================== */}
-            {/* ⭐ NEW: Invoice route - Accessible by Doctor, Receptionist, Admin */}
             <Route path="/invoices/:invoiceId" element={
                 <ProtectedRoute allowedRoles={['Bác sĩ', 'Lễ tân', 'Admin']}>
                     <InvoiceViewPage />
@@ -129,6 +123,7 @@ function AppRoutes() {
                     <div className="text-center">
                         <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
                         <p className="text-xl text-gray-600 mb-8">Trang không tồn tại</p>
+
                         <a
                             href="/"
                             className="px-6 py-3 bg-teal-700 text-white rounded-xl hover:bg-teal-800 transition"
@@ -138,7 +133,7 @@ function AppRoutes() {
                     </div>
                 </div>
             } />
-        </Routes>
+        </Routes >
     );
 }
 

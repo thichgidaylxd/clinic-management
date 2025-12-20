@@ -32,6 +32,17 @@ const invoiceAPI = {
         }
     },
 
+    getMyInvoices: async () => {
+        const res = await fetch(`${API_URL}/invoices/my`, {
+            headers: getAuthHeader()
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Lỗi tải hoá đơn');
+
+        return data;
+    },
+
     /**
      * =========================
      * Lấy chi tiết 1 hóa đơn
@@ -40,7 +51,7 @@ const invoiceAPI = {
     getById: async (invoiceId) => {
         try {
             const response = await axios.get(
-                `${API_URL}/invoices/${invoiceId}`,
+                `${API_URL}/prescriptions/invoice/${invoiceId}`,
                 { headers: getAuthHeader() }
             );
             return response.data;

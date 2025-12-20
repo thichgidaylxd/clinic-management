@@ -109,26 +109,7 @@ function MedicalRecords() {
                         </div>
                     </div>
 
-                    {/* Filter by Specialty */}
-                    <div>
-                        <div className="relative">
-                            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <select
-                                value={filterSpecialty}
-                                onChange={(e) => {
-                                    setFilterSpecialty(e.target.value);
-                                    setCurrentPage(1); // Reset trang khi thay đổi filter
-                                }}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:border-teal-500 focus:outline-none appearance-none bg-white focus:ring-2 focus:ring-teal-200"
-                            >
-                                <option value="all">Tất cả chuyên khoa</option>
-                                <option value="Nha khoa">Nha khoa</option>
-                                <option value="Nội khoa">Nội khoa</option>
-                                <option value="Ngoại khoa">Ngoại khoa</option>
-                                {/* Nếu có danh sách chuyên khoa động từ API, bạn có thể load vào đây */}
-                            </select>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, ClipboardList, Loader2 } from 'lucide-react';
+import { Activity, AlertCircle, CheckCircle2, ClipboardList, Loader2 } from 'lucide-react';
 import AppointmentList from './AppointmentList';
 import PatientInfo from './PatientInfo';
-import VitalSignsForm from './VitalSignsForm';
 import MedicalInfoForm from './MedicalInfoForm';
 import MedicinePrescription from './MedicinePrescription';
 import InvoiceNote from './InvoiceNote';
@@ -10,12 +9,7 @@ import InvoiceSummary from './InvoiceSummary';
 import { doctorAPI } from '../../services/doctorAPI';
 import medicineAPI from '../../services/medicineAPI';
 import prescriptionAPI from '../../services/prescriptionAPI';
-function handleMedicalRecordChange(field, value) {
-    setMedicalRecord(prev => ({
-        ...prev,
-        [field]: value
-    }));
-}
+
 
 function Examination() {
     const [appointments, setAppointments] = useState([]);
@@ -28,13 +22,13 @@ function Examination() {
     const [medicines, setMedicines] = useState([]);
     const [selectedMedicines, setSelectedMedicines] = useState([]);
     const [invoiceNote, setInvoiceNote] = useState('');
-
+    function handleMedicalRecordChange(field, value) {
+        setMedicalRecord(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    }
     const [medicalRecord, setMedicalRecord] = useState({
-        chieu_cao: '',
-        can_nang: '',
-        huyet_ap: '',
-        nhiet_do: '',
-        nhip_tim: '',
         trieu_chung: '',
         chuan_doan: '',
         phuong_phap_dieu_tri: ''
@@ -66,15 +60,11 @@ function Examination() {
         setError('');
         setSuccess(false);
         setMedicalRecord({
-            chieu_cao: '',
-            can_nang: '',
-            huyet_ap: '',
-            nhiet_do: '',
-            nhip_tim: '',
             trieu_chung: '',
             chuan_doan: '',
             phuong_phap_dieu_tri: ''
         });
+
         setSelectedMedicines([]);
         setInvoiceNote('');
     };
@@ -92,7 +82,9 @@ function Examination() {
             const payload = {
                 ma_lich_hen: selectedAppointment.ma_lich_hen,
                 ma_bac_si: selectedAppointment.ma_bac_si,
-                ...medicalRecord,
+                trieu_chung: medicalRecord.trieu_chung,
+                chuan_doan: medicalRecord.chuan_doan,
+                phuong_phap_dieu_tri: medicalRecord.phuong_phap_dieu_tri,
                 medicines: selectedMedicines.map(med => ({
                     ma_thuoc: med.ma_thuoc,
                     so_luong: parseInt(med.so_luong),
@@ -176,10 +168,6 @@ function Examination() {
                             <>
                                 <PatientInfo appointment={selectedAppointment} />
 
-                                <VitalSignsForm
-                                    medicalRecord={medicalRecord}
-                                    onChange={handleMedicalRecordChange}
-                                />
 
                                 <MedicalInfoForm
                                     medicalRecord={medicalRecord}

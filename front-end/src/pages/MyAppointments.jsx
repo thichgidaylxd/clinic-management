@@ -212,7 +212,7 @@ function MyAppointments() {
                                     {/* Actions */}
                                     <div className="flex gap-3 pt-4 border-t">
                                         <button
-                                            onClick={() => navigate(`/appointments/${appointment.ma_lich_hen}`)}
+                                            onClick={() => navigate(`/patient/appointments/${appointment.ma_lich_hen}`)}
                                             className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium"
                                         >
                                             Chi tiết
@@ -229,7 +229,7 @@ function MyAppointments() {
 
                                         {appointment.trang_thai_lich_hen === 3 && (
                                             <button
-                                                onClick={() => navigate(`/appointments/${appointment.ma_lich_hen}/rate`)}
+                                                onClick={() => navigate(`/patient/appointments/${appointment.ma_lich_hen}/rate`)}
                                                 className="flex-1 px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-800 transition font-medium"
                                             >
                                                 Đánh giá

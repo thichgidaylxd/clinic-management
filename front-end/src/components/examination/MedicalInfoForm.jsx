@@ -17,7 +17,7 @@ function MedicalInfoForm({ medicalRecord, onChange }) {
                     </label>
                     <textarea
                         value={medicalRecord.trieu_chung}
-                        onChange={(e) => handleMedicalRecordChange('trieu_chung', e.target.value)}
+                        onChange={(e) => onChange('trieu_chung', e.target.value)}
                         rows="3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Mô tả triệu chứng của bệnh nhân..."
@@ -30,7 +30,7 @@ function MedicalInfoForm({ medicalRecord, onChange }) {
                     </label>
                     <textarea
                         value={medicalRecord.chuan_doan}
-                        onChange={(e) => handleMedicalRecordChange('chuan_doan', e.target.value)}
+                        onChange={(e) => onChange('chuan_doan', e.target.value)}
                         rows="3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Chẩn đoán bệnh..."
@@ -43,7 +43,7 @@ function MedicalInfoForm({ medicalRecord, onChange }) {
                     </label>
                     <textarea
                         value={medicalRecord.phuong_phap_dieu_tri}
-                        onChange={(e) => handleMedicalRecordChange('phuong_phap_dieu_tri', e.target.value)}
+                        onChange={(e) => onChange('phuong_phap_dieu_tri', e.target.value)}
                         rows="3"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Phương pháp điều trị..."
