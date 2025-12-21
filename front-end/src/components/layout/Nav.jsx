@@ -59,7 +59,7 @@ function Nav({ onLoginClick, onRegisterClick, onLogout, user }) {
                         </a>
                     ))}
                     <button
-                        onClick={() => Navigate('/booking')}
+                        onClick={() => navigate('/booking')}
                         className="flex items-center gap-2 relative text-gray-600 hover:text-teal-700 transition 
               after:content-[''] after:absolute after:left-1/2 after:bottom-0 
               after:w-0 after:h-[2px] after:bg-teal-700 after:transition-all after:duration-300 

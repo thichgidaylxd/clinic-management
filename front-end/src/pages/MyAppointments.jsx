@@ -59,6 +59,11 @@ function MyAppointments() {
         setShowCancelModal(true);
     };
 
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('vi-VN', options);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -150,7 +155,7 @@ function MyAppointments() {
                                         {/* Date */}
                                         <div className="text-right">
                                             <div className="text-sm text-gray-500">Ngày khám</div>
-                                            <div className="font-bold text-gray-900">{appointment.ngay}</div>
+                                            <div className="font-bold text-gray-900">{formatDate(appointment.ngay_hen)}</div>
                                         </div>
                                     </div>
 

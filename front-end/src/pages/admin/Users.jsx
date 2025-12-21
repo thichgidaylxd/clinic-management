@@ -136,8 +136,8 @@ function Users() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý Người dùng</h1>
-                    <p className="text-gray-600">Quản lý tài khoản và phân quyền người dùng</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý tài khoản</h1>
+                    <p className="text-gray-600">phân quyền người dùng</p>
                 </div>
                 <button
                     onClick={handleCreate}

@@ -59,7 +59,7 @@ function Step4Confirm({ service, specialty, date, timeSlot, doctor, onBack, onSu
                 // Authenticated booking
                 response = await bookingAPI.createAuthAppointment(appointmentData, token);
             } else {
-                // Guest booking
+                // Guest booking or receptionist booking
                 const guestData = {
                     ...appointmentData,
                     ten_benh_nhan: formData.ten_benh_nhan,

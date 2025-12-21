@@ -215,7 +215,7 @@ function RateDoctorPage() {
                                 <div>
                                     <p className="text-xs text-gray-500">Ngày khám</p>
                                     <p className="font-medium text-gray-900">
-                                        {new Date(appointment?.ngay).toLocaleDateString('vi-VN')}
+                                        {new Date(appointment?.ngay_hen).toLocaleDateString('vi-VN')}
                                     </p>
                                 </div>
                             </div>

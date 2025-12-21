@@ -52,8 +52,10 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                         navigate("/receptionist/appointments");
                     } else if (role === "Bệnh nhân") {
                         navigate("/");
+                        window.location.reload(); // reload để cập nhật UI
                     } else {
                         navigate("/"); // fallback
+                        window.location.reload(); // reload để cập nhật UI
                     }
                 }, 600);
 
@@ -82,8 +84,13 @@ function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                 </button>
 
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 bg-teal-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <div className="w-10 h-10 border-2 border-white rounded"></div>
+                    <div className="flex items-center gap-2">
+                        <img
+                            src="/clinic_logo_no_bg.png"
+                            alt="Clinic Logo"
+                            className="w-auto h-12"
+                            onClick={() => navigate('/')}
+                        />
                     </div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-2">Chào mừng trở lại</h2>
                     <p className="text-gray-600">Đăng nhập để tiếp tục</p>
