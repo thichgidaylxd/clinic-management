@@ -26,14 +26,6 @@ class PatientValidator {
                 .messages({
                     'string.pattern.base': 'Số điện thoại phải có 10 chữ số'
                 }),
-
-
-
-            hinh_anh_benh_nhan: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Hình ảnh phải là chuỗi base64'
-                })
         });
     }
 
@@ -62,11 +54,6 @@ class PatientValidator {
 
 
 
-            hinh_anh_benh_nhan: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Hình ảnh phải là chuỗi base64'
-                })
         }).min(1).messages({
             'object.min': 'Phải có ít nhất một trường để cập nhật'
         });

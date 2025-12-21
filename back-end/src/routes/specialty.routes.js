@@ -107,9 +107,6 @@ router.get(
  *               mo_ta_chuyen_khoa:
  *                 type: string
  *                 example: Chuyên khoa điều trị các bệnh nội khoa
- *               hinh_anh_chuyen_khoa:
- *                 type: string
- *                 description: Hình ảnh dạng base64
  *     responses:
  *       201:
  *         description: Tạo chuyên khoa thành công
@@ -152,8 +149,7 @@ router.post(
  *                 type: string
  *               mo_ta_chuyen_khoa:
  *                 type: string
- *               hinh_anh_chuyen_khoa:
- *                 type: string
+
  *     responses:
  *       200:
  *         description: Cập nhật thành công

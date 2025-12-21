@@ -246,10 +246,11 @@ class UserService {
 
     // Đổi mật khẩu
     static async changePassword(userId, oldPassword, newPassword) {
-        const user = await UserModel.findById(userId);
+        const user = await UserModel.findByIdWithPassword(userId);
         if (!user) {
             throw new Error('Không tìm thấy người dùng');
         }
+        console.log(user)
 
         // Verify old password
         const isValidPassword = await BcryptUtil.compare(oldPassword, user.mat_khau_nguoi_dung);

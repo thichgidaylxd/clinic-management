@@ -7,7 +7,6 @@ class DoctorModel {
     const {
       ma_nguoi_dung_bac_si,
       ma_chuc_vu_bac_si,
-      bang_cap_bac_si,
       so_nam_kinh_nghiem_bac_si,
       dang_hoat_dong_bac_si
     } = doctorData;
@@ -19,17 +18,15 @@ class DoctorModel {
         ma_bac_si,
         ma_nguoi_dung_bac_si,
         ma_chuc_vu_bac_si,
-        bang_cap_bac_si,
         so_nam_kinh_nghiem_bac_si,
         dang_hoat_dong_bac_si
-      ) VALUES (?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?)
     `;
 
     await db.execute(query, [
       UUIDUtil.toBinary(ma_bac_si),
       UUIDUtil.toBinary(ma_nguoi_dung_bac_si),
       ma_chuc_vu_bac_si ? UUIDUtil.toBinary(ma_chuc_vu_bac_si) : null,
-      bang_cap_bac_si || null,
       so_nam_kinh_nghiem_bac_si || 0,
       dang_hoat_dong_bac_si !== undefined ? dang_hoat_dong_bac_si : 1
     ]);
@@ -56,7 +53,6 @@ class DoctorModel {
             BIN_TO_UUID(bs.ma_nguoi_dung_bac_si) as ma_nguoi_dung_bac_si,
             BIN_TO_UUID(bs.ma_chuc_vu_bac_si) as ma_chuc_vu_bac_si,
             bs.so_nam_kinh_nghiem_bac_si,
-            bs.bang_cap_bac_si,
             bs.dang_hoat_dong_bac_si,
             bs.ngay_tao_bac_si,
             nd.ten_nguoi_dung,
@@ -64,6 +60,7 @@ class DoctorModel {
             nd.email_nguoi_dung,
             nd.so_dien_thoai_nguoi_dung,
             nd.gioi_tinh_nguoi_dung,
+            nd.ten_dang_nhap_nguoi_dung,
             cv.ten_chuc_vu,
             -- Lấy danh sách chuyên khoa (GROUP_CONCAT)
             GROUP_CONCAT(
@@ -147,7 +144,6 @@ class DoctorModel {
             BIN_TO_UUID(bs.ma_nguoi_dung_bac_si) as ma_nguoi_dung_bac_si,
             BIN_TO_UUID(bs.ma_chuc_vu_bac_si) as ma_chuc_vu_bac_si,
             bs.so_nam_kinh_nghiem_bac_si,
-            bs.bang_cap_bac_si,
             bs.dang_hoat_dong_bac_si,
             bs.ngay_tao_bac_si,
             nd.ten_nguoi_dung,
@@ -198,7 +194,6 @@ class DoctorModel {
         BIN_TO_UUID(bs.ma_bac_si) as ma_bac_si,
         BIN_TO_UUID(bs.ma_nguoi_dung_bac_si) as ma_nguoi_dung_bac_si,
         BIN_TO_UUID(bs.ma_chuc_vu_bac_si) as ma_chuc_vu_bac_si,
-        bs.bang_cap_bac_si,
         bs.so_nam_kinh_nghiem_bac_si,
         bs.dang_hoat_dong_bac_si,
         cv.ten_chuc_vu
@@ -252,7 +247,6 @@ class DoctorModel {
   static async update(doctorId, updateData) {
     const {
       ma_chuc_vu_bac_si,
-      bang_cap_bac_si,
       so_nam_kinh_nghiem_bac_si,
       dang_hoat_dong_bac_si
     } = updateData;
@@ -263,11 +257,6 @@ class DoctorModel {
     if (ma_chuc_vu_bac_si !== undefined) {
       fields.push('ma_chuc_vu_bac_si = ?');
       values.push(ma_chuc_vu_bac_si ? UUIDUtil.toBinary(ma_chuc_vu_bac_si) : null);
-    }
-
-    if (bang_cap_bac_si !== undefined) {
-      fields.push('bang_cap_bac_si = ?');
-      values.push(bang_cap_bac_si);
     }
 
     if (so_nam_kinh_nghiem_bac_si !== undefined) {

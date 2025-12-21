@@ -1,12 +1,12 @@
+// medicine.model.js - FIX
 const db = require('../config/database');
 const UUIDUtil = require('../utils/uuid.util');
 
 class MedicineModel {
-    // Tạo thuốc mới
     static async create(medicineData, userId) {
         const {
             ten_thuoc,
-            thanh_phan_thuoc, // ✅ Thêm
+            thanh_phan_thuoc,
             don_gia_thuoc,
             huong_dan_su_dung_thuoc,
             don_vi_tinh,
@@ -39,7 +39,7 @@ class MedicineModel {
             UUIDUtil.toBinary(userId),
             UUIDUtil.toBinary(userId),
             ten_thuoc,
-            thanh_phan_thuoc || null, // ✅ Thêm
+            thanh_phan_thuoc || null,
             don_gia_thuoc,
             huong_dan_su_dung_thuoc || null,
             don_vi_tinh || null,
@@ -51,7 +51,6 @@ class MedicineModel {
         return ma_thuoc;
     }
 
-    // Lấy danh sách thuốc
     static async findAll(page = 1, limit = 10, search = '', status = null) {
         const pageInt = parseInt(page) || 1;
         const limitInt = parseInt(limit) || 10;
@@ -101,7 +100,6 @@ class MedicineModel {
 
         const [rows] = await db.execute(query, params);
 
-        // Đếm tổng số
         let countQuery = 'SELECT COUNT(*) as total FROM bang_thuoc t';
         if (conditions.length > 0) {
             countQuery += ' WHERE ' + conditions.join(' AND ');
@@ -120,7 +118,6 @@ class MedicineModel {
         };
     }
 
-    // Tìm thuốc theo ID
     static async findById(medicineId) {
         const query = `
       SELECT 
@@ -128,6 +125,7 @@ class MedicineModel {
         BIN_TO_UUID(t.ma_nguoi_tao_thuoc) as ma_nguoi_tao_thuoc,
         BIN_TO_UUID(t.ma_nguoi_cap_nhat_thuoc) as ma_nguoi_cap_nhat_thuoc,
         t.ten_thuoc,
+        t.thanh_phan_thuoc,
         t.don_gia_thuoc,
         t.huong_dan_su_dung_thuoc,
         t.don_vi_tinh,
@@ -149,21 +147,6 @@ class MedicineModel {
         return rows[0] || null;
     }
 
-    // Tìm theo tên
-    static async findByName(name) {
-        const query = `
-      SELECT 
-        BIN_TO_UUID(ma_thuoc) as ma_thuoc,
-        ten_thuoc
-      FROM bang_thuoc
-      WHERE ten_thuoc = ?
-    `;
-
-        const [rows] = await db.execute(query, [name]);
-        return rows[0] || null;
-    }
-
-    // Cập nhật thuốc
     static async update(medicineId, updateData, userId) {
         const {
             ten_thuoc,
@@ -180,45 +163,38 @@ class MedicineModel {
         const fields = [];
         const values = [];
 
-        if (thanh_phan_thuoc !== undefined) {
-            fields.push('thanh_phan_thuoc = ?');
-            values.push(thanh_phan_thuoc);
-        }
         if (ten_thuoc !== undefined) {
             fields.push('ten_thuoc = ?');
             values.push(ten_thuoc);
         }
-
+        if (thanh_phan_thuoc !== undefined) {
+            fields.push('thanh_phan_thuoc = ?');
+            values.push(thanh_phan_thuoc);
+        }
         if (don_gia_thuoc !== undefined) {
             fields.push('don_gia_thuoc = ?');
             values.push(don_gia_thuoc);
         }
-
         if (huong_dan_su_dung_thuoc !== undefined) {
             fields.push('huong_dan_su_dung_thuoc = ?');
             values.push(huong_dan_su_dung_thuoc);
         }
-
         if (don_vi_tinh !== undefined) {
             fields.push('don_vi_tinh = ?');
             values.push(don_vi_tinh);
         }
-
         if (so_luong_thuoc_ton_thuoc !== undefined) {
             fields.push('so_luong_thuoc_ton_thuoc = ?');
             values.push(so_luong_thuoc_ton_thuoc);
         }
-
         if (han_su_dung_thuoc !== undefined) {
             fields.push('han_su_dung_thuoc = ?');
             values.push(han_su_dung_thuoc);
         }
-
         if (giay_to_kiem_dinh_thuoc !== undefined) {
             fields.push('giay_to_kiem_dinh_thuoc = ?');
             values.push(giay_to_kiem_dinh_thuoc);
         }
-
         if (trang_thai_thuoc !== undefined) {
             fields.push('trang_thai_thuoc = ?');
             values.push(trang_thai_thuoc);
@@ -228,7 +204,6 @@ class MedicineModel {
             throw new Error('Không có dữ liệu để cập nhật');
         }
 
-        // Thêm người cập nhật
         fields.push('ma_nguoi_cap_nhat_thuoc = ?');
         values.push(UUIDUtil.toBinary(userId));
 
@@ -244,21 +219,18 @@ class MedicineModel {
         return result.affectedRows > 0;
     }
 
-    // Xóa thuốc (soft delete - chuyển trạng thái)
     static async softDelete(medicineId) {
         const query = 'UPDATE bang_thuoc SET trang_thai_thuoc = 0 WHERE ma_thuoc = ?';
         const [result] = await db.execute(query, [UUIDUtil.toBinary(medicineId)]);
         return result.affectedRows > 0;
     }
 
-    // Xóa vĩnh viễn
     static async delete(medicineId) {
         const query = 'DELETE FROM bang_thuoc WHERE ma_thuoc = ?';
         const [result] = await db.execute(query, [UUIDUtil.toBinary(medicineId)]);
         return result.affectedRows > 0;
     }
 
-    // Kiểm tra tên thuốc đã tồn tại
     static async existsByName(name, excludeId = null) {
         let query = 'SELECT COUNT(*) as count FROM bang_thuoc WHERE ten_thuoc = ?';
         const params = [name];
@@ -272,14 +244,12 @@ class MedicineModel {
         return rows[0].count > 0;
     }
 
-    // Kiểm tra thuốc có đang được sử dụng không
     static async isInUse(medicineId) {
         const query = 'SELECT COUNT(*) as count FROM bang_thuoc_hoa_don WHERE ma_thuoc = ?';
         const [rows] = await db.execute(query, [UUIDUtil.toBinary(medicineId)]);
         return rows[0].count > 0;
     }
 
-    // Lấy thuốc sắp hết hạn
     static async getExpiringSoon(days = 30) {
         const query = `
       SELECT 
@@ -301,7 +271,6 @@ class MedicineModel {
         return rows;
     }
 
-    // Lấy thuốc sắp hết
     static async getLowStock(threshold = 10) {
         const query = `
       SELECT 
@@ -320,7 +289,6 @@ class MedicineModel {
         return rows;
     }
 
-    // Cập nhật số lượng tồn kho
     static async updateStock(medicineId, quantity, type = 'add') {
         let query;
         if (type === 'add') {

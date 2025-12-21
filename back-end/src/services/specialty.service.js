@@ -11,20 +11,10 @@ class SpecialtyService {
             throw new Error('Tên chuyên khoa đã tồn tại');
         }
 
-        // Xử lý hình ảnh base64 nếu có
-        if (specialtyData.hinh_anh_chuyen_khoa) {
-            // Chuyển base64 sang Buffer
-            const base64Data = specialtyData.hinh_anh_chuyen_khoa.replace(/^data:image\/\w+;base64,/, '');
-            specialtyData.hinh_anh_chuyen_khoa = Buffer.from(base64Data, 'base64');
-        }
+
 
         const specialtyId = await SpecialtyModel.create(specialtyData);
         const specialty = await SpecialtyModel.findById(specialtyId);
-
-        // Chuyển BLOB sang base64 để trả về
-        if (specialty.hinh_anh_chuyen_khoa) {
-            specialty.hinh_anh_chuyen_khoa = specialty.hinh_anh_chuyen_khoa.toString('base64');
-        }
 
         return specialty;
     }
@@ -35,10 +25,7 @@ class SpecialtyService {
 
         // Chuyển BLOB sang base64
         result.data = result.data.map(specialty => ({
-            ...specialty,
-            hinh_anh_chuyen_khoa: specialty.hinh_anh_chuyen_khoa
-                ? specialty.hinh_anh_chuyen_khoa.toString('base64')
-                : null
+            ...specialty
         }));
 
         return result;
@@ -52,10 +39,7 @@ class SpecialtyService {
             throw new Error('Không tìm thấy chuyên khoa');
         }
 
-        // Chuyển BLOB sang base64
-        if (specialty.hinh_anh_chuyen_khoa) {
-            specialty.hinh_anh_chuyen_khoa = specialty.hinh_anh_chuyen_khoa.toString('base64');
-        }
+
 
         return specialty;
     }
@@ -79,11 +63,7 @@ class SpecialtyService {
             }
         }
 
-        // Xử lý hình ảnh base64 nếu có
-        if (updateData.hinh_anh_chuyen_khoa) {
-            const base64Data = updateData.hinh_anh_chuyen_khoa.replace(/^data:image\/\w+;base64,/, '');
-            updateData.hinh_anh_chuyen_khoa = Buffer.from(base64Data, 'base64');
-        }
+
 
         const updated = await SpecialtyModel.update(specialtyId, updateData);
 

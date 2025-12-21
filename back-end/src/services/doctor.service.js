@@ -24,7 +24,6 @@ class DoctorService {
             chuyen_khoa_ids, // ✅ Array of specialty IDs
             ma_chuc_vu_bac_si,
             so_nam_kinh_nghiem_bac_si,
-            bang_cap_bac_si
         } = doctorData;
 
         // 1. Kiểm tra username đã tồn tại
@@ -90,19 +89,18 @@ class DoctorService {
 
         console.log('✅ Created user:', userId);
 
-        // 8. Xử lý bằng cấp base64 nếu có
-        let processedBangCap = null;
-        if (bang_cap_bac_si) {
-            const base64Data = bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-            processedBangCap = Buffer.from(base64Data, 'base64');
-        }
+        // // 8. Xử lý bằng cấp base64 nếu có
+        // let processedBangCap = null;
+        // if (bang_cap_bac_si) {
+        //     const base64Data = bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
+        //     processedBangCap = Buffer.from(base64Data, 'base64');
+        // }
 
         // 9. Tạo Doctor
         const doctorId = await DoctorModel.create({
             ma_nguoi_dung_bac_si: userId,
             ma_chuc_vu_bac_si: ma_chuc_vu_bac_si || null,
             so_nam_kinh_nghiem_bac_si: so_nam_kinh_nghiem_bac_si || null,
-            bang_cap_bac_si: processedBangCap,
             dang_hoat_dong_bac_si: 1
         });
 
@@ -132,10 +130,7 @@ class DoctorService {
 
         // Chuyển BLOB sang base64
         result.data = result.data.map(doctor => ({
-            ...doctor,
-            bang_cap_bac_si: doctor.bang_cap_bac_si
-                ? doctor.bang_cap_bac_si.toString('base64')
-                : null
+            ...doctor
         }));
 
         return result;
@@ -148,10 +143,6 @@ class DoctorService {
             throw new Error('Không tìm thấy bác sĩ');
         }
 
-        // Chuyển BLOB sang base64
-        if (doctor.bang_cap_bac_si) {
-            doctor.bang_cap_bac_si = doctor.bang_cap_bac_si.toString('base64');
-        }
 
         return doctor;
     }
@@ -201,11 +192,6 @@ class DoctorService {
             doctorUpdateData.dang_hoat_dong_bac_si = updateData.dang_hoat_dong_bac_si;
         }
 
-        // Xử lý bằng cấp base64
-        if (updateData.bang_cap_bac_si) {
-            const base64Data = updateData.bang_cap_bac_si.replace(/^data:.*?;base64,/, '');
-            doctorUpdateData.bang_cap_bac_si = Buffer.from(base64Data, 'base64');
-        }
 
         // Kiểm tra chức vụ
         if (doctorUpdateData.ma_chuc_vu_bac_si) {

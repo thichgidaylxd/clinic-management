@@ -118,11 +118,7 @@ class DoctorValidator {
                     'number.min': 'Số năm kinh nghiệm phải lớn hơn hoặc bằng 0',
                     'number.max': 'Số năm kinh nghiệm không được vượt quá 100'
                 }),
-            bang_cap_bac_si: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Bằng cấp phải là chuỗi base64'
-                }),
+
             dang_hoat_dong_bac_si: Joi.number()
                 .integer()
                 .valid(0, 1)
@@ -204,11 +200,6 @@ class DoctorValidator {
                     'number.base': 'Số năm kinh nghiệm phải là số',
                     'number.min': 'Số năm kinh nghiệm phải lớn hơn hoặc bằng 0',
                     'number.max': 'Số năm kinh nghiệm không được vượt quá 100'
-                }),
-            bang_cap_bac_si: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Bằng cấp phải là chuỗi base64'
                 }),
             dang_hoat_dong_bac_si: Joi.number()
                 .integer()

@@ -31,12 +31,21 @@ class ReceptionistController {
             const { id } = req.params;
             const { note } = req.body;
 
-            const appointment = await ReceptionistService.confirmAppointment(id, note);
+            // 👇 người xác nhận (lễ tân / admin)
+            const maNguoiXacNhan = req.user.ma_nguoi_dung;
+
+            const appointment = await ReceptionistService.confirmAppointment(
+                id,
+                note,
+                maNguoiXacNhan
+            );
+
             return ResponseUtil.success(res, appointment, 'Xác nhận lịch hẹn thành công');
         } catch (error) {
             next(error);
         }
     }
+
 
     // Check-in
     static async checkInAppointment(req, res, next) {

@@ -12,7 +12,6 @@ class AppointmentModel {
             ma_nguoi_xac_nhan,
             ma_phong_kham,
             ma_dich_vu_lich_hen,
-            ma_lich_lam_viec,  // ✅ THÊM
             trang_thai_lich_hen,
             ly_do_kham_lich_hen,
             ly_do_huy_lich_hen,
@@ -22,7 +21,6 @@ class AppointmentModel {
             gio_ket_thuc,  // ✅ THÊM
             thoi_gian_xac_nhan,
             thoi_gian_hoan_thanh,
-            thoi_gian_vao_kham,
             gia_dich_vu_lich_hen,
             tong_gia_lich_hen
         } = appointmentData;
@@ -39,7 +37,6 @@ class AppointmentModel {
             ma_nguoi_xac_nhan,
             ma_phong_kham,
             ma_dich_vu_lich_hen,
-            ma_lich_lam_viec,
             ngay_hen,
             gio_bat_dau,
             gio_ket_thuc,
@@ -49,10 +46,9 @@ class AppointmentModel {
             ghi_chu_lich_hen,
             thoi_gian_xac_nhan,
             thoi_gian_hoan_thanh,
-            thoi_gian_vao_kham,
             gia_dich_vu_lich_hen,
             tong_gia_lich_hen
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
         await db.execute(query, [
@@ -64,7 +60,6 @@ class AppointmentModel {
             ma_nguoi_xac_nhan ? UUIDUtil.toBinary(ma_nguoi_xac_nhan) : null,
             ma_phong_kham ? UUIDUtil.toBinary(ma_phong_kham) : null,
             ma_dich_vu_lich_hen ? UUIDUtil.toBinary(ma_dich_vu_lich_hen) : null,
-            ma_lich_lam_viec ? UUIDUtil.toBinary(ma_lich_lam_viec) : null,
             ngay_hen || null,
             gio_bat_dau || null,
             gio_ket_thuc || null,
@@ -74,7 +69,6 @@ class AppointmentModel {
             ghi_chu_lich_hen || null,
             thoi_gian_xac_nhan || null,
             thoi_gian_hoan_thanh || null,
-            thoi_gian_vao_kham || null,
             gia_dich_vu_lich_hen || null,
             tong_gia_lich_hen || null
         ]);
@@ -401,7 +395,6 @@ class AppointmentModel {
 
             -- ===== THỜI GIAN =====
             lh.thoi_gian_check_in,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
 
             -- ===== BÁC SĨ =====
@@ -493,7 +486,6 @@ class AppointmentModel {
             BIN_TO_UUID(lh.ma_chuyen_khoa) as ma_chuyen_khoa,
             BIN_TO_UUID(lh.ma_phong_kham) as ma_phong_kham,
             BIN_TO_UUID(lh.ma_dich_vu_lich_hen) as ma_dich_vu_lich_hen,
-            BIN_TO_UUID(lh.ma_lich_lam_viec) as ma_lich_lam_viec,  -- ✅ THÊM
             lh.trang_thai_lich_hen,
             lh.ly_do_kham_lich_hen,
             lh.ly_do_huy_lich_hen,
@@ -505,7 +497,6 @@ class AppointmentModel {
             lh.ngay_tao_lich_hen,
             lh.ngay_cap_nhat_lich_hen,  -- ✅ THÊM
             lh.thoi_gian_xac_nhan,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
             lh.gia_dich_vu_lich_hen,
             lh.tong_gia_lich_hen,
@@ -557,7 +548,6 @@ class AppointmentModel {
             'ghi_chu_lich_hen',  // ✅ THÊM
             'thoi_gian_xac_nhan',
             'thoi_gian_check_in',  // ✅ THÊM
-            'thoi_gian_vao_kham',
             'thoi_gian_hoan_thanh'
         ];
 
@@ -859,16 +849,12 @@ class AppointmentModel {
             -- Room
             pk.ten_phong_kham,
             pk.so_phong_kham,
-            -- Work schedule info
-            llv.thoi_gian_bat_dau_lich_lam_viec,
-            llv.thoi_gian_ket_thuc_lich_lam_viec
         FROM bang_lich_hen lh
         INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
         INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
         INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
         LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
         LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
-        LEFT JOIN bang_lich_lam_viec llv ON lh.ma_lich_lam_viec = llv.ma_lich_lam_viec
         LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
         WHERE DATE(lh.ngay_hen) = CURDATE()
     `;
@@ -900,25 +886,28 @@ class AppointmentModel {
         const [rows] = await db.execute(query, params);
         return rows;
     }
-
     // Xác nhận lịch hẹn
-    static async confirm(appointmentId, receptionistNote = null) {
+    static async confirm(appointmentId, receptionistNote = null, maNguoiXacNhan) {
         const query = `
         UPDATE bang_lich_hen 
         SET 
             trang_thai_lich_hen = 1,
             ghi_chu_lich_hen = COALESCE(?, ghi_chu_lich_hen),
-            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP  -- ✅ ĐỔI
+            ma_nguoi_xac_nhan = ?,
+            thoi_gian_xac_nhan = CURRENT_TIMESTAMP,
+            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
 
         const [result] = await db.execute(query, [
             receptionistNote,
+            UUIDUtil.toBinary(maNguoiXacNhan),
             UUIDUtil.toBinary(appointmentId)
         ]);
 
         return result.affectedRows > 0;
     }
+
 
     // Check-in bệnh nhân
     static async checkIn(appointmentId) {
@@ -1085,7 +1074,6 @@ class AppointmentModel {
             BIN_TO_UUID(lh.ma_chuyen_khoa) as ma_chuyen_khoa,
             BIN_TO_UUID(lh.ma_phong_kham) as ma_phong_kham,
             BIN_TO_UUID(lh.ma_dich_vu_lich_hen) as ma_dich_vu_lich_hen,
-            BIN_TO_UUID(lh.ma_lich_lam_viec) as ma_lich_lam_viec,
             lh.ngay_hen,
             lh.gio_bat_dau,
             lh.gio_ket_thuc,
@@ -1095,7 +1083,6 @@ class AppointmentModel {
             lh.ghi_chu_lich_hen,
             lh.thoi_gian_xac_nhan,
             lh.thoi_gian_check_in,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
             lh.gia_dich_vu_lich_hen,
             lh.tong_gia_lich_hen,
@@ -1144,7 +1131,6 @@ class AppointmentModel {
         lh.trang_thai_lich_hen,
         lh.ly_do_kham_lich_hen,
         lh.thoi_gian_check_in,
-        lh.thoi_gian_vao_kham,
         BIN_TO_UUID(bn.ma_benh_nhan) as ma_benh_nhan,
         CONCAT(bn.ho_benh_nhan, ' ', bn.ten_benh_nhan) as ten_benh_nhan,
         bn.gioi_tinh_benh_nhan,
