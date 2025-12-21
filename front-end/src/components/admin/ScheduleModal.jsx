@@ -14,6 +14,7 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    console.log(doctors);
     const isEdit = !!schedule;
     const formatDateForInput = (dateString) => {
         if (!dateString) return '';
@@ -95,7 +96,7 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                             <option value="">Chọn bác sĩ</option>
                             {doctors.map((d) => (
                                 <option key={d.ma_bac_si} value={d.ma_bac_si}>
-                                    {d.ho_nguoi_dung} {d.ten_nguoi_dung} - {d.ten_chuyen_khoa || 'Chưa có chuyên khoa'}
+                                    {d.ho_nguoi_dung} {d.ten_nguoi_dung}
                                 </option>
                             ))}
                         </select>
@@ -154,7 +155,7 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                             <option value="">Chọn phòng khám</option>
                             {rooms.map((r) => (
                                 <option key={r.ma_phong_kham} value={r.ma_phong_kham}>
-                                    {r.ten_phong_kham} - {r.ten_loai_phong_kham}
+                                    {r.ten_phong_kham} - {r.so_phong_kham}
                                 </option>
                             ))}
                         </select>

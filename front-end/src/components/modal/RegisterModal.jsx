@@ -94,13 +94,32 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                     <div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Họ và tên đầy đủ
+                                Họ của bạn
                             </label>
                             <div className="relative">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type="text"
-                                    placeholder="Nguyễn Văn A"
+                                    placeholder="Nguyễn Văn, Trần Thị, ..."
+                                    value={formData.ho_nguoi_dung}
+                                    onChange={(e) => setFormData({ ...formData, ho_nguoi_dung: e.target.value })}
+                                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    {/* Họ và tên */}
+                    <div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Tên của bạn
+                            </label>
+                            <div className="relative">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Hiếu, Lan, ..."
                                     value={formData.ten_nguoi_dung}
                                     onChange={(e) => setFormData({ ...formData, ten_nguoi_dung: e.target.value })}
                                     className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none transition"

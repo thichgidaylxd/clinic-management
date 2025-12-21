@@ -26,6 +26,7 @@ function DoctorModal({ doctor, onClose, onSuccess }) {
 
     useEffect(() => {
         loadData();
+        console.log('Editing doctor:', doctor);
         if (doctor) {
             setFormData({
                 ten_nguoi_dung: doctor.ten_nguoi_dung || '',

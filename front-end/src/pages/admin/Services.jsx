@@ -150,7 +150,7 @@ function Services() {
                                                 {service.ten_dich_vu}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-2 py-4">
                                             <span className="px-3 py-1 bg-teal-100 text-teal-800 text-sm font-medium rounded-full">
                                                 {service.ten_chuyen_khoa || 'Chưa có'}
                                             </span>

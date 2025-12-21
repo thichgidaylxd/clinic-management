@@ -109,9 +109,10 @@ export const receptionistAPI = {
     confirmAppointment: async (id, note = null) => {
         return safeFetch(`${API_BASE_URL}/receptionist/appointments/${id}/confirm`, {
             method: 'PUT',
-            body: JSON.stringify({ ghi_chu_lich_hen: note })
+            body: JSON.stringify({ note })
         });
     },
+
 
     checkInAppointment: async (id) => {
         return safeFetch(`${API_BASE_URL}/receptionist/appointments/${id}/check-in`, {

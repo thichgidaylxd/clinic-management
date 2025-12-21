@@ -63,6 +63,34 @@ function Medicines() {
         return medicines.filter(m => m.so_luong_thuoc_ton_thuoc < 50).length;
     };
 
+    const getExpiryStatus = (expiryDate) => {
+        if (!expiryDate) return null;
+
+        const today = new Date();
+        const expDate = new Date(expiryDate);
+        const diffDays = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) {
+            return {
+                label: 'Đã hết hạn',
+                className: 'bg-red-100 text-red-800'
+            };
+        }
+
+        if (diffDays <= 30) {
+            return {
+                label: `Sắp hết hạn (${diffDays} ngày)`,
+                className: 'bg-yellow-100 text-yellow-800'
+            };
+        }
+
+        return {
+            label: `Còn hạn (${diffDays} ngày)`,
+            className: 'bg-green-100 text-green-800'
+        };
+    };
+
+
     return (
         <div>
             {/* Header */}
@@ -165,6 +193,9 @@ function Medicines() {
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
                                         Tồn kho
                                     </th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                                        Hạn sử dụng
+                                    </th>
                                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">
                                         Thao tác
                                     </th>
@@ -205,6 +236,28 @@ function Medicines() {
                                                 {medicine.so_luong_thuoc_ton_thuoc || 0}
                                             </span>
                                         </td>
+                                        <td className="px-6 py-4">
+                                            {medicine.han_su_dung_thuoc ? (() => {
+                                                const expiry = getExpiryStatus(medicine.han_su_dung_thuoc);
+                                                return (
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="text-sm text-gray-700">
+                                                            {new Date(medicine.han_su_dung_thuoc).toLocaleDateString('vi-VN')}
+                                                        </span>
+                                                        {expiry && (
+                                                            <span
+                                                                className={`px-2 py-1 text-xs font-medium rounded-full inline-block w-fit ${expiry.className}`}
+                                                            >
+                                                                {expiry.label}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })() : (
+                                                <span className="text-gray-400 text-sm">—</span>
+                                            )}
+                                        </td>
+
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
