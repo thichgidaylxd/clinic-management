@@ -139,14 +139,7 @@ class PrescriptionValidator {
      * Validate thanh toán
      */
     static payment() {
-        return Joi.object({
-            ma_phuong_thuc_thanh_toan: Joi.string()
-                .guid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã phương thức thanh toán không hợp lệ'
-                })
-        });
+
     }
 
     /**

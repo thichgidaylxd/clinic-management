@@ -13,18 +13,10 @@ class PatientService {
             }
         }
 
-        // Xử lý hình ảnh base64 nếu có
-        if (patientData.hinh_anh_benh_nhan) {
-            const base64Data = patientData.hinh_anh_benh_nhan.replace(/^data:.*?;base64,/, '');
-            patientData.hinh_anh_benh_nhan = Buffer.from(base64Data, 'base64');
-        }
 
         const patientId = await PatientModel.create(patientData);
         const patient = await PatientModel.findById(patientId);
 
-        if (patient?.hinh_anh_benh_nhan) {
-            patient.hinh_anh_benh_nhan = patient.hinh_anh_benh_nhan.toString('base64');
-        }
 
         return patient;
     }
@@ -34,10 +26,7 @@ class PatientService {
         const result = await PatientModel.findAll(page, limit, search, gender);
 
         result.data = result.data.map(patient => ({
-            ...patient,
-            hinh_anh_benh_nhan: patient.hinh_anh_benh_nhan
-                ? patient.hinh_anh_benh_nhan.toString('base64')
-                : null
+            ...patient
         }));
 
         return result;
@@ -50,9 +39,6 @@ class PatientService {
             throw new Error('Không tìm thấy bệnh nhân');
         }
 
-        if (patient.hinh_anh_benh_nhan) {
-            patient.hinh_anh_benh_nhan = patient.hinh_anh_benh_nhan.toString('base64');
-        }
 
         return patient;
     }
@@ -81,11 +67,6 @@ class PatientService {
             if (exists) {
                 throw new Error('Số điện thoại đã được đăng ký cho bệnh nhân khác');
             }
-        }
-
-        if (updateData.hinh_anh_benh_nhan) {
-            const base64Data = updateData.hinh_anh_benh_nhan.replace(/^data:.*?;base64,/, '');
-            updateData.hinh_anh_benh_nhan = Buffer.from(base64Data, 'base64');
         }
 
         const updated = await PatientModel.update(patientId, updateData);

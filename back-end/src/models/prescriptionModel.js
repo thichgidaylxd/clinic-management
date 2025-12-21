@@ -230,7 +230,6 @@ class PrescriptionModel {
                 BIN_TO_UUID(hd.ma_benh_nhan_hoa_don) as ma_benh_nhan,
                 BIN_TO_UUID(hd.ma_chuyen_khoa_hoa_don) as ma_chuyen_khoa,
                 BIN_TO_UUID(hd.ma_nguoi_dung_hoa_don) as ma_nguoi_dung,
-                BIN_TO_UUID(hd.ma_phuong_thuc_thanh_toan) as ma_phuong_thuc_thanh_toan,
                 hd.tong_thanh_tien_hoa_don,
                 hd.trang_thai_hoa_don,
                 hd.ghi_chu_hoa_don,
@@ -290,19 +289,16 @@ class PrescriptionModel {
      * Cập nhật trạng thái thanh toán
      */
     static async updatePaymentStatus(invoiceId, paymentData) {
-        const { ma_phuong_thuc_thanh_toan } = paymentData;
 
         const query = `
             UPDATE bang_hoa_don
             SET 
                 trang_thai_hoa_don = 1,
-                ma_phuong_thuc_thanh_toan = ?,
                 ngay_tra_tien_hoa_don = CURRENT_TIMESTAMP
             WHERE ma_hoa_don = UUID_TO_BIN(?)
         `;
 
         const [result] = await db.execute(query, [
-            ma_phuong_thuc_thanh_toan ? UUIDUtil.toBinary(ma_phuong_thuc_thanh_toan) : null,
             invoiceId
         ]);
 

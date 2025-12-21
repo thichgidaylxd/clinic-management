@@ -421,7 +421,6 @@ class PatientModel {
             lh.ly_do_kham_lich_hen,
             lh.ngay_tao_lich_hen,
             lh.thoi_gian_xac_nhan,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
             lh.ngay_hen,  -- ✅ ĐỔI (từ tg.ngay)
             lh.gio_bat_dau,  -- ✅ ĐỔI (từ tg.thoi_gian_bat_dau)

@@ -9,6 +9,9 @@ const routes = require('./routes');
 const errorMiddleware = require('./middlewares/error.middleware');
 const swaggerSpec = require('./config/swagger');
 const { ENV } = require('./config/env');
+const startDoctorScheduleCron = require('./cron/doctorSchedule.cron');
+
+startDoctorScheduleCron();
 
 const app = express();
 

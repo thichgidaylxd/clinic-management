@@ -360,30 +360,34 @@ class AppointmentService {
         return await AppointmentModel.findByPatient(patient.ma_benh_nhan, page, limit, status);
     }
 
-    // Xác nhận lịch hẹn (Lễ tân)
-    static async confirm(appointmentId, userId) {
-        console.log('Confirming appointment:', appointmentId, 'by user:', userId);
+    // Xác nhận lịch hẹn
+    static async confirmAppointment(appointmentId, note, maNguoiXacNhan) {
         const appointment = await AppointmentModel.findById(appointmentId);
         if (!appointment) {
             throw new Error('Không tìm thấy lịch hẹn');
         }
 
-        if (appointment.trang_thai_lich_hen !== 0) {
-            throw new Error('Chỉ có thể xác nhận lịch hẹn ở trạng thái PENDING');
+        if (appointment.trang_thai_lich_hen !== CONSTANTS.APPOINTMENT_STATUS.PENDING) {
+            throw new Error('Chỉ có thể xác nhận lịch hẹn đang chờ');
         }
 
-        const updated = await AppointmentModel.update(appointmentId, {
-            trang_thai_lich_hen: 1,
-            thoi_gian_xac_nhan: new Date(),
-            ma_nguoi_xac_nhan: userId  // ✅ THÊM
-        });
+        if (!maNguoiXacNhan) {
+            throw new Error('Thiếu thông tin người xác nhận');
+        }
 
-        if (!updated) {
+        const confirmed = await AppointmentModel.confirm(
+            appointmentId,
+            note,
+            maNguoiXacNhan
+        );
+
+        if (!confirmed) {
             throw new Error('Xác nhận lịch hẹn thất bại');
         }
 
         return await AppointmentModel.findById(appointmentId);
     }
+
 
     // Check-in (Lễ tân)
     static async checkIn(appointmentId, roomId = null) {

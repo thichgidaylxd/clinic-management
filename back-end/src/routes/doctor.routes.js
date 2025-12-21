@@ -254,8 +254,6 @@ router.get(
  *                 format: uuid
  *               so_nam_kinh_nghiem_bac_si:
  *                 type: integer
- *               bang_cap_bac_si:
- *                 type: string
  *                 description: Base64 encoded image
  *     responses:
  *       201:

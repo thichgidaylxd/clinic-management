@@ -61,7 +61,7 @@ class PrescriptionService {
             ma_chuyen_khoa: appointment.ma_chuyen_khoa,
 
             // ✅ user bệnh nhân (nullable)
-            ma_nguoi_dung_hoa_don: appointment.ma_nguoi_dung_benh_nhan || null,
+            ma_nguoi_dung_hoa_don: appointment.ma_nguoi_tao_lich_hen || null,
 
             gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
             medicines,

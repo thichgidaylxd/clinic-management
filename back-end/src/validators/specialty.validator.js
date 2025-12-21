@@ -19,11 +19,7 @@ class SpecialtyValidator {
                     'string.base': 'Mô tả chuyên khoa phải là chuỗi'
                 }),
 
-            hinh_anh_chuyen_khoa: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Hình ảnh phải là chuỗi base64'
-                })
+
         });
     }
 
@@ -42,11 +38,7 @@ class SpecialtyValidator {
                     'string.base': 'Mô tả chuyên khoa phải là chuỗi'
                 }),
 
-            hinh_anh_chuyen_khoa: Joi.string()
-                .allow('', null)
-                .messages({
-                    'string.base': 'Hình ảnh phải là chuỗi base64'
-                })
+
         }).min(1).messages({
             'object.min': 'Phải có ít nhất một trường để cập nhật'
         });

@@ -116,6 +116,19 @@ class UserModel {
     return rows[0] || null;
   }
 
+  static async findByIdWithPassword(userId) {
+    const query = `
+    SELECT 
+      BIN_TO_UUID(nd.ma_nguoi_dung) as ma_nguoi_dung,
+      nd.mat_khau_nguoi_dung
+    FROM bang_nguoi_dung nd
+    WHERE nd.ma_nguoi_dung = ?
+  `;
+
+    const [rows] = await db.execute(query, [UUIDUtil.toBinary(userId)]);
+    return rows[0] || null;
+  }
+
   // Tìm người dùng theo ID
   static async findById(userId) {
     const query = `

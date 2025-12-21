@@ -21,7 +21,6 @@ class AppointmentModel {
             gio_ket_thuc,  // ✅ THÊM
             thoi_gian_xac_nhan,
             thoi_gian_hoan_thanh,
-            thoi_gian_vao_kham,
             gia_dich_vu_lich_hen,
             tong_gia_lich_hen
         } = appointmentData;
@@ -47,10 +46,9 @@ class AppointmentModel {
             ghi_chu_lich_hen,
             thoi_gian_xac_nhan,
             thoi_gian_hoan_thanh,
-            thoi_gian_vao_kham,
             gia_dich_vu_lich_hen,
             tong_gia_lich_hen
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
         await db.execute(query, [
@@ -71,7 +69,6 @@ class AppointmentModel {
             ghi_chu_lich_hen || null,
             thoi_gian_xac_nhan || null,
             thoi_gian_hoan_thanh || null,
-            thoi_gian_vao_kham || null,
             gia_dich_vu_lich_hen || null,
             tong_gia_lich_hen || null
         ]);
@@ -398,7 +395,6 @@ class AppointmentModel {
 
             -- ===== THỜI GIAN =====
             lh.thoi_gian_check_in,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
 
             -- ===== BÁC SĨ =====
@@ -501,7 +497,6 @@ class AppointmentModel {
             lh.ngay_tao_lich_hen,
             lh.ngay_cap_nhat_lich_hen,  -- ✅ THÊM
             lh.thoi_gian_xac_nhan,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
             lh.gia_dich_vu_lich_hen,
             lh.tong_gia_lich_hen,
@@ -553,7 +548,6 @@ class AppointmentModel {
             'ghi_chu_lich_hen',  // ✅ THÊM
             'thoi_gian_xac_nhan',
             'thoi_gian_check_in',  // ✅ THÊM
-            'thoi_gian_vao_kham',
             'thoi_gian_hoan_thanh'
         ];
 
@@ -892,25 +886,28 @@ class AppointmentModel {
         const [rows] = await db.execute(query, params);
         return rows;
     }
-
     // Xác nhận lịch hẹn
-    static async confirm(appointmentId, receptionistNote = null) {
+    static async confirm(appointmentId, receptionistNote = null, maNguoiXacNhan) {
         const query = `
         UPDATE bang_lich_hen 
         SET 
             trang_thai_lich_hen = 1,
             ghi_chu_lich_hen = COALESCE(?, ghi_chu_lich_hen),
-            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP  -- ✅ ĐỔI
+            ma_nguoi_xac_nhan = ?,
+            thoi_gian_xac_nhan = CURRENT_TIMESTAMP,
+            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
 
         const [result] = await db.execute(query, [
             receptionistNote,
+            UUIDUtil.toBinary(maNguoiXacNhan),
             UUIDUtil.toBinary(appointmentId)
         ]);
 
         return result.affectedRows > 0;
     }
+
 
     // Check-in bệnh nhân
     static async checkIn(appointmentId) {
@@ -1086,7 +1083,6 @@ class AppointmentModel {
             lh.ghi_chu_lich_hen,
             lh.thoi_gian_xac_nhan,
             lh.thoi_gian_check_in,
-            lh.thoi_gian_vao_kham,
             lh.thoi_gian_hoan_thanh,
             lh.gia_dich_vu_lich_hen,
             lh.tong_gia_lich_hen,
@@ -1135,7 +1131,6 @@ class AppointmentModel {
         lh.trang_thai_lich_hen,
         lh.ly_do_kham_lich_hen,
         lh.thoi_gian_check_in,
-        lh.thoi_gian_vao_kham,
         BIN_TO_UUID(bn.ma_benh_nhan) as ma_benh_nhan,
         CONCAT(bn.ho_benh_nhan, ' ', bn.ten_benh_nhan) as ten_benh_nhan,
         bn.gioi_tinh_benh_nhan,

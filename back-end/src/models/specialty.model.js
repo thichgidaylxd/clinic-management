@@ -7,7 +7,6 @@ class SpecialtyModel {
         const {
             ten_chuyen_khoa,
             mo_ta_chuyen_khoa,
-            hinh_anh_chuyen_khoa
         } = specialtyData;
 
         const ma_chuyen_khoa = UUIDUtil.generate();
@@ -16,16 +15,15 @@ class SpecialtyModel {
       INSERT INTO bang_chuyen_khoa (
         ma_chuyen_khoa,
         ten_chuyen_khoa,
-        mo_ta_chuyen_khoa,
-        hinh_anh_chuyen_khoa
-      ) VALUES (?, ?, ?, ?)
+        mo_ta_chuyen_khoa
+      ) VALUES (?, ?, ?)
     `;
+        console.log(specialtyData);
 
         await db.execute(query, [
             UUIDUtil.toBinary(ma_chuyen_khoa),
             ten_chuyen_khoa,
             mo_ta_chuyen_khoa || null,
-            hinh_anh_chuyen_khoa || null
         ]);
 
         return ma_chuyen_khoa;
@@ -43,7 +41,6 @@ class SpecialtyModel {
         BIN_TO_UUID(ma_chuyen_khoa) as ma_chuyen_khoa,
         ten_chuyen_khoa,
         mo_ta_chuyen_khoa,
-        hinh_anh_chuyen_khoa,
         ngay_tao_chuyen_khoa,
         ngay_cap_nhat_chuyen_khoa
       FROM bang_chuyen_khoa
@@ -90,7 +87,6 @@ class SpecialtyModel {
         BIN_TO_UUID(ma_chuyen_khoa) as ma_chuyen_khoa,
         ten_chuyen_khoa,
         mo_ta_chuyen_khoa,
-        hinh_anh_chuyen_khoa,
         ngay_tao_chuyen_khoa,
         ngay_cap_nhat_chuyen_khoa
       FROM bang_chuyen_khoa
@@ -108,7 +104,6 @@ class SpecialtyModel {
             BIN_TO_UUID(ma_chuyen_khoa) as ma_chuyen_khoa,
             ten_chuyen_khoa,
             mo_ta_chuyen_khoa,
-            hinh_anh_chuyen_khoa
         FROM bang_chuyen_khoa
         WHERE ten_chuyen_khoa LIKE ?
         LIMIT 1
@@ -122,7 +117,6 @@ class SpecialtyModel {
         const {
             ten_chuyen_khoa,
             mo_ta_chuyen_khoa,
-            hinh_anh_chuyen_khoa
         } = updateData;
 
         const fields = [];
@@ -138,10 +132,6 @@ class SpecialtyModel {
             values.push(mo_ta_chuyen_khoa);
         }
 
-        if (hinh_anh_chuyen_khoa !== undefined) {
-            fields.push('hinh_anh_chuyen_khoa = ?');
-            values.push(hinh_anh_chuyen_khoa);
-        }
 
         if (fields.length === 0) {
             throw new Error('Không có dữ liệu để cập nhật');
