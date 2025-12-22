@@ -83,6 +83,8 @@ function BookingV2() {
                 return (
                     <Step1Service
                         onNext={handleStep1Next}
+                        initialService={selectedService}
+                        initialSpecialty={selectedSpecialty}
                     />
                 );
 
@@ -90,11 +92,13 @@ function BookingV2() {
                 return (
                     <Step2DateTime
                         specialty={selectedSpecialty}
-                        service={selectedService}
                         onNext={handleStep2Next}
                         onBack={handleBack}
+                        initialDate={selectedDate}
+                        initialTimeSlot={selectedTimeSlot}
                     />
                 );
+
 
             case 3:
                 return (
@@ -104,8 +108,10 @@ function BookingV2() {
                         timeSlot={selectedTimeSlot}
                         onNext={handleStep3Next}
                         onBack={handleBack}
+                        initialDoctor={selectedDoctor}
                     />
                 );
+
 
             case 4:
                 return (

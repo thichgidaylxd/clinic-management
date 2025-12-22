@@ -10,11 +10,15 @@ function SuccessModal({ isOpen, onClose, appointmentData }) {
     const handleViewAppointments = () => {
         const user = JSON.parse(localStorage.getItem('user') || 'null');
         if (user) {
-            navigate('/appointments'); // Trang lịch hẹn của bệnh nhân
+            navigate('/patient/appointments'); // Trang lịch hẹn của bệnh nhân
         } else {
             onClose();
         }
     };
+
+    const formatDate = (date) =>
+        new Date(date).toLocaleDateString('vi-VN');
+
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
@@ -55,7 +59,7 @@ function SuccessModal({ isOpen, onClose, appointmentData }) {
                         <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
                         <div>
                             <p className="text-sm text-gray-600">Ngày khám</p>
-                            <p className="font-medium text-gray-900">{appointmentData.ngay}</p>
+                            <p className="font-medium text-gray-900">{formatDate(appointmentData.ngay_hen)}</p>
                         </div>
                     </div>
 
@@ -64,7 +68,7 @@ function SuccessModal({ isOpen, onClose, appointmentData }) {
                         <div>
                             <p className="text-sm text-gray-600">Giờ khám</p>
                             <p className="font-medium text-gray-900">
-                                {appointmentData.thoi_gian_bat_dau} - {appointmentData.thoi_gian_ket_thuc}
+                                {appointmentData.gio_bat_dau.slice(0, 5)} - {appointmentData.gio_ket_thuc.slice(0, 5)}
                             </p>
                         </div>
                     </div>

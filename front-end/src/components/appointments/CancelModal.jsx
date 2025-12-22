@@ -30,6 +30,8 @@ function CancelModal({ appointment, onClose, onSuccess }) {
             setLoading(false);
         }
     };
+    const formatDate = (date) =>
+        new Date(date).toLocaleDateString('vi-VN');
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
@@ -61,7 +63,7 @@ function CancelModal({ appointment, onClose, onSuccess }) {
                             {appointment.ho_bac_si} {appointment.ten_bac_si}
                         </div>
                         <div className="text-sm text-gray-600">
-                            {appointment.ngay} • {appointment.thoi_gian_bat_dau} - {appointment.thoi_gian_ket_thuc}
+                            {formatDate(appointment.ngay_hen)} • {appointment.gio_bat_dau.slice(0, 5)} - {appointment.gio_ket_thuc.slice(0, 5)}
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,7 @@ import InvoiceSummary from './InvoiceSummary';
 import { doctorAPI } from '../../services/doctorAPI';
 import medicineAPI from '../../services/medicineAPI';
 import prescriptionAPI from '../../services/prescriptionAPI';
+import { use } from 'react';
 
 
 function Examination() {
@@ -54,6 +55,9 @@ function Examination() {
             setLoading(false);
         }
     };
+
+
+
 
     const handleSelectAppointment = (appointment) => {
         setSelectedAppointment(appointment);
@@ -106,13 +110,20 @@ function Examination() {
         }
     };
 
-    const serviceFee = selectedAppointment?.gia_dich_vu_lich_hen || 0;
+    const serviceFee = Number(selectedAppointment?.gia_dich_vu_lich_hen || 0);
+
     const medicineTotal = selectedMedicines.reduce((total, med) => {
         const medicine = medicines.find(m => m.ma_thuoc === med.ma_thuoc);
-        return total + (medicine?.don_gia_thuoc || 0) * (parseInt(med.so_luong) || 0);
+        const price = Number(medicine?.don_gia_thuoc || 0);
+        const quantity = Number(med.so_luong || 0);
+        return total + price * quantity;
     }, 0);
+
+    console.log('Medicine Total:', medicineTotal);
+    console.log('Service Fee:', serviceFee);
     const grandTotal = serviceFee + medicineTotal;
 
+    console.log('Grand Total:', grandTotal);
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
