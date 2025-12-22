@@ -35,6 +35,49 @@ export const adminAPI = {
         return handleResponse(response);
     },
 
+    getDashboard: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+
+        const response = await fetch(
+            `${API_BASE_URL}/revenue/dashboard${query ? `?${query}` : ''}`,
+            {
+                method: 'GET',
+                headers: getAuthHeaders()
+            }
+        );
+
+        return handleResponse(response);
+    },
+    // Doanh thu theo ngày
+    getByDate: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+
+        const response = await fetch(
+            `${API_BASE_URL}/revenue/by-date${query ? `?${query}` : ''}`,
+            {
+                method: 'GET',
+                headers: getAuthHeaders()
+            }
+        );
+
+        return handleResponse(response);
+    },
+
+    // Doanh thu theo dịch vụ
+    getByService: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+
+        const response = await fetch(
+            `${API_BASE_URL}/revenue/by-service${query ? `?${query}` : ''}`,
+            {
+                method: 'GET',
+                headers: getAuthHeaders()
+            }
+        );
+
+        return handleResponse(response);
+    },
+
     updateSpecialty: async (id, data) => {
         const response = await fetch(`${API_BASE_URL}/specialties/${id}`, {
             method: 'PUT',

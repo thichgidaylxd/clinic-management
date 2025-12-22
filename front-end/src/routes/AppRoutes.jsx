@@ -42,7 +42,7 @@ import Examination from "../components/examination/Examination";
 import WorkSchedule from "../pages/doctor/Schedule";
 import Profile from "../components/Profile";
 import MyInvoices from "../pages/MyInvoices";
-
+import RevenueDashboard from "../pages/admin/RevenueDashboard";
 
 function AppRoutes() {
     return (
@@ -82,6 +82,7 @@ function AppRoutes() {
                 <Route path="medicines" element={<AdminMedicines />} />
                 <Route path="rooms" element={<AdminRooms />} />
                 <Route path="users" element={<AdminUsers />} />
+                <Route path="revenue" element={<RevenueDashboard />} />
             </Route>
 
             {/* =================== RECEPTIONIST ROUTES =================== */}
