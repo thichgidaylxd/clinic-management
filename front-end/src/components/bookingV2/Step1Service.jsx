@@ -2,12 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Stethoscope, DollarSign, AlertCircle, Loader2 } from 'lucide-react';
 import { bookingAPI } from '../../services/api';
 
-function Step1Service({ onNext }) {
+function Step1Service({ onNext, initialService, initialSpecialty }) {
+
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState(null);
+    const [selectedService, setSelectedService] = useState(initialService || null);
+    const [specialty, setSpecialty] = useState(initialSpecialty || null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [specialty, setSpecialty] = useState(null);
+
+
+    useEffect(() => {
+        if (initialService) {
+            setSelectedService(initialService);
+        }
+        if (initialSpecialty) {
+            setSpecialty(initialSpecialty);
+        }
+    }, [initialService, initialSpecialty]);
+
 
     useEffect(() => {
         loadServices();
@@ -37,6 +50,11 @@ function Step1Service({ onNext }) {
             // Step 2: Lấy dịch vụ theo chuyên khoa
             const servicesData = await bookingAPI.getServicesBySpecialty(
                 nhaKhoaSpecialty.ma_chuyen_khoa
+            );
+            setSelectedService(prev =>
+                prev && servicesData.data?.some(s => s.ma_dich_vu === prev.ma_dich_vu)
+                    ? prev
+                    : null
             );
 
             console.log('Services data:', servicesData);

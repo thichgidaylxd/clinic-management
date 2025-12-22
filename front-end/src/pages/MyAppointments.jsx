@@ -44,8 +44,8 @@ function MyAppointments() {
             0: { text: 'Chờ xác nhận', color: 'bg-yellow-100 text-yellow-800', icon: <Clock className="w-4 h-4" /> },
             1: { text: 'Đã xác nhận', color: 'bg-blue-100 text-blue-800', icon: <CheckCircle className="w-4 h-4" /> },
             2: { text: 'Đã check-in', color: 'bg-purple-100 text-purple-800', icon: <MapPin className="w-4 h-4" /> },
-            3: { text: 'Hoàn thành', color: 'bg-green-100 text-green-800', icon: <CheckCircle className="w-4 h-4" /> },
-            4: { text: 'Đã hủy', color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> }
+            4: { text: 'Hoàn thành', color: 'bg-green-100 text-green-800', icon: <CheckCircle className="w-4 h-4" /> },
+            5: { text: 'Đã hủy', color: 'bg-red-100 text-red-800', icon: <XCircle className="w-4 h-4" /> }
         };
         return statusMap[status] || statusMap[0];
     };
@@ -95,8 +95,8 @@ function MyAppointments() {
                         { value: 0, label: 'Chờ xác nhận' },
                         { value: 1, label: 'Đã xác nhận' },
                         { value: 2, label: 'Đã check-in' },
-                        { value: 3, label: 'Hoàn thành' },
-                        { value: 4, label: 'Đã hủy' }
+                        { value: 4, label: 'Hoàn thành' },
+                        { value: 5, label: 'Đã hủy' }
                     ].map((filter) => (
                         <button
                             key={filter.value}

@@ -127,7 +127,7 @@ function RateDoctorPage() {
                     <h2 className="text-xl font-bold text-gray-900 mb-2">Không thể đánh giá</h2>
                     <p className="text-gray-600 mb-6">{error}</p>
                     <button
-                        onClick={() => navigate('/my-appointments')}
+                        onClick={() => navigate('/patient/appointments')}
                         className="px-6 py-3 bg-teal-700 text-white rounded-lg hover:bg-teal-800 transition"
                     >
                         Quay lại danh sách
@@ -161,7 +161,7 @@ function RateDoctorPage() {
             <div className="container mx-auto px-4 max-w-3xl">
                 {/* Back Button */}
                 <button
-                    onClick={() => navigate('/my-appointments')}
+                    onClick={() => navigate('/patient/appointments')}
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
                 >
                     <ArrowLeft className="w-5 h-5" />
@@ -300,7 +300,7 @@ function RateDoctorPage() {
                     <div className="flex gap-3">
                         <button
                             type="button"
-                            onClick={() => navigate('/my-appointments')}
+                            onClick={() => navigate('/patient/appointments')}
                             className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
                             disabled={submitting}
                         >

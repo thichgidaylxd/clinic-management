@@ -83,6 +83,11 @@ function AdminLayout() {
             path: '/admin/users',
             label: 'Tài khoản',
             icon: <UserCog className="w-5 h-5" />
+        },
+        {
+            path: '/admin/revenue',
+            label: 'Doanh thu',
+            icon: <UserCog className="w-5 h-5" />
         }
     ];
 

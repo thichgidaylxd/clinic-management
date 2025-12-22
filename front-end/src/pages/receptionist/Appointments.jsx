@@ -49,6 +49,8 @@ function ReceptionistAppointments() {
                 adminAPI.getDoctors(1, 100)
             ]);
 
+            console.log('Appointments data:', aptRes.data);
+
             let filteredAppointments = aptRes.data || [];
 
             // Lọc theo tìm kiếm (tên hoặc SĐT bệnh nhân)
@@ -396,62 +398,83 @@ function ReceptionistAppointments() {
                             <Timeline status={apt.trang_thai_lich_hen} />
 
                             {/* ACTIONS */}
-                            <div className="flex flex-wrap items-center justify-end gap-2 mt-6 pt-4 border-t border-gray-100">
-                                {/* CHỜ XÁC NHẬN */}
-                                {apt.trang_thai_lich_hen === 0 && (
-                                    <>
-                                        <button
-                                            onClick={() => handleConfirm(apt.ma_lich_hen)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                        >
-                                            <CheckCircle className="w-4 h-4" />
-                                            Xác nhận
-                                        </button>
+                            <div className="flex w-full items-start justify-between gap-4 mt-6 pt-4 border-t border-gray-100">
 
-                                        <button
-                                            onClick={() => handleNoShow(apt.ma_lich_hen)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-                                        >
-                                            <AlertCircle className="w-4 h-4" />
-                                            Không đến
-                                        </button>
-                                    </>
-                                )}
+                                {/* LEFT: NOTE */}
+                                <div className="flex-1 max-w-[70%]">
+                                    {apt.ghi_chu_lich_hen && (
+                                        <div className="bg-gray-50 border-l-4 border-gray-400 p-4 rounded">
+                                            <p className="text-xs font-semibold text-gray-600 uppercase mb-1 flex items-center gap-1">
+                                                <FileText className="w-3 h-3" />
+                                                Ghi chú lễ tân
+                                            </p>
+                                            <p className="text-sm text-gray-700 whitespace-pre-line">
+                                                {apt.ghi_chu_lich_hen}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
 
-                                {/* ĐÃ XÁC NHẬN */}
-                                {apt.trang_thai_lich_hen === 1 && (
-                                    <>
-                                        <button
-                                            onClick={() => handleCheckIn(apt.ma_lich_hen)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors"
-                                        >
-                                            <UserCheck className="w-4 h-4" />
-                                            Check-in
-                                        </button>
+                                {/* RIGHT: BUTTONS */}
+                                <div className="flex flex-wrap items-center justify-end gap-2">
 
-                                        <button
-                                            onClick={() => handleNoShow(apt.ma_lich_hen)}
-                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
-                                        >
-                                            <AlertCircle className="w-4 h-4" />
-                                            Không đến
-                                        </button>
-                                    </>
-                                )}
+                                    {/* CHỜ XÁC NHẬN */}
+                                    {apt.trang_thai_lich_hen === 0 && (
+                                        <>
+                                            <button
+                                                onClick={() => handleConfirm(apt.ma_lich_hen)}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                <CheckCircle className="w-4 h-4" />
+                                                Xác nhận
+                                            </button>
 
-                                {/* GHI CHÚ - LUÔN HIỂN THỊ */}
-                                <button
-                                    onClick={() => {
-                                        setSelectedAppointment(apt);
-                                        setNote(apt.ghi_chu_lich_hen || '');
-                                        setNoteModal(true);
-                                    }}
-                                    className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors"
-                                >
-                                    <FileText className="w-4 h-4" />
-                                    Ghi chú
-                                </button>
+                                            <button
+                                                onClick={() => handleNoShow(apt.ma_lich_hen)}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                <AlertCircle className="w-4 h-4" />
+                                                Không đến
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* ĐÃ XÁC NHẬN */}
+                                    {apt.trang_thai_lich_hen === 1 && (
+                                        <>
+                                            <button
+                                                onClick={() => handleCheckIn(apt.ma_lich_hen)}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                <UserCheck className="w-4 h-4" />
+                                                Check-in
+                                            </button>
+
+                                            <button
+                                                onClick={() => handleNoShow(apt.ma_lich_hen)}
+                                                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                <AlertCircle className="w-4 h-4" />
+                                                Không đến
+                                            </button>
+                                        </>
+                                    )}
+
+                                    {/* GHI CHÚ BUTTON */}
+                                    <button
+                                        onClick={() => {
+                                            setSelectedAppointment(apt);
+                                            setNote(apt.ghi_chu_lich_hen || '');
+                                            setNoteModal(true);
+                                        }}
+                                        className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-medium transition-colors"
+                                    >
+                                        <FileText className="w-4 h-4" />
+                                        Ghi chú
+                                    </button>
+                                </div>
                             </div>
+
                         </div>
                     ))}
                 </div>

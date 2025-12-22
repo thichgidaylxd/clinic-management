@@ -2,11 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { User, Briefcase, Award, Clock, MapPin, AlertCircle, Loader2 } from 'lucide-react';
 import { bookingAPI } from '../../services/api';
 
-function Step3Doctor({ specialty, date, timeSlot, onNext, onBack }) {
+function Step3Doctor({
+    specialty,
+    date,
+    timeSlot,
+    onNext,
+    onBack,
+    initialDoctor
+}) {
+
     const [doctors, setDoctors] = useState([]);
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [selectedDoctor, setSelectedDoctor] = useState(initialDoctor || null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    useEffect(() => {
+        if (initialDoctor) {
+            setSelectedDoctor(initialDoctor);
+        }
+    }, [initialDoctor]);
 
     useEffect(() => {
         loadAvailableDoctors();
@@ -55,12 +68,6 @@ function Step3Doctor({ specialty, date, timeSlot, onNext, onBack }) {
             return;
         }
         onNext({ doctor: selectedDoctor });
-    };
-
-    const getGenderDisplay = (gender) => {
-        if (gender === 0) return '👩 Nữ';
-        if (gender === 1) return '👨 Nam';
-        return '👤 Khác';
     };
 
     if (loading) {
@@ -148,9 +155,6 @@ function Step3Doctor({ specialty, date, timeSlot, onNext, onBack }) {
                                 {/* Name */}
                                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                                     {doctor.ho_nguoi_dung} {doctor.ten_nguoi_dung}
-                                    <span className="ml-2 text-sm font-normal text-gray-500">
-                                        {getGenderDisplay(doctor.gioi_tinh_nguoi_dung)}
-                                    </span>
                                 </h3>
 
                                 {/* Position */}

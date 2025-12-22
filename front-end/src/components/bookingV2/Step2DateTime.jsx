@@ -2,23 +2,52 @@ import React, { useEffect, useState } from 'react';
 import { Calendar, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import { bookingAPI } from '../../services/api';
 
-function Step2DateTime({ specialty, onNext, onBack }) {
-    const [selectedDate, setSelectedDate] = useState('');
-    const [selectedSlot, setSelectedSlot] = useState(null);
+function Step2DateTime({
+    specialty,
+    onNext,
+    onBack,
+    initialDate,
+    initialTimeSlot
+}) {
+    const [selectedDate, setSelectedDate] = useState(initialDate || '');
+    const [selectedSlot, setSelectedSlot] = useState(initialTimeSlot || null);
+
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    useEffect(() => {
+        if (initialDate) {
+            setSelectedDate(initialDate);
+        }
+        if (initialTimeSlot) {
+            setSelectedSlot(initialTimeSlot);
+        }
+    }, [initialDate, initialTimeSlot]);
 
     useEffect(() => {
         if (selectedDate && specialty?.ma_chuyen_khoa) {
             loadSlots();
         }
     }, [selectedDate, specialty?.ma_chuyen_khoa]);
+    const isToday = (dateStr) => {
+        const today = new Date();
+        const selected = new Date(dateStr);
+
+        return (
+            today.getFullYear() === selected.getFullYear() &&
+            today.getMonth() === selected.getMonth() &&
+            today.getDate() === selected.getDate()
+        );
+    };
+
+    const timeToMinutes = (time) => {
+        const [h, m] = time.split(':').map(Number);
+        return h * 60 + m;
+    };
 
     const loadSlots = async () => {
         setLoading(true);
         setError('');
-        setSelectedSlot(null);
         setSlots([]);
 
         try {
@@ -27,11 +56,29 @@ function Step2DateTime({ specialty, onNext, onBack }) {
                 specialtyId: specialty.ma_chuyen_khoa
             });
 
-            const data = res.data || [];
+            let data = res.data || [];
+
+            // Nếu là hôm nay → chỉ lấy slot sau thời điểm hiện tại
+            if (isToday(selectedDate)) {
+                const now = new Date();
+                const currentMinutes = now.getHours() * 60 + now.getMinutes();
+                data = data.filter(slot => timeToMinutes(slot.start) > currentMinutes);
+            }
+
             setSlots(data);
 
+            // ✅ GIỮ LẠI SLOT CŨ NẾU CÒN TỒN TẠI
+            setSelectedSlot(prev =>
+                prev &&
+                    data.some(
+                        s => s.start === prev.start && s.end === prev.end
+                    )
+                    ? prev
+                    : null
+            );
+
             if (data.length === 0) {
-                setError('Không có khung giờ trống trong ngày này');
+                setError('Không có khung giờ trống phù hợp trong ngày này');
             }
         } catch (err) {
             console.error(err);
@@ -40,6 +87,12 @@ function Step2DateTime({ specialty, onNext, onBack }) {
             setLoading(false);
         }
     };
+
+    const isSunday = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.getDay() === 0; // 0 = Sunday
+    };
+
 
     const handleNext = () => {
         if (!selectedSlot) {
@@ -84,10 +137,24 @@ function Step2DateTime({ specialty, onNext, onBack }) {
                     type="date"
                     min={minDate}
                     value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (isSunday(value)) {
+                            setError('Không nhận khám vào ngày Chủ nhật');
+                            setSelectedDate('');
+                            setSlots([]);
+                            setSelectedSlot(null);
+                            return;
+                        }
+
+                        setError('');
+                        setSelectedDate(value);
+                    }}
                     disabled={loading}
                     className="w-full px-4 py-3 border-2 rounded-xl focus:border-teal-600"
                 />
+
             </div>
 
             {/* SLOTS */}

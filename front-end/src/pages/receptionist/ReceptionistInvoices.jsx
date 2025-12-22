@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Download, CheckCircle, Clock, Filter, RefreshCw } from 'lucide-react';
-import invoiceAPI from '@/services/invoiceAPI';
+import invoiceAPI from '../../services/invoiceAPI';
 
 function ReceptionistInvoices() {
     const [invoices, setInvoices] = useState([]);
@@ -8,6 +8,7 @@ function ReceptionistInvoices() {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [processingId, setProcessingId] = useState(null);
+    const [dateFilter, setDateFilter] = useState('');
 
     useEffect(() => {
         fetchInvoices();
@@ -17,6 +18,7 @@ function ReceptionistInvoices() {
         try {
             setLoading(true);
             const res = await invoiceAPI.getAll();
+            console.log('Invoices data:', res.data);
             setInvoices(res.data);
         } catch (error) {
             console.error('Lỗi khi tải hóa đơn:', error);
@@ -54,6 +56,7 @@ function ReceptionistInvoices() {
                 },
             });
 
+
             if (!response.ok) {
                 throw new Error('Không thể tải PDF');
             }
@@ -76,15 +79,22 @@ function ReceptionistInvoices() {
     const filteredInvoices = invoices.filter(invoice => {
         const matchesSearch =
             invoice.ma_hoa_don.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            `${invoice.ho_benh_nhan} ${invoice.ten_benh_nhan}`.toLowerCase().includes(searchTerm.toLowerCase());
+            `${invoice.ho_benh_nhan} ${invoice.ten_benh_nhan}`
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
 
         const matchesStatus =
             statusFilter === 'all' ||
             (statusFilter === 'paid' && invoice.trang_thai_hoa_don === 1) ||
             (statusFilter === 'unpaid' && invoice.trang_thai_hoa_don === 0);
 
-        return matchesSearch && matchesStatus;
+        const matchesDate =
+            !dateFilter ||
+            invoice.ngay_tao_hoa_don?.split('T')[0] === dateFilter;
+
+        return matchesSearch && matchesStatus && matchesDate;
     });
+
 
     // Statistics
     const totalInvoices = invoices.length;
@@ -176,14 +186,29 @@ function ReceptionistInvoices() {
                                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
+                        {/* Date Filter */}
+                        <div className="relative">
+                            <input
+                                type="date"
+                                value={dateFilter}
+                                onChange={(e) => setDateFilter(e.target.value)}
+                                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                        <button
+                            onClick={() => setDateFilter('')}
+                            className="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 text-sm"
+                        >
+                            Xóa ngày
+                        </button>
 
                         {/* Status Filter */}
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setStatusFilter('all')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'all'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 Tất cả
@@ -191,8 +216,8 @@ function ReceptionistInvoices() {
                             <button
                                 onClick={() => setStatusFilter('paid')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'paid'
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 Đã thanh toán
@@ -200,8 +225,8 @@ function ReceptionistInvoices() {
                             <button
                                 onClick={() => setStatusFilter('unpaid')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'unpaid'
-                                        ? 'bg-orange-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-orange-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 Chưa thanh toán

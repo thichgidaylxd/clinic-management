@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { adminAPI } from '../../services/adminAPI';
 
-function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
+function ScheduleModal({ schedule, doctors, onClose, onSuccess }) {
+
     const [formData, setFormData] = useState({
         ma_bac_si_lich_lam_viec: '',
         ngay_lich_lam_viec: '',
         thoi_gian_bat_dau_lich_lam_viec: '',
         thoi_gian_ket_thuc_lich_lam_viec: '',
-        ma_phong_kham_lich_lam_viec: '',
         trang_thai_lich_lam_viec: 1
     });
     const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                 ngay_lich_lam_viec: formatDateForInput(schedule.ngay_lich_lam_viec),
                 thoi_gian_bat_dau_lich_lam_viec: schedule.thoi_gian_bat_dau_lich_lam_viec?.substring(0, 5) || '',
                 thoi_gian_ket_thuc_lich_lam_viec: schedule.thoi_gian_ket_thuc_lich_lam_viec?.substring(0, 5) || '',
-                ma_phong_kham_lich_lam_viec: schedule.ma_phong_kham_lich_lam_viec || '',
                 trang_thai_lich_lam_viec: schedule.trang_thai_lich_lam_viec ?? 1
             });
         }
@@ -59,6 +58,23 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
     };
 
     const today = formatDateForInput(new Date());
+    const setShift = (shift) => {
+        if (shift === 'morning') {
+            setFormData({
+                ...formData,
+                thoi_gian_bat_dau_lich_lam_viec: '08:00',
+                thoi_gian_ket_thuc_lich_lam_viec: '11:30'
+            });
+        }
+
+        if (shift === 'afternoon') {
+            setFormData({
+                ...formData,
+                thoi_gian_bat_dau_lich_lam_viec: '13:00',
+                thoi_gian_ket_thuc_lich_lam_viec: '17:00'
+            });
+        }
+    };
 
 
 
@@ -125,10 +141,16 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                                 type="time"
                                 required
                                 value={formData.thoi_gian_bat_dau_lich_lam_viec}
-                                onChange={(e) => setFormData({ ...formData, thoi_gian_bat_dau_lich_lam_viec: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        thoi_gian_bat_dau_lich_lam_viec: e.target.value
+                                    })
+                                }
                                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
                             />
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Giờ kết thúc <span className="text-red-500">*</span>
@@ -137,29 +159,38 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                                 type="time"
                                 required
                                 value={formData.thoi_gian_ket_thuc_lich_lam_viec}
-                                onChange={(e) => setFormData({ ...formData, thoi_gian_ket_thuc_lich_lam_viec: e.target.value })}
+                                onChange={(e) =>
+                                    setFormData({
+                                        ...formData,
+                                        thoi_gian_ket_thuc_lich_lam_viec: e.target.value
+                                    })
+                                }
                                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
                             />
                         </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Phòng khám
-                        </label>
-                        <select
-                            value={formData.ma_phong_kham_lich_lam_viec}
-                            onChange={(e) => setFormData({ ...formData, ma_phong_kham_lich_lam_viec: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
+                    {/* BUTTON CHỌN CA */}
+                    <div className="flex gap-4 mt-2">
+                        <button
+                            type="button"
+                            onClick={() => setShift('morning')}
+                            className="flex-1 px-4 py-2 border-2 border-teal-600 text-teal-700 rounded-xl hover:bg-teal-50 font-medium transition"
                         >
-                            <option value="">Chọn phòng khám</option>
-                            {rooms.map((r) => (
-                                <option key={r.ma_phong_kham} value={r.ma_phong_kham}>
-                                    {r.ten_phong_kham} - {r.so_phong_kham}
-                                </option>
-                            ))}
-                        </select>
+                            Ca sáng (08:00 – 11:30)
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setShift('afternoon')}
+                            className="flex-1 px-4 py-2 border-2 border-orange-500 text-orange-600 rounded-xl hover:bg-orange-50 font-medium transition"
+                        >
+                            Ca chiều (13:00 – 17:00)
+                        </button>
                     </div>
+
+
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">

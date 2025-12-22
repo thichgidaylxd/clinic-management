@@ -17,6 +17,7 @@ const prescriptionAPI = {
      */
     create: async (data) => {
         try {
+            console.log('Creating prescription with data:', data);
             const response = await axios.post(
                 `${API_URL}/prescriptions`,
                 data,
