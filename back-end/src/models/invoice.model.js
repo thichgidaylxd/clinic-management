@@ -6,7 +6,7 @@ class InvoiceModel {
     // ==============================
     // LẤY DANH SÁCH HÓA ĐƠN
     // ==============================
-    static async findAll({ page = 1, limit = 10, status }) {
+    static async findAll({ page = 1, limit = 100, status }) {
         const offset = (page - 1) * limit;
         let where = '';
         const params = [];
