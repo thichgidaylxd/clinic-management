@@ -5,6 +5,7 @@ const PrescriptionModel = require('../models/prescriptionModel');
 class PrescriptionService {
 
 
+    // kê đơn thuốc
     static async createPrescription(data) {
         const {
             ma_lich_hen,

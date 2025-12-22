@@ -8,6 +8,7 @@ module.exports = function generateInvoicePDF(invoice, res) {
         margin: 50,
         bufferPages: true
     });
+    console.log(invoice)
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(

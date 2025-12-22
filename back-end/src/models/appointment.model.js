@@ -952,13 +952,13 @@ class AppointmentModel {
             ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
-
         const safeNote = note ?? null; // ✅ QUAN TRỌNG
 
         const [result] = await db.execute(query, [
             safeNote,
             UUIDUtil.toBinary(appointmentId)
         ]);
+
 
         return result.affectedRows > 0;
     }
