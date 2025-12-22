@@ -71,7 +71,7 @@ class InvoiceController {
         try {
             const { invoiceId } = req.params;
             const invoice = await InvoiceService.getDetail(invoiceId);
-
+            console.log(invoice);
             generateInvoicePDF(invoice, res);
         } catch (err) {
             next(err);

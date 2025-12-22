@@ -9,6 +9,8 @@ class PrescriptionController {
      */
     static async create(req, res, next) {
         try {
+
+            console.log('📝 Request body for creating prescription:', req.body);
             const result = await PrescriptionService.createPrescription(req.body);
 
             return ResponseUtil.success(

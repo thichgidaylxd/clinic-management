@@ -8,8 +8,6 @@ class WorkScheduleService {
     static async create(scheduleData) {
         const {
             ma_bac_si_lich_lam_viec,
-            ma_phong_kham_lich_lam_viec,
-            // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
             ngay_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec
@@ -19,26 +17,6 @@ class WorkScheduleService {
         const doctor = await DoctorModel.findById(ma_bac_si_lich_lam_viec);
         if (!doctor) {
             throw new Error('Bác sĩ không tồn tại');
-        }
-
-        // Kiểm tra phòng khám có tồn tại (nếu có)
-        if (ma_phong_kham_lich_lam_viec) {
-            const room = await RoomModel.findById(ma_phong_kham_lich_lam_viec);
-            if (!room) {
-                throw new Error('Phòng khám không tồn tại');
-            }
-
-            // Kiểm tra phòng có bị trùng lịch không
-            const roomOccupied = await WorkScheduleModel.isRoomOccupied(
-                ma_phong_kham_lich_lam_viec,
-                ngay_lich_lam_viec,
-                thoi_gian_bat_dau_lich_lam_viec,
-                thoi_gian_ket_thuc_lich_lam_viec
-            );
-
-            if (roomOccupied) {
-                throw new Error('Phòng khám đã có lịch sử dụng trong khung giờ này');
-            }
         }
 
         // ❌ XÓA: Validate chuyên khoa
@@ -121,33 +99,14 @@ class WorkScheduleService {
         }
 
         const {
-            ma_phong_kham_lich_lam_viec,
+            // ❌ XÓA: ma_phong_kham_lich_lam_viec
             // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
             ngay_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec
         } = updateData;
 
-        // Kiểm tra phòng khám có tồn tại (nếu có)
-        if (ma_phong_kham_lich_lam_viec) {
-            const room = await RoomModel.findById(ma_phong_kham_lich_lam_viec);
-            if (!room) {
-                throw new Error('Phòng khám không tồn tại');
-            }
 
-            // Kiểm tra phòng có bị trùng lịch không
-            const roomOccupied = await WorkScheduleModel.isRoomOccupied(
-                ma_phong_kham_lich_lam_viec,
-                ngay_lich_lam_viec || schedule.ngay_lich_lam_viec,
-                thoi_gian_bat_dau_lich_lam_viec || schedule.thoi_gian_bat_dau_lich_lam_viec,
-                thoi_gian_ket_thuc_lich_lam_viec || schedule.thoi_gian_ket_thuc_lich_lam_viec,
-                scheduleId
-            );
-
-            if (roomOccupied) {
-                throw new Error('Phòng khám đã có lịch sử dụng trong khung giờ này');
-            }
-        }
 
         // ❌ XÓA: Validate chuyên khoa
 

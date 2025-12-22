@@ -89,7 +89,15 @@ class PrescriptionValidator {
                 .allow(null, '')
                 .messages({
                     'string.max': 'Ghi chú hóa đơn không được quá 1000 ký tự'
-                })
+                }),
+            chi_phi_phat_sinh: Joi.number()
+                .min(0)
+                .default(0)
+                .messages({
+                    'number.base': 'Chi phí phát sinh phải là số',
+                    'number.min': 'Chi phí phát sinh không được âm'
+                }),
+
         });
     }
 
