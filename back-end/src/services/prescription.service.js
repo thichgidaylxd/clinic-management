@@ -5,6 +5,7 @@ const PrescriptionModel = require('../models/prescriptionModel');
 class PrescriptionService {
 
 
+    // kê đơn thuốc
     static async createPrescription(data) {
         const {
             ma_lich_hen,
@@ -14,10 +15,13 @@ class PrescriptionService {
             chuan_doan,
             phuong_phap_dieu_tri,
 
-            // thuốc
-            medicines, // [{ ma_thuoc, so_luong, ghi_chu }]
-            ghi_chu_hoa_don
+            medicines,
+            ghi_chu_hoa_don,
+            chi_phi_phat_sinh // ✅ THÊM
         } = data;
+
+        console.log('Creating prescription with data:', data);
+
 
         // ===== VALIDATE =====
         if (!ma_lich_hen || !ma_bac_si) {
@@ -43,7 +47,15 @@ class PrescriptionService {
         }
 
         // ===== KIỂM TRA TỒN KHO =====
-        await PrescriptionModel.checkMedicineStock(medicines);
+        const stockCheck = await PrescriptionModel.checkMedicineStock(medicines);
+        const unavailable = stockCheck.filter(m => !m.available);
+
+        if (unavailable.length > 0) {
+            throw new Error(
+                unavailable.map(m => `${m.ten_thuoc}: ${m.reason}`).join(', ')
+            );
+        }
+
 
         // ===== 1. TẠO HỒ SƠ BỆNH ÁN =====
         const ma_ho_so_benh_an = await MedicalRecordModel.create({
@@ -63,7 +75,10 @@ class PrescriptionService {
             // ✅ user bệnh nhân (nullable)
             ma_nguoi_dung_hoa_don: appointment.ma_nguoi_tao_lich_hen || null,
 
+            ten_dich_vu: appointment.ten_dich_vu || null,
             gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
+            chi_phi_phat_sinh: Number(chi_phi_phat_sinh || 0), // ✅ SỬA
+
             medicines,
             ghi_chu_hoa_don
         });
@@ -120,10 +135,15 @@ class PrescriptionService {
             ma_benh_nhan: appointment.ma_benh_nhan,
             ma_chuyen_khoa: appointment.ma_chuyen_khoa,
             ma_nguoi_dung_hoa_don: ma_bac_si,
+
+            ten_dich_vu: appointment.ten_dich_vu || null,
             gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
+            chi_phi_phat_sinh: 0,
+
             medicines,
             ghi_chu_hoa_don
         };
+
 
         const ma_hoa_don = await PrescriptionModel.create(prescriptionData);
 

@@ -139,7 +139,6 @@ class AppointmentModel {
             BIN_TO_UUID(ma_lich_lam_viec) as ma_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec,
-            BIN_TO_UUID(ma_phong_kham_lich_lam_viec) as ma_phong_kham
         FROM bang_lich_lam_viec
         WHERE ma_bac_si_lich_lam_viec = UUID_TO_BIN(?)
             AND ngay_lich_lam_viec = DATE(?)
@@ -525,7 +524,6 @@ class AppointmentModel {
         LEFT JOIN bang_chuyen_khoa ck ON lh.ma_chuyen_khoa = ck.ma_chuyen_khoa
         LEFT JOIN bang_phong_kham pk ON lh.ma_phong_kham = pk.ma_phong_kham
         LEFT JOIN bang_dich_vu dv ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
-        -- ❌ XÓA: LEFT JOIN bang_thoi_gian_chi_tiet tg ON lh.ma_lich_hen = tg.ma_lich_hen
         WHERE lh.ma_lich_hen = ?
     `;
 
@@ -846,16 +844,12 @@ class AppointmentModel {
             nd.ten_nguoi_dung as ten_bac_si,
             -- Specialty
             GROUP_CONCAT(DISTINCT ck.ten_chuyen_khoa SEPARATOR ', ') as ten_chuyen_khoa,
-            -- Room
-            pk.ten_phong_kham,
-            pk.so_phong_kham,
         FROM bang_lich_hen lh
         INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
         INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
         INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
         LEFT JOIN bang_bac_si_chuyen_khoa bsck ON bs.ma_bac_si = bsck.ma_bac_si
         LEFT JOIN bang_chuyen_khoa ck ON bsck.ma_chuyen_khoa = ck.ma_chuyen_khoa
-        LEFT JOIN bang_phong_kham pk ON llv.ma_phong_kham_lich_lam_viec = pk.ma_phong_kham
         WHERE DATE(lh.ngay_hen) = CURDATE()
     `;
 
@@ -952,13 +946,13 @@ class AppointmentModel {
             ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
-
         const safeNote = note ?? null; // ✅ QUAN TRỌNG
 
         const [result] = await db.execute(query, [
             safeNote,
             UUIDUtil.toBinary(appointmentId)
         ]);
+
 
         return result.affectedRows > 0;
     }

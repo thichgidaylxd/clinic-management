@@ -12,14 +12,6 @@ class WorkScheduleValidator {
                     'any.required': 'Mã bác sĩ là bắt buộc'
                 }),
 
-            ma_phong_kham_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã phòng khám không hợp lệ'
-                }),
-
-
             ngay_lich_lam_viec: Joi.date()
                 .required()
                 .custom((value, helpers) => {
@@ -76,13 +68,6 @@ class WorkScheduleValidator {
     // Validate cập nhật lịch làm việc
     static update() {
         return Joi.object({
-            ma_phong_kham_lich_lam_viec: Joi.string()
-                .uuid()
-                .allow(null)
-                .messages({
-                    'string.guid': 'Mã phòng khám không hợp lệ'
-                }),
-
 
             ngay_lich_lam_viec: Joi.date()
                 .required()

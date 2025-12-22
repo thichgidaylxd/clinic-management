@@ -75,8 +75,7 @@ class ReceptionistController {
     static async updateNote(req, res, next) {
         try {
             const { id } = req.params;
-            const { note } = req.body;
-
+            const note = req.body.ghi_chu_lich_hen;
             const appointment = await ReceptionistService.updateAppointmentNote(id, note);
             return ResponseUtil.success(res, appointment, 'Cập nhật ghi chú thành công');
         } catch (error) {

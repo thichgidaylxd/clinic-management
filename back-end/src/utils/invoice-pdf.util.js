@@ -8,6 +8,7 @@ module.exports = function generateInvoicePDF(invoice, res) {
         margin: 50,
         bufferPages: true
     });
+    console.log(invoice)
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
@@ -51,6 +52,24 @@ module.exports = function generateInvoicePDF(invoice, res) {
         .text(`Bệnh nhân: ${invoice.ho_benh_nhan || ''} ${invoice.ten_benh_nhan || ''}`)
         .moveDown(1);
 
+    // ===== DỊCH VỤ KHÁM =====
+    doc.moveDown(0.5);
+
+    doc.fontSize(12)
+        .font('RobotoBold')
+        .text('DỊCH VỤ KHÁM', 50);
+
+    doc.moveDown(0.3);
+
+    doc.fontSize(11)
+        .font('Roboto')
+        .text(`• Tên dịch vụ: ${invoice.ten_dich_vu_hoa_don || '---'}`)
+        .text(
+            `• Chi phí dịch vụ: ${Number(invoice.gia_dich_vu_hoa_don || 0).toLocaleString('vi-VN')} VNĐ`
+        );
+
+    doc.moveDown(0.8);
+
     // ===== ĐƯỜNG KẺ NGANG =====
     doc.moveTo(50, doc.y)
         .lineTo(550, doc.y)
@@ -61,7 +80,7 @@ module.exports = function generateInvoicePDF(invoice, res) {
     // ===== TIÊU ĐỀ BẢNG =====
     doc.fontSize(13)
         .font('RobotoBold')
-        .text('DANH SÁCH THUỐC VÀ DỊCH VỤ', 50);
+        .text('DANH SÁCH THUỐC', 50);
 
     doc.moveDown(0.5);
 
@@ -93,17 +112,15 @@ module.exports = function generateInvoicePDF(invoice, res) {
     currentY += 10;
 
     // ===== NỘI DUNG BẢNG =====
-    doc.font('Roboto').fontSize(10);
+
+    if (currentY > 700) {
+        doc.addPage();
+        currentY = 50;
+    }
 
     invoice.medicines.forEach((med, index) => {
-        // Kiểm tra nếu còn đủ chỗ trên trang
-        if (currentY > 700) {
-            doc.addPage();
-            currentY = 50;
-        }
-
-        const quantity = med.so_luong_thuoc_hoa_don || 0;
-        const unitPrice = Number(med.don_gia_thuoc) || 0;
+        const quantity = Number(med.so_luong_thuoc_hoa_don || 0);
+        const unitPrice = Number(med.don_gia_thuoc || 0);
         const total = quantity * unitPrice;
 
         doc.text((index + 1).toString(), colPositions.stt, currentY, { width: 25 });
@@ -120,29 +137,103 @@ module.exports = function generateInvoicePDF(invoice, res) {
         .lineTo(550, currentY)
         .stroke();
 
-    currentY += 15;
+    currentY += 20;
+
+    // ===== ĐỊNH VỊ CỐ ĐỊNH CHO PHẦN TỔNG TIỀN =====
+    const summaryLabelX = 320;  // Vị trí cố định cho nhãn
+    const summaryValueX = 450;  // Vị trí cố định cho giá trị
+    const summaryValueWidth = 100; // Độ rộng cố định cho giá trị
+
+    // ===== CHI PHÍ DỊCH VỤ =====
+    doc.fontSize(11)
+        .font('RobotoBold')
+        .text('CHI PHÍ DỊCH VỤ:', summaryLabelX, currentY);
+
+    doc.font('Roboto')
+        .text(
+            `${Number(invoice.gia_dich_vu_hoa_don || 0).toLocaleString('vi-VN')} VNĐ`,
+            summaryValueX,
+            currentY,
+            { width: summaryValueWidth, align: 'right' }
+        );
+
+    currentY += 20;
+
+    // ===== TÍNH TỔNG TIỀN THUỐC =====
+    const medicineTotal = invoice.medicines.reduce(
+        (sum, m) => sum + Number(m.thanh_tien || 0),
+        0
+    );
+
+    // ===== TIỀN THUỐC =====
+    doc.fontSize(11)
+        .font('RobotoBold')
+        .text('TIỀN THUỐC:', summaryLabelX, currentY);
+
+    doc.font('Roboto')
+        .text(
+            `${medicineTotal.toLocaleString('vi-VN')} VNĐ`,
+            summaryValueX,
+            currentY,
+            { width: summaryValueWidth, align: 'right' }
+        );
+
+    currentY += 20;
+
+    // ===== CHI PHÍ PHÁT SINH =====
+    const extraFee = Number(invoice.chi_phi_phat_sinh_hoa_don || 0);
+
+    if (extraFee > 0) {
+        doc.fontSize(11)
+            .font('RobotoBold')
+            .text('CHI PHÍ PHÁT SINH:', summaryLabelX, currentY);
+
+        doc.fontSize(11)
+            .font('Roboto')
+            .text(
+                `${extraFee.toLocaleString('vi-VN')} VNĐ`,
+                summaryValueX,
+                currentY,
+                { width: summaryValueWidth, align: 'right' }
+            );
+
+        currentY += 20;
+    }
 
     // ===== TỔNG TIỀN =====
     doc.fontSize(14)
         .font('RobotoBold')
-        .text('TỔNG TIỀN:', 350, currentY, { width: 130 })
+        .text('TỔNG TIỀN:', summaryLabelX, currentY);
+
+    doc.fontSize(14)
         .text(
             `${Number(invoice.tong_thanh_tien_hoa_don).toLocaleString('vi-VN')} VNĐ`,
-            470,
+            summaryValueX,
             currentY,
-            { width: 80, align: 'right' }
+            { width: summaryValueWidth, align: 'right' }
         );
 
-    currentY += 30;
+    currentY -= 50;
 
     // ===== TRẠNG THÁI THANH TOÁN =====
     doc.fontSize(11)
         .font('Roboto')
         .text(
-            `Trạng thái: ${invoice.trang_thai_hoa_don === 1 ? '✓ Đã thanh toán' : '○ Chưa thanh toán'}`,
+            `Trạng thái: ${invoice.trang_thai_hoa_don === 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}`,
             50,
             currentY
         );
+
+    if (invoice.ghi_chu_hoa_don) {
+        doc.moveDown(1);
+        doc.fontSize(11)
+            .font('RobotoBold')
+            .text('GHI CHÚ:', 50);
+        doc.font('Roboto')
+            .text(invoice.ghi_chu_hoa_don, 50);
+    }
+
+    currentY += 50;
 
     // ===== FOOTER =====
     const footerY = doc.page.height - 80;

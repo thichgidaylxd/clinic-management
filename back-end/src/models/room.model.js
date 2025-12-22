@@ -252,12 +252,6 @@ class RoomModel {
         return rows[0].count > 0;
     }
 
-    // Kiểm tra phòng có đang được sử dụng không
-    static async isInUse(roomId) {
-        const query = 'SELECT COUNT(*) as count FROM bang_lich_lam_viec WHERE ma_phong_kham_lich_lam_viec = ?';
-        const [rows] = await db.execute(query, [UUIDUtil.toBinary(roomId)]);
-        return rows[0].count > 0;
-    }
 
     // Lấy phòng khám có sẵn (trạng thái = 1)
     static async getAvailableRooms(specialtyId = null, roomTypeId = null) {

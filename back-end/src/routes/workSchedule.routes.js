@@ -280,10 +280,7 @@ router.get(
  *                 type: string
  *                 format: uuid
  *                 description: ID bác sĩ
- *               ma_phong_kham_lich_lam_viec:
- *                 type: string
- *                 format: uuid
- *                 description: ID phòng khám (tùy chọn)
+
  *               ma_chuyen_khoa_lich_lam_viec:
  *                 type: string
  *                 format: uuid
@@ -338,9 +335,7 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               ma_phong_kham_lich_lam_viec:
- *                 type: string
- *                 format: uuid
+
  *               ma_chuyen_khoa_lich_lam_viec:
  *                 type: string
  *                 format: uuid
