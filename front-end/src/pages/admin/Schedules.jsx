@@ -6,7 +6,6 @@ import { adminAPI } from '../../services/adminAPI';
 function Schedules() {
     const [schedules, setSchedules] = useState([]);
     const [doctors, setDoctors] = useState([]);
-    const [rooms, setRooms] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterDoctor, setFilterDoctor] = useState('');
     const [filterDate, setFilterDate] = useState('');
@@ -40,7 +39,7 @@ function Schedules() {
 
             const token = localStorage.getItem('token');
 
-            const [schedulesRes, doctorsRes, roomsRes] = await Promise.all([
+            const [schedulesRes, doctorsRes] = await Promise.all([
                 fetch(`http://localhost:5000/api/v1/work-schedules?${params}`, {
                     headers: {
                         'Content-Type': 'application/json',
@@ -52,19 +51,17 @@ function Schedules() {
                     return data;
                 }),
                 adminAPI.getDoctors(1, 100),
-                adminAPI.getRooms(1, 100)
             ]);
 
             // ✅ Handle different response structures
             const schedulesData = schedulesRes.data?.data || schedulesRes.data || [];
             const doctorsData = doctorsRes.data?.data || doctorsRes.data || [];
-            const roomsData = roomsRes.data?.data || roomsRes.data || [];
 
             console.log('✅ Schedules data:', schedulesData); // ✅ Debug
 
             setSchedules(schedulesData);
             setDoctors(doctorsData);
-            setRooms(roomsData);
+
         } catch (error) {
             console.error('❌ Load data error:', error);
         } finally {
@@ -262,8 +259,8 @@ function Schedules() {
                                             <td className="px-6 py-4">
                                                 <span
                                                     className={`px-3 py-1 text-sm font-medium rounded-full ${schedule.trang_thai_lich_lam_viec === 1
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-red-100 text-red-800'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-red-100 text-red-800'
                                                         }`}
                                                 >
                                                     {schedule.trang_thai_lich_lam_viec === 1 ? 'Hoạt động' : 'Đã hủy'}
@@ -319,7 +316,6 @@ function Schedules() {
                 <ScheduleModal
                     schedule={selectedSchedule}
                     doctors={doctors}
-                    rooms={rooms}
                     onClose={() => {
                         setShowModal(false);
                         setSelectedSchedule(null);

@@ -20,6 +20,7 @@ function PatientInfo({ appointment }) {
                         </p>
                     </div>
                 </div>
+
                 <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
                     <div className="bg-green-100 p-2 rounded-lg">
                         <Phone className="w-5 h-5 text-green-600" />

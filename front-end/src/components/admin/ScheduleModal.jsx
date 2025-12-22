@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { adminAPI } from '../../services/adminAPI';
 
-function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
+function ScheduleModal({ schedule, doctors, onClose, onSuccess }) {
+
     const [formData, setFormData] = useState({
         ma_bac_si_lich_lam_viec: '',
         ngay_lich_lam_viec: '',
         thoi_gian_bat_dau_lich_lam_viec: '',
         thoi_gian_ket_thuc_lich_lam_viec: '',
-        ma_phong_kham_lich_lam_viec: '',
         trang_thai_lich_lam_viec: 1
     });
     const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                 ngay_lich_lam_viec: formatDateForInput(schedule.ngay_lich_lam_viec),
                 thoi_gian_bat_dau_lich_lam_viec: schedule.thoi_gian_bat_dau_lich_lam_viec?.substring(0, 5) || '',
                 thoi_gian_ket_thuc_lich_lam_viec: schedule.thoi_gian_ket_thuc_lich_lam_viec?.substring(0, 5) || '',
-                ma_phong_kham_lich_lam_viec: schedule.ma_phong_kham_lich_lam_viec || '',
                 trang_thai_lich_lam_viec: schedule.trang_thai_lich_lam_viec ?? 1
             });
         }
@@ -191,23 +190,7 @@ function ScheduleModal({ schedule, doctors, rooms, onClose, onSuccess }) {
                     </div>
 
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Phòng khám
-                        </label>
-                        <select
-                            value={formData.ma_phong_kham_lich_lam_viec}
-                            onChange={(e) => setFormData({ ...formData, ma_phong_kham_lich_lam_viec: e.target.value })}
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
-                        >
-                            <option value="">Chọn phòng khám</option>
-                            {rooms.map((r) => (
-                                <option key={r.ma_phong_kham} value={r.ma_phong_kham}>
-                                    {r.ten_phong_kham} - {r.so_phong_kham}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">

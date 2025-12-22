@@ -2,15 +2,19 @@ import React from 'react';
 import { DollarSign, Stethoscope, Pill, CheckCircle2, Save, Loader2, ArrowLeft } from 'lucide-react';
 
 function InvoiceSummary({
+    serviceName,
     serviceFee,
     medicineTotal,
+    extraFee,
+    setExtraFee,
     grandTotal,
     selectedMedicines,
-    medicalRecord,
     submitting,
     onSubmit,
     onCancel
 }) {
+
+
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
@@ -26,11 +30,31 @@ function InvoiceSummary({
             <div className="p-6">
                 <div className="space-y-4 mb-6">
                     <div className="flex justify-between items-center py-3 border-b border-gray-200">
-                        <span className="text-gray-700 flex items-center gap-2">
-                            <Stethoscope className="w-4 h-4 text-blue-600" />
-                            Tiền khám
-                        </span>
-                        <span className="font-semibold text-gray-900">{formatPrice(serviceFee)}</span>
+                        <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                            <span className="text-gray-700 flex items-center gap-2">
+                                <Stethoscope className="w-4 h-4 text-blue-600" />
+                                {serviceName}
+                            </span>
+                            <span className="font-semibold text-gray-900">
+                                <div className="ms-4">{formatPrice(serviceFee)}</div>
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                            <span className="text-gray-700 flex items-center gap-2">
+                                <DollarSign className="w-4 h-4 text-orange-600" />
+                                Chi phí phát sinh
+                            </span>
+
+                            <input
+                                type="number"
+                                min={0}
+                                value={extraFee}
+                                onChange={(e) => setExtraFee(Number(e.target.value || 0))}
+                                className="w-40 ms-4 text-right px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-semibold"
+                            />
+                        </div>
+
                     </div>
                     <div className="flex justify-between items-center py-3 border-b border-gray-200">
                         <span className="text-gray-700 flex items-center gap-2">
@@ -39,6 +63,16 @@ function InvoiceSummary({
                         </span>
                         <span className="font-semibold text-gray-900">{formatPrice(medicineTotal)}</span>
                     </div>
+                    <div className="flex justify-between items-center py-3 border-b border-gray-200">
+                        <span className="text-gray-700 flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-orange-600" />
+                            Chi phí phát sinh
+                        </span>
+                        <span className="font-semibold text-gray-900">
+                            {formatPrice(extraFee)}
+                        </span>
+                    </div>
+
                     <div className="bg-purple-50 rounded-lg p-4">
                         <div className="flex justify-between items-center">
                             <span className="text-lg font-bold text-gray-900">Tổng cộng</span>

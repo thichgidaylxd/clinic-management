@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Download, CheckCircle, Clock, Filter, RefreshCw } from 'lucide-react';
-import invoiceAPI from '@/services/invoiceAPI';
+import invoiceAPI from '../../services/invoiceAPI';
 
 function ReceptionistInvoices() {
     const [invoices, setInvoices] = useState([]);
@@ -18,6 +18,7 @@ function ReceptionistInvoices() {
         try {
             setLoading(true);
             const res = await invoiceAPI.getAll();
+            console.log('Invoices data:', res.data);
             setInvoices(res.data);
         } catch (error) {
             console.error('Lỗi khi tải hóa đơn:', error);
