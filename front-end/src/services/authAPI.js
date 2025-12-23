@@ -21,7 +21,17 @@ const getAuthHeaders = () => {
 
 export const authAPI = {
     // =================== AUTH ===================
-
+    changeMyPassword: async (oldPassword, newPassword) => {
+        const response = await fetch(`${API_BASE_URL}/users/me/password`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+                mat_khau_cu: oldPassword,
+                mat_khau_moi: newPassword
+            })
+        });
+        return handleResponse(response);
+    },
     login: async (payload) => {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',

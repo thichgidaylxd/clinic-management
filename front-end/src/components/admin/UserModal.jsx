@@ -14,6 +14,9 @@ function UserModal({ user, roles, onClose, onSuccess }) {
         ma_vai_tro: '',
         trang_thai_nguoi_dung: 1
     });
+
+    const [newPassword, setNewPassword] = useState('');
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -42,10 +45,25 @@ function UserModal({ user, roles, onClose, onSuccess }) {
 
         try {
             if (isEdit) {
+                // 1. Update info user
                 await adminAPI.updateUser(user.ma_nguoi_dung, formData);
+
+                // 2. Nếu admin nhập mật khẩu mới → reset password
+                if (newPassword && newPassword.trim().length > 0) {
+                    if (newPassword.length < 6) {
+                        throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự');
+                    }
+
+                    await adminAPI.resetUserPassword(
+                        user.ma_nguoi_dung,
+                        newPassword
+                    );
+                }
             } else {
+                // Create user
                 await adminAPI.createUser(formData);
             }
+
             alert(isEdit ? 'Cập nhật thành công' : 'Thêm mới thành công');
             onSuccess();
         } catch (err) {
@@ -54,6 +72,7 @@ function UserModal({ user, roles, onClose, onSuccess }) {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
@@ -148,6 +167,24 @@ function UserModal({ user, roles, onClose, onSuccess }) {
                                 placeholder="0987654321"
                             />
                         </div>
+                        {isEdit && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Mật khẩu mới (tùy chọn)
+                                </label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-700 focus:outline-none"
+                                    placeholder="Để trống nếu không đổi mật khẩu"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Nếu nhập, hệ thống sẽ reset mật khẩu cho người dùng
+                                </p>
+                            </div>
+                        )}
+
                     </div>
 
                     {!isEdit && (
@@ -209,8 +246,8 @@ function UserModal({ user, roles, onClose, onSuccess }) {
                                 <input
                                     type="radio"
                                     value="0"
-                                    checked={formData.gioi_tinh_nguoi_dung === 0}
-                                    onChange={() => setFormData({ ...formData, gioi_tinh_nguoi_dung: 0 })}
+                                    checked={formData.gioi_tinh_nguoi_dung === 1}
+                                    onChange={() => setFormData({ ...formData, gioi_tinh_nguoi_dung: 1 })}
                                     className="w-4 h-4 text-teal-700"
                                 />
                                 <span>Nam</span>
@@ -218,9 +255,9 @@ function UserModal({ user, roles, onClose, onSuccess }) {
                             <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                     type="radio"
-                                    value="1"
-                                    checked={formData.gioi_tinh_nguoi_dung === 1}
-                                    onChange={() => setFormData({ ...formData, gioi_tinh_nguoi_dung: 1 })}
+                                    value="0"
+                                    checked={formData.gioi_tinh_nguoi_dung === 0}
+                                    onChange={() => setFormData({ ...formData, gioi_tinh_nguoi_dung: 0 })}
                                     className="w-4 h-4 text-teal-700"
                                 />
                                 <span>Nữ</span>
