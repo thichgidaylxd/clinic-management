@@ -94,6 +94,21 @@ export const receptionistAPI = {
         return safeFetch(`${API_BASE_URL}/appointments/by-date?${params.toString()}`);
     },
 
+    // Lấy tất cả lịch hẹn (không lọc ngày)
+    getAllAppointments: async (filters = {}) => {
+        const params = new URLSearchParams();
+
+        if (filters.doctorId) params.append('doctorId', filters.doctorId);
+        if (filters.status !== undefined && filters.status !== '') {
+            params.append('status', filters.status);
+        }
+        if (filters.search) params.append('search', filters.search);
+
+        const url = `${API_BASE_URL}/appointments`;
+        return safeFetch(params.toString() ? `${url}?${params}` : url);
+    },
+
+
 
     // Appointments
     getTodayAppointments: async (filters = {}) => {

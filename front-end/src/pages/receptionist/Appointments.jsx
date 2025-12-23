@@ -44,14 +44,18 @@ function ReceptionistAppointments() {
     const loadData = async () => {
         setLoading(true);
         try {
+            const appointmentPromise = selectedDate
+                ? receptionistAPI.getAppointmentsByDate(selectedDate)
+                : receptionistAPI.getAllAppointments(filters);
+
             const [aptRes, doctorRes] = await Promise.all([
-                receptionistAPI.getAppointmentsByDate(selectedDate),
+                appointmentPromise,
                 adminAPI.getDoctors(1, 100)
             ]);
 
             console.log('Appointments data:', aptRes.data);
 
-            let filteredAppointments = aptRes.data || [];
+            let filteredAppointments = selectedDate ? aptRes.data || [] : aptRes.data.data || [];
 
             // Lọc theo tìm kiếm (tên hoặc SĐT bệnh nhân)
             if (filters.search.trim()) {
@@ -230,7 +234,7 @@ function ReceptionistAppointments() {
             <div className="flex items-center gap-4 mb-6">
                 <CalendarDays className="w-6 h-6 text-teal-700" />
                 <h1 className="text-2xl font-bold text-gray-800">
-                    Lịch hẹn ngày {new Date(selectedDate).toLocaleDateString('vi-VN')}
+                    Lịch hẹn ngày {(selectedDate ? new Date(selectedDate).toLocaleDateString('vi-VN') : [])}
                 </h1>
                 <input
                     type="date"

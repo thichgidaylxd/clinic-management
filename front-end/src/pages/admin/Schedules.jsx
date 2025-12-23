@@ -203,9 +203,6 @@ function Schedules() {
                                         Giờ làm việc
                                     </th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                                        Phòng khám
-                                    </th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
                                         Trạng thái
                                     </th>
                                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">
@@ -250,11 +247,6 @@ function Schedules() {
                                                         {formatTime(schedule.thoi_gian_ket_thuc_lich_lam_viec)}
                                                     </span>
                                                 </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-gray-900">
-                                                    {schedule.ten_phong_kham || 'Chưa gán'}
-                                                </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span
