@@ -16,7 +16,7 @@ function startDoctorScheduleCron() {
     // });
 
     // ⏰ 18:50 mỗi ngày
-    cron.schedule('58 18 * * *', async () => {
+    cron.schedule('15 16 * * *', async () => {
         console.log('[CRON] Generating doctor schedules...');
 
         try {

@@ -40,6 +40,7 @@ class WorkScheduleService {
     // Lấy danh sách lịch làm việc
     static async getAll(page, limit, filters) {
         // Kiểm tra bác sĩ
+        console.log("dsfsd", filters)
         if (filters.doctorId) {
             const doctor = await DoctorModel.findById(filters.doctorId);
             if (!doctor) {
@@ -47,7 +48,6 @@ class WorkScheduleService {
             }
         }
 
-        // ❌ XÓA: Validate specialtyId
 
         // Kiểm tra phòng
         if (filters.roomId) {

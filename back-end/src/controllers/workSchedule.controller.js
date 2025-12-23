@@ -55,6 +55,7 @@ class WorkScheduleController {
                 toDate,
                 status
             };
+            console.log(filters)
 
             const result = await WorkScheduleService.getAll(page, limit, filters);
 
