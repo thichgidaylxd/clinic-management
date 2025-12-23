@@ -157,6 +157,34 @@ router.delete(
     UserController.delete
 );
 
+
+/**
+ * @swagger
+ * /users/me/password:
+ *   put:
+ *     summary: Người dùng tự đổi mật khẩu
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserChangePassword'
+ *     responses:
+ *       200:
+ *         description: Đổi mật khẩu thành công
+ *       400:
+ *         description: Mật khẩu cũ không đúng
+ */
+router.put(
+    '/me/password',
+    AuthMiddleware.authenticate,
+    validate(UserValidator.changePassword()),
+    UserController.changeMyPassword
+);
+
 /**
  * @swagger
  * /users/{id}/password:
@@ -189,6 +217,23 @@ router.put(
     AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
     validate(UserValidator.changePassword()),
     UserController.changePassword
+);
+
+/**
+ * @swagger
+ * /users/{id}/reset-password:
+ *   put:
+ *     summary: Admin reset mật khẩu người dùng
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.put(
+    '/:id/reset-password',
+    AuthMiddleware.authenticate,
+    AuthMiddleware.authorize(CONSTANTS.ROLES.ADMIN),
+    validate(UserValidator.resetPassword()),
+    UserController.resetPasswordByAdmin
 );
 
 module.exports = router;

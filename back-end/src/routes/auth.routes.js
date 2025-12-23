@@ -54,10 +54,6 @@ const AuthMiddleware = require('../middlewares/auth.middleware');
  *                 enum: [0, 1, 2]
  *                 description: 0-Nữ, 1-Nam, 2-Khác
  *                 example: 1
- *               dia_chi_nguoi_dung:
- *                 type: string
- *                 description: Địa chỉ của người dùng
- *                 example: 123 Đường ABC, Quận 1, TP.HCM
  *               ma_vai_tro:
  *                 type: string
  *                 format: uuid

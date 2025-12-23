@@ -102,6 +102,43 @@ class UserController {
             next(error);
         }
     }
+
+    // Người dùng tự đổi mật khẩu
+    static async changeMyPassword(req, res, next) {
+        try {
+            const userId = req.user.ma_nguoi_dung; // lấy từ JWT
+            const { mat_khau_cu, mat_khau_moi } = req.body;
+
+            await UserService.changePassword(userId, mat_khau_cu, mat_khau_moi);
+
+            return ResponseUtil.success(
+                res,
+                null,
+                'Đổi mật khẩu thành công'
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async resetPasswordByAdmin(req, res, next) {
+        try {
+            const { id } = req.params;
+            const { mat_khau_moi } = req.body;
+
+            await UserService.resetPasswordByAdmin(id, mat_khau_moi);
+
+            return ResponseUtil.success(
+                res,
+                null,
+                'Reset mật khẩu thành công'
+            );
+        } catch (error) {
+            next(error);
+        }
+    }
+
+
 }
 
 module.exports = UserController;

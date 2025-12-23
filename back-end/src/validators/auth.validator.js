@@ -55,9 +55,6 @@ class AuthValidator {
                 .messages({
                     'any.only': 'Giới tính không hợp lệ (0: Nữ, 1: Nam, 2: Khác)'
                 }),
-
-            dia_chi_nguoi_dung: Joi.string().allow(''),
-
             ma_vai_tro: Joi.string().uuid().messages({
                 'string.guid': 'Mã vai trò không hợp lệ'
             })

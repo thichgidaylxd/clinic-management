@@ -13,7 +13,6 @@ class UserModel {
       email_nguoi_dung,
       so_dien_thoai_nguoi_dung,
       gioi_tinh_nguoi_dung,
-      dia_chi_nguoi_dung
     } = userData;
 
     const ma_nguoi_dung = UUIDUtil.generate();
@@ -29,9 +28,8 @@ class UserModel {
         email_nguoi_dung,
         so_dien_thoai_nguoi_dung,
         gioi_tinh_nguoi_dung,
-        dia_chi_nguoi_dung,
         trang_thai_nguoi_dung
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `;
 
     await db.execute(query, [
@@ -43,8 +41,7 @@ class UserModel {
       mat_khau_nguoi_dung,
       email_nguoi_dung || null,
       so_dien_thoai_nguoi_dung || null,
-      gioi_tinh_nguoi_dung || null,
-      dia_chi_nguoi_dung || null
+      gioi_tinh_nguoi_dung || null
     ]);
 
     return ma_nguoi_dung;
@@ -63,7 +60,6 @@ class UserModel {
         nd.email_nguoi_dung,
         nd.so_dien_thoai_nguoi_dung,
         nd.gioi_tinh_nguoi_dung,
-        nd.dia_chi_nguoi_dung,
         nd.trang_thai_nguoi_dung,
         nd.ngay_tao_nguoi_dung,
         vt.ten_vai_tro
@@ -103,7 +99,6 @@ class UserModel {
         nd.email_nguoi_dung,
         nd.so_dien_thoai_nguoi_dung,
         nd.gioi_tinh_nguoi_dung,
-        nd.dia_chi_nguoi_dung,
         nd.trang_thai_nguoi_dung,
         nd.ngay_tao_nguoi_dung,
         vt.ten_vai_tro
@@ -141,7 +136,6 @@ class UserModel {
         nd.email_nguoi_dung,
         nd.so_dien_thoai_nguoi_dung,
         nd.gioi_tinh_nguoi_dung,
-        nd.dia_chi_nguoi_dung,
         nd.trang_thai_nguoi_dung,
         nd.ngay_tao_nguoi_dung,
         vt.ten_vai_tro
@@ -188,7 +182,6 @@ class UserModel {
       email_nguoi_dung,
       so_dien_thoai_nguoi_dung,
       gioi_tinh_nguoi_dung,
-      dia_chi_nguoi_dung,
       mat_khau_nguoi_dung, // ✅ THÊM: Để đổi password
       ma_vai_tro,          // ✅ THÊM: Để đổi vai trò
       trang_thai_nguoi_dung
@@ -222,10 +215,6 @@ class UserModel {
       values.push(gioi_tinh_nguoi_dung);
     }
 
-    if (dia_chi_nguoi_dung !== undefined) {
-      fields.push('dia_chi_nguoi_dung = ?');
-      values.push(dia_chi_nguoi_dung);
-    }
 
     // ✅ THÊM: Password update
     if (mat_khau_nguoi_dung !== undefined) {
