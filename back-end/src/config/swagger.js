@@ -106,9 +106,6 @@ const options = {
                             enum: [0, 1, 2],
                             description: '0: Nữ, 1: Nam, 2: Khác'
                         },
-                        dia_chi_nguoi_dung: {
-                            type: 'string'
-                        },
                         trang_thai_nguoi_dung: {
                             type: 'integer',
                             enum: [0, 1],

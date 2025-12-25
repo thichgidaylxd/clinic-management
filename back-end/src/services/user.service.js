@@ -247,6 +247,7 @@ class UserService {
     // Đổi mật khẩu
     static async changePassword(userId, oldPassword, newPassword) {
         const user = await UserModel.findByIdWithPassword(userId);
+        console.log(userId)
         if (!user) {
             throw new Error('Không tìm thấy người dùng');
         }
@@ -273,6 +274,26 @@ class UserService {
 
         return true;
     }
+
+    static async resetPasswordByAdmin(userId, newPassword) {
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            throw new Error('Không tìm thấy người dùng');
+        }
+
+        if (newPassword.length < 6) {
+            throw new Error('Mật khẩu mới phải có ít nhất 6 ký tự');
+        }
+
+        const hashedPassword = await BcryptUtil.hash(newPassword, 10);
+
+        await UserModel.update(userId, {
+            mat_khau_nguoi_dung: hashedPassword
+        });
+
+        return true;
+    }
+
 }
 
 module.exports = UserService;

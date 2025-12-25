@@ -50,6 +50,11 @@ class UserValidator {
             trang_thai_nguoi_dung: Joi.number().valid(0, 1)
         }).min(1);
     }
+    static resetPassword() {
+        return Joi.object({
+            mat_khau_moi: Joi.string().min(6).required()
+        });
+    }
 
     static changePassword() {
         return Joi.object({

@@ -78,14 +78,17 @@ class WorkScheduleModel {
     }
 
     if (filters.fromDate) {
-      conditions.push('llv.ngay_lich_lam_viec >= ?');
-      params.push(filters.fromDate);
+      const fromDateOnly = new Date(filters.fromDate).toISOString().split("T")[0];
+      conditions.push("DATE(llv.ngay_lich_lam_viec) >= ?");
+      params.push(fromDateOnly);
     }
 
     if (filters.toDate) {
-      conditions.push('llv.ngay_lich_lam_viec <= ?');
-      params.push(filters.toDate);
+      const toDateOnly = new Date(filters.toDate).toISOString().split("T")[0];
+      conditions.push("DATE(llv.ngay_lich_lam_viec) <= ?");
+      params.push(toDateOnly);
     }
+
 
     if (filters.status !== undefined && filters.status !== null) {
       conditions.push('llv.trang_thai_lich_lam_viec = ?');
