@@ -21,7 +21,7 @@ pool.getConnection()
         connection.release();
     })
     .catch(err => {
-        console.error('❌ Lỗi kết nối database:', err.message);
+        console.error(' Lỗi kết nối database:', err.message);
         process.exit(1);
     });
 

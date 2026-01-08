@@ -278,12 +278,12 @@ class DoctorService {
             const wsStart = this.toMinutes(ws.thoi_gian_bat_dau_lich_lam_viec);
             const wsEnd = this.toMinutes(ws.thoi_gian_ket_thuc_lich_lam_viec);
 
-            // ❌ Slot không nằm trong ca → loại
+            //  Slot không nằm trong ca → loại
             if (startMin < wsStart || endMin > wsEnd) {
                 continue;
             }
 
-            // ❌ Slot đã có lịch hẹn → loại
+            //  Slot đã có lịch hẹn → loại
             const isAvailable = await AppointmentModel.isSlotAvailable(
                 ws.ma_bac_si,
                 date,

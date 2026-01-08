@@ -170,7 +170,7 @@ class AppointmentModel {
         const [bookedSlots] = await db.execute(bookedSlotsQuery, [doctorId, date]);
 
         console.log('📅 Work schedules:', workSchedules.length);
-        console.log('❌ Booked slots:', bookedSlots);
+        console.log(' Booked slots:', bookedSlots);
 
         // 3. Tính toán available slots
         const availableSlots = [];
@@ -210,7 +210,7 @@ class AppointmentModel {
                     );
 
                     if (overlap) {
-                        console.log(`❌ Overlap detected: ${slotStart}-${slotEnd} vs ${bookedStart}-${bookedEnd}`);
+                        console.log(` Overlap detected: ${slotStart}-${slotEnd} vs ${bookedStart}-${bookedEnd}`);
                     }
 
                     return overlap;

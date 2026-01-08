@@ -105,7 +105,7 @@ class AppointmentService {
 
         console.log('Appointment created:', appointmentId);
 
-        // ❌ XÓA: Không cần createTimeSlot nữa
+        //  XÓA: Không cần createTimeSlot nữa
 
         return await AppointmentModel.findById(appointmentId);
     }
@@ -196,7 +196,7 @@ class AppointmentService {
             gio_ket_thuc  //  THÊM
         });
 
-        // ❌ XÓA: Không cần createTimeSlot nữa
+        //  XÓA: Không cần createTimeSlot nữa
 
         return await AppointmentModel.findById(appointmentId);
     }

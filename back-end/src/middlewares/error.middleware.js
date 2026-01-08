@@ -1,7 +1,7 @@
 const ResponseUtil = require('../utils/response.util');
 
 const errorMiddleware = (err, req, res, next) => {
-    console.error('❌ Lỗi:', err);
+    console.error(' Lỗi:', err);
 
     // Lỗi validation
     if (err.name === 'ValidationError') {

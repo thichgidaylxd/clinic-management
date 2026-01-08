@@ -19,7 +19,7 @@ class WorkScheduleService {
             throw new Error('Bác sĩ không tồn tại');
         }
 
-        // ❌ XÓA: Validate chuyên khoa
+        //  XÓA: Validate chuyên khoa
 
         // Kiểm tra bác sĩ có trùng lịch không
         const hasConflict = await WorkScheduleModel.hasConflict(
@@ -99,8 +99,8 @@ class WorkScheduleService {
         }
 
         const {
-            // ❌ XÓA: ma_phong_kham_lich_lam_viec
-            // ❌ XÓA: ma_chuyen_khoa_lich_lam_viec
+            //  XÓA: ma_phong_kham_lich_lam_viec
+            //  XÓA: ma_chuyen_khoa_lich_lam_viec
             ngay_lich_lam_viec,
             thoi_gian_bat_dau_lich_lam_viec,
             thoi_gian_ket_thuc_lich_lam_viec
@@ -108,7 +108,7 @@ class WorkScheduleService {
 
 
 
-        // ❌ XÓA: Validate chuyên khoa
+        //  XÓA: Validate chuyên khoa
 
         // Kiểm tra trùng lịch nếu có thay đổi thời gian
         if (ngay_lich_lam_viec || thoi_gian_bat_dau_lich_lam_viec || thoi_gian_ket_thuc_lich_lam_viec) {
