@@ -5,14 +5,14 @@ class PatientModel {
     // Tạo bệnh nhân mới
     static async create(patientData) {
         const {
-            ma_nguoi_dung_benh_nhan = null,  // ✅ THÊM
+            ma_nguoi_dung_benh_nhan = null,  //  THÊM
             ten_benh_nhan = null,
-            ho_benh_nhan = null,  // ✅ THÊM
+            ho_benh_nhan = null,  //  THÊM
             so_dien_thoai_benh_nhan,
-            email_benh_nhan = null,  // ✅ THÊM
-            ngay_sinh_benh_nhan = null,  // ✅ THÊM
+            email_benh_nhan = null,  //  THÊM
+            ngay_sinh_benh_nhan = null,  //  THÊM
             gioi_tinh_benh_nhan = null,
-            dia_chi_benh_nhan = null  // ✅ THÊM
+            dia_chi_benh_nhan = null  //  THÊM
         } = patientData;
 
         const ma_benh_nhan = UUIDUtil.generate();
@@ -422,9 +422,9 @@ class PatientModel {
             lh.ngay_tao_lich_hen,
             lh.thoi_gian_xac_nhan,
             lh.thoi_gian_hoan_thanh,
-            lh.ngay_hen,  -- ✅ ĐỔI (từ tg.ngay)
-            lh.gio_bat_dau,  -- ✅ ĐỔI (từ tg.thoi_gian_bat_dau)
-            lh.gio_ket_thuc  -- ✅ ĐỔI (từ tg.thoi_gian_ket_thuc)
+            lh.ngay_hen,  --  ĐỔI (từ tg.ngay)
+            lh.gio_bat_dau,  --  ĐỔI (từ tg.thoi_gian_bat_dau)
+            lh.gio_ket_thuc  --  ĐỔI (từ tg.thoi_gian_ket_thuc)
         FROM bang_lich_hen lh
         INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
         INNER JOIN bang_nguoi_dung nd ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
@@ -441,7 +441,7 @@ class PatientModel {
             params.push(parseInt(status));
         }
 
-        query += ` ORDER BY lh.ngay_hen DESC, lh.gio_bat_dau DESC LIMIT ${offset}, ${limitInt}`; //✅ ĐỔI
+        query += ` ORDER BY lh.ngay_hen DESC, lh.gio_bat_dau DESC LIMIT ${offset}, ${limitInt}`; // ĐỔI
 
         const [rows] = await db.execute(query, params);
 

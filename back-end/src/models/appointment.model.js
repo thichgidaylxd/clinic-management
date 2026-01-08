@@ -15,10 +15,10 @@ class AppointmentModel {
             trang_thai_lich_hen,
             ly_do_kham_lich_hen,
             ly_do_huy_lich_hen,
-            ghi_chu_lich_hen,  // ✅ THÊM
-            ngay_hen,  // ✅ THÊM
-            gio_bat_dau,  // ✅ THÊM
-            gio_ket_thuc,  // ✅ THÊM
+            ghi_chu_lich_hen,  //  THÊM
+            ngay_hen,  //  THÊM
+            gio_bat_dau,  //  THÊM
+            gio_ket_thuc,  //  THÊM
             thoi_gian_xac_nhan,
             thoi_gian_hoan_thanh,
             gia_dich_vu_lich_hen,
@@ -155,7 +155,7 @@ class AppointmentModel {
             };
         }
 
-        // 2. Lấy các slot đã đặt - ✅ ĐỔI QUERY
+        // 2. Lấy các slot đã đặt -  ĐỔI QUERY
         const bookedSlotsQuery = `
         SELECT 
             lh.gio_bat_dau,
@@ -199,7 +199,7 @@ class AppointmentModel {
 
                 // Check overlap
                 const isBooked = bookedSlots.some(booked => {
-                    // ✅ ĐỔI: Dùng gio_bat_dau/gio_ket_thuc
+                    //  ĐỔI: Dùng gio_bat_dau/gio_ket_thuc
                     const bookedStart = booked.gio_bat_dau.substring(0, 5);
                     const bookedEnd = booked.gio_ket_thuc.substring(0, 5);
 
@@ -333,12 +333,12 @@ class AppointmentModel {
         }
 
         if (fromDate) {
-            conditions.push('lh.ngay_hen >= ?');  // ✅ ĐỔI
+            conditions.push('lh.ngay_hen >= ?');  //  ĐỔI
             params.push(fromDate);
         }
 
         if (toDate) {
-            conditions.push('lh.ngay_hen <= ?');  // ✅ ĐỔI
+            conditions.push('lh.ngay_hen <= ?');  //  ĐỔI
             params.push(toDate);
         }
 
@@ -351,7 +351,7 @@ class AppointmentModel {
             query += ' WHERE ' + conditions.join(' AND ');
         }
 
-        query += ` ORDER BY lh.ngay_hen DESC, lh.gio_bat_dau DESC LIMIT ${limitInt} OFFSET ${offset}`;  // ✅ ĐỔI
+        query += ` ORDER BY lh.ngay_hen DESC, lh.gio_bat_dau DESC LIMIT ${limitInt} OFFSET ${offset}`;  //  ĐỔI
 
         const [rows] = await db.execute(query, params);
 
@@ -437,7 +437,7 @@ class AppointmentModel {
         LEFT JOIN bang_phong_kham pk 
             ON lh.ma_phong_kham = pk.ma_phong_kham
 
-        -- ✅ JOIN ĐÚNG DỊCH VỤ
+        --  JOIN ĐÚNG DỊCH VỤ
         LEFT JOIN bang_dich_vu dv
             ON lh.ma_dich_vu_lich_hen = dv.ma_dich_vu
 
@@ -488,24 +488,24 @@ class AppointmentModel {
             lh.trang_thai_lich_hen,
             lh.ly_do_kham_lich_hen,
             lh.ly_do_huy_lich_hen,
-            lh.ghi_chu_lich_hen,  -- ✅ THÊM
-            lh.ngay_hen,  -- ✅ THÊM (thay cho tg.ngay)
-            lh.gio_bat_dau,  -- ✅ THÊM (thay cho tg.thoi_gian_bat_dau)
-            lh.gio_ket_thuc,  -- ✅ THÊM (thay cho tg.thoi_gian_ket_thuc)
-            lh.thoi_gian_check_in,  -- ✅ THÊM
+            lh.ghi_chu_lich_hen,  --  THÊM
+            lh.ngay_hen,  --  THÊM (thay cho tg.ngay)
+            lh.gio_bat_dau,  --  THÊM (thay cho tg.thoi_gian_bat_dau)
+            lh.gio_ket_thuc,  --  THÊM (thay cho tg.thoi_gian_ket_thuc)
+            lh.thoi_gian_check_in,  --  THÊM
             lh.ngay_tao_lich_hen,
-            lh.ngay_cap_nhat_lich_hen,  -- ✅ THÊM
+            lh.ngay_cap_nhat_lich_hen,  --  THÊM
             lh.thoi_gian_xac_nhan,
             lh.thoi_gian_hoan_thanh,
             lh.gia_dich_vu_lich_hen,
             lh.tong_gia_lich_hen,
             -- Patient info
             bn.ten_benh_nhan,
-            bn.ho_benh_nhan,  -- ✅ THÊM
+            bn.ho_benh_nhan,  --  THÊM
             bn.so_dien_thoai_benh_nhan,
             bn.gioi_tinh_benh_nhan,
-            bn.ngay_sinh_benh_nhan,  -- ✅ THÊM
-            bn.dia_chi_benh_nhan,  -- ✅ THÊM (nếu có)
+            bn.ngay_sinh_benh_nhan,  --  THÊM
+            bn.dia_chi_benh_nhan,  --  THÊM (nếu có)
             -- Doctor info
             nd.ten_nguoi_dung as ten_bac_si,
             nd.ho_nguoi_dung as ho_bac_si,
@@ -513,10 +513,10 @@ class AppointmentModel {
             ck.ten_chuyen_khoa,
             -- Room
             pk.ten_phong_kham,
-            pk.so_phong_kham,  -- ✅ THÊM
+            pk.so_phong_kham,  --  THÊM
             -- Service
             dv.ten_dich_vu,
-            dv.don_gia_dich_vu  -- ✅ THÊM
+            dv.don_gia_dich_vu  --  THÊM
         FROM bang_lich_hen lh
         INNER JOIN bang_benh_nhan bn ON lh.ma_benh_nhan = bn.ma_benh_nhan
         INNER JOIN bang_bac_si bs ON lh.ma_bac_si = bs.ma_bac_si
@@ -540,12 +540,12 @@ class AppointmentModel {
 
         const allowedFields = [
             'ma_phong_kham',
-            'ma_nguoi_xac_nhan',  // ✅ THÊM
+            'ma_nguoi_xac_nhan',  //  THÊM
             'trang_thai_lich_hen',
             'ly_do_huy_lich_hen',
-            'ghi_chu_lich_hen',  // ✅ THÊM
+            'ghi_chu_lich_hen',  //  THÊM
             'thoi_gian_xac_nhan',
-            'thoi_gian_check_in',  // ✅ THÊM
+            'thoi_gian_check_in',  //  THÊM
             'thoi_gian_hoan_thanh'
         ];
 
@@ -831,7 +831,7 @@ class AppointmentModel {
             lh.trang_thai_lich_hen,
             lh.ly_do_kham_lich_hen,
             lh.ghi_chu_lich_hen,
-            lh.thoi_gian_check_in,  -- ✅ ĐỔI
+            lh.thoi_gian_check_in,  --  ĐỔI
             lh.ngay_tao_lich_hen,
             -- Patient info
             bn.ho_benh_nhan,
@@ -909,7 +909,7 @@ class AppointmentModel {
         UPDATE bang_lich_hen 
         SET 
             trang_thai_lich_hen = 2,
-            thoi_gian_check_in = CURRENT_TIMESTAMP,  -- ✅ ĐỔI
+            thoi_gian_check_in = CURRENT_TIMESTAMP,  --  ĐỔI
             ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
@@ -927,7 +927,7 @@ class AppointmentModel {
         UPDATE bang_lich_hen 
         SET 
             trang_thai_lich_hen = 6,
-            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP  -- ✅ ĐỔI
+            ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP  --  ĐỔI
         WHERE ma_lich_hen = ?
     `;
 
@@ -946,7 +946,7 @@ class AppointmentModel {
             ngay_cap_nhat_lich_hen = CURRENT_TIMESTAMP
         WHERE ma_lich_hen = ?
     `;
-        const safeNote = note ?? null; // ✅ QUAN TRỌNG
+        const safeNote = note ?? null; //  QUAN TRỌNG
 
         const [result] = await db.execute(query, [
             safeNote,
@@ -993,7 +993,7 @@ class AppointmentModel {
         WHERE lh.ma_bac_si = ?
             AND DATE(lh.ngay_hen) = CURDATE()
             AND lh.trang_thai_lich_hen = 2
-        ORDER BY lh.thoi_gian_check_in ASC  -- ✅ ĐỔI
+        ORDER BY lh.thoi_gian_check_in ASC  --  ĐỔI
         LIMIT 1
     `;
 
