@@ -21,7 +21,7 @@ class DoctorSpecialtyModel {
     static async addMultipleSpecialties(doctorId, specialtyIds) {
         if (!specialtyIds || specialtyIds.length === 0) return true;
 
-        // ✅ FIX: Dùng vòng lặp thay vì VALUES bulk insert
+        //  FIX: Dùng vòng lặp thay vì VALUES bulk insert
         for (const specialtyId of specialtyIds) {
             const query = `
             INSERT INTO bang_bac_si_chuyen_khoa (ma_bac_si, ma_chuyen_khoa)

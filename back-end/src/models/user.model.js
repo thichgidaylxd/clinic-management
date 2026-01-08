@@ -87,7 +87,7 @@ class UserModel {
     return rows[0] || null;
   }
 
-  // ✅ Tìm người dùng theo số điện thoại
+  //  Tìm người dùng theo số điện thoại
   static async findByPhone(phone) {
     const query = `
       SELECT 
@@ -163,7 +163,7 @@ class UserModel {
     return rows[0].count > 0;
   }
 
-  // ✅ Kiểm tra số điện thoại đã tồn tại
+  //  Kiểm tra số điện thoại đã tồn tại
   static async existsByPhone(phone) {
     if (!phone) return false;
     const query = 'SELECT COUNT(*) as count FROM bang_nguoi_dung WHERE so_dien_thoai_nguoi_dung = ?';
@@ -174,7 +174,7 @@ class UserModel {
 
 
 
-  // ✅ CẬP NHẬT người dùng
+  //  CẬP NHẬT người dùng
   static async update(userId, updateData) {
     const {
       ten_nguoi_dung,
@@ -182,8 +182,8 @@ class UserModel {
       email_nguoi_dung,
       so_dien_thoai_nguoi_dung,
       gioi_tinh_nguoi_dung,
-      mat_khau_nguoi_dung, // ✅ THÊM: Để đổi password
-      ma_vai_tro,          // ✅ THÊM: Để đổi vai trò
+      mat_khau_nguoi_dung, //  THÊM: Để đổi password
+      ma_vai_tro,          //  THÊM: Để đổi vai trò
       trang_thai_nguoi_dung
     } = updateData;
 
@@ -216,13 +216,13 @@ class UserModel {
     }
 
 
-    // ✅ THÊM: Password update
+    //  THÊM: Password update
     if (mat_khau_nguoi_dung !== undefined) {
       fields.push('mat_khau_nguoi_dung = ?');
       values.push(mat_khau_nguoi_dung);
     }
 
-    // ✅ THÊM: Role update
+    //  THÊM: Role update
     if (ma_vai_tro !== undefined) {
       fields.push('ma_vai_tro = ?');
       values.push(UUIDUtil.toBinary(ma_vai_tro));
@@ -248,14 +248,14 @@ class UserModel {
     const [result] = await db.execute(query, values);
     return result.affectedRows > 0;
   }
-  // ✅ Xóa người dùng
+  //  Xóa người dùng
   static async delete(userId) {
     const query = 'DELETE FROM bang_nguoi_dung WHERE ma_nguoi_dung = ?';
     const [result] = await db.execute(query, [UUIDUtil.toBinary(userId)]);
     return result.affectedRows > 0;
   }
 
-  // ✅ Lấy tất cả người dùng (với phân trang)
+  //  Lấy tất cả người dùng (với phân trang)
   static async findAll(page = 1, limit = 10, roleId = null) {
     const offset = (page - 1) * limit;
 

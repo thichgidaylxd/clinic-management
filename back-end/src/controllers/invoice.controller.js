@@ -55,7 +55,7 @@ class InvoiceController {
                 data: invoices
             });
         } catch (error) {
-            console.error('❌ Get my invoices error:', error);
+            console.error(' Get my invoices error:', error);
             return res.status(400).json({
                 success: false,
                 message: error.message

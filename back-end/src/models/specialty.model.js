@@ -175,8 +175,8 @@ class SpecialtyModel {
         const queries = [
             'SELECT COUNT(*) as count FROM bang_dich_vu WHERE ma_chuyen_khoa_dich_vu = ?',
             'SELECT COUNT(*) as count FROM bang_phong_kham WHERE ma_chuyen_khoa_phong_kham = ?',
-            // ❌ XÓA: bang_lich_lam_viec
-            'SELECT COUNT(*) as count FROM bang_bac_si_chuyen_khoa WHERE ma_chuyen_khoa = ?', // ✅ Thêm
+            //  XÓA: bang_lich_lam_viec
+            'SELECT COUNT(*) as count FROM bang_bac_si_chuyen_khoa WHERE ma_chuyen_khoa = ?', //  Thêm
             'SELECT COUNT(*) as count FROM bang_lich_hen WHERE ma_chuyen_khoa = ?'
         ];
 

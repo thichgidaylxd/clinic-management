@@ -17,11 +17,11 @@ const pool = mysql.createPool({
 // Test kết nối
 pool.getConnection()
     .then(connection => {
-        console.log('✅ Kết nối database thành công!');
+        console.log(' Kết nối database thành công!');
         connection.release();
     })
     .catch(err => {
-        console.error('❌ Lỗi kết nối database:', err.message);
+        console.error(' Lỗi kết nối database:', err.message);
         process.exit(1);
     });
 

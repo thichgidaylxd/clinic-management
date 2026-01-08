@@ -38,7 +38,7 @@ class DoctorValidator {
                     'string.max': 'Họ không được vượt quá 50 ký tự',
                     'any.required': 'Họ là bắt buộc'
                 }),
-            // ✅ Doctor fields
+            //  Doctor fields
             chuyen_khoa_ids: Joi.array()
                 .items(Joi.string())
                 .min(1)
@@ -182,7 +182,7 @@ class DoctorValidator {
                 .messages({
                     'string.guid': 'ID chức vụ không hợp lệ'
                 }),
-            // ✅ Doctor fields
+            //  Doctor fields
             chuyen_khoa_ids: Joi.array()
                 .items(Joi.string())
                 .min(1)

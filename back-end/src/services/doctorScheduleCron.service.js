@@ -40,7 +40,7 @@ class DoctorScheduleCronService {
 
                 if (exists.length > 0) continue;
 
-                // ✅ tạo lịch
+                //  tạo lịch
                 await db.execute(
                     `
                     INSERT INTO bang_lich_lam_viec

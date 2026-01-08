@@ -19,6 +19,6 @@ process.on('SIGTERM', () => {
 });
 
 process.on('unhandledRejection', (err) => {
-    console.error('❌ Lỗi không được xử lý:', err);
+    console.error(' Lỗi không được xử lý:', err);
     server.close(() => process.exit(1));
 });

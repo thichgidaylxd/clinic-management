@@ -18,7 +18,7 @@ const prescriptionRoutes = require('./prescription.routes');
 const invoiceRoutes = require('./invoice.routes');
 const medicalRecordRoutes = require('./medicalRecord.routes');
 const DoctorReviewRoutes = require('./doctorReview.routes');
-const RevenueRoutes = require('./revenue.routes'); // ✅ THỐNG KÊ DOANH THU
+const RevenueRoutes = require('./revenue.routes'); //  THỐNG KÊ DOANH THU
 
 // ==========================
 // ROUTE MẶC ĐỊNH
@@ -46,7 +46,7 @@ router.get('/', (req, res) => {
             invoices: '/api/v1/invoices',
             medicalRecords: '/api/v1/medical-records',
             reviews: '/api/v1/reviews',
-            revenue: '/api/v1/revenue' // ✅ THÊM
+            revenue: '/api/v1/revenue' //  THÊM
         }
     });
 });
@@ -72,7 +72,7 @@ router.use('/invoices', invoiceRoutes);
 router.use('/medical-records', medicalRecordRoutes);
 router.use('/reviews', DoctorReviewRoutes);
 
-// ✅ ROUTE DOANH THU
+//  ROUTE DOANH THU
 router.use('/revenue', RevenueRoutes);
 
 module.exports = router;

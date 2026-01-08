@@ -21,7 +21,7 @@ class DoctorService {
             mat_khau_nguoi_dung,
             gioi_tinh_nguoi_dung,
             // Doctor fields
-            chuyen_khoa_ids, // ✅ Array of specialty IDs
+            chuyen_khoa_ids, //  Array of specialty IDs
             ma_chuc_vu_bac_si,
             so_nam_kinh_nghiem_bac_si,
         } = doctorData;
@@ -58,13 +58,13 @@ class DoctorService {
             }
         }
 
-        // ✅ 5.5. Kiểm tra chuyên khoa (phải chọn ít nhất 1)
+        //  5.5. Kiểm tra chuyên khoa (phải chọn ít nhất 1)
         if (!chuyen_khoa_ids || chuyen_khoa_ids.length === 0) {
             console.log('Chuyen khoa ids is empty:', doctorData);
             throw new Error('Phải chọn ít nhất 1 chuyên khoa');
         }
 
-        // ✅ 5.6. Validate tất cả chuyên khoa tồn tại
+        //  5.6. Validate tất cả chuyên khoa tồn tại
         for (const specialtyId of chuyen_khoa_ids) {
             const specialty = await SpecialtyModel.findById(specialtyId);
             if (!specialty) {
@@ -87,7 +87,7 @@ class DoctorService {
             ma_vai_tro: doctorRole.ma_vai_tro
         });
 
-        console.log('✅ Created user:', userId);
+        console.log(' Created user:', userId);
 
         // // 8. Xử lý bằng cấp base64 nếu có
         // let processedBangCap = null;
@@ -104,11 +104,11 @@ class DoctorService {
             dang_hoat_dong_bac_si: 1
         });
 
-        console.log('✅ Created doctor:', doctorId);
+        console.log(' Created doctor:', doctorId);
 
-        // ✅ 10. Thêm chuyên khoa cho bác sĩ
+        //  10. Thêm chuyên khoa cho bác sĩ
         await DoctorSpecialtyModel.addMultipleSpecialties(doctorId, chuyen_khoa_ids);
-        console.log('✅ Added specialties:', chuyen_khoa_ids);
+        console.log(' Added specialties:', chuyen_khoa_ids);
 
         // 11. Lấy thông tin đầy đủ
         const doctor = await this.getDoctorById(doctorId);
@@ -175,7 +175,7 @@ class DoctorService {
             userUpdateData.gioi_tinh_nguoi_dung = updateData.gioi_tinh_nguoi_dung;
         }
 
-        // ✅ Password update (nếu có)
+        //  Password update (nếu có)
         if (updateData.mat_khau_nguoi_dung) {
             const hashedPassword = await bcrypt.hash(updateData.mat_khau_nguoi_dung, 10);
             userUpdateData.mat_khau_nguoi_dung = hashedPassword;
@@ -201,7 +201,7 @@ class DoctorService {
             }
         }
 
-        // ✅ Cập nhật chuyên khoa (nếu có)
+        //  Cập nhật chuyên khoa (nếu có)
         if (updateData.chuyen_khoa_ids !== undefined) {
             // Validate chuyên khoa
             if (updateData.chuyen_khoa_ids.length === 0) {
@@ -221,19 +221,19 @@ class DoctorService {
                 doctorId,
                 updateData.chuyen_khoa_ids
             );
-            console.log('✅ Updated specialties:', updateData.chuyen_khoa_ids);
+            console.log(' Updated specialties:', updateData.chuyen_khoa_ids);
         }
 
         // Update User (nếu có)
         if (Object.keys(userUpdateData).length > 0) {
             await UserModel.update(doctor.ma_nguoi_dung_bac_si, userUpdateData);
-            console.log('✅ Updated user');
+            console.log(' Updated user');
         }
 
         // Update Doctor (nếu có)
         if (Object.keys(doctorUpdateData).length > 0) {
             await DoctorModel.update(doctorId, doctorUpdateData);
-            console.log('✅ Updated doctor');
+            console.log(' Updated doctor');
         }
 
         return await this.getDoctorById(doctorId);
@@ -278,12 +278,12 @@ class DoctorService {
             const wsStart = this.toMinutes(ws.thoi_gian_bat_dau_lich_lam_viec);
             const wsEnd = this.toMinutes(ws.thoi_gian_ket_thuc_lich_lam_viec);
 
-            // ❌ Slot không nằm trong ca → loại
+            //  Slot không nằm trong ca → loại
             if (startMin < wsStart || endMin > wsEnd) {
                 continue;
             }
 
-            // ❌ Slot đã có lịch hẹn → loại
+            //  Slot đã có lịch hẹn → loại
             const isAvailable = await AppointmentModel.isSlotAvailable(
                 ws.ma_bac_si,
                 date,
@@ -293,7 +293,7 @@ class DoctorService {
 
             if (!isAvailable) continue;
 
-            // ✅ Gộp theo bác sĩ (1 bác sĩ chỉ xuất hiện 1 lần)
+            //  Gộp theo bác sĩ (1 bác sĩ chỉ xuất hiện 1 lần)
             if (!doctorMap.has(ws.ma_bac_si)) {
                 doctorMap.set(ws.ma_bac_si, ws);
             }

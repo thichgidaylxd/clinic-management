@@ -77,7 +77,7 @@ class MedicalRecordModel {
         const whereConditions = [];
         const params = [];
 
-        // ✅ UUID_TO_BIN CHUẨN
+        //  UUID_TO_BIN CHUẨN
         whereConditions.push('hsba.ma_bac_si = UUID_TO_BIN(?)');
         params.push(doctorId);
 

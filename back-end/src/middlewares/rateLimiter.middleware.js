@@ -3,7 +3,7 @@ const rateLimit = require('express-rate-limit');
 // Rate limiter cho API endpoints
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 phút
-    max: 100, // ✅ Tăng từ mặc định (thường là 10-20) lên 100 requests
+    max: 100, //  Tăng từ mặc định (thường là 10-20) lên 100 requests
     message: {
         success: false,
         message: 'Quá nhiều requests từ IP này, vui lòng thử lại sau 1 phút'

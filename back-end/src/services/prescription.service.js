@@ -17,7 +17,7 @@ class PrescriptionService {
 
             medicines,
             ghi_chu_hoa_don,
-            chi_phi_phat_sinh // ✅ THÊM
+            chi_phi_phat_sinh //  THÊM
         } = data;
 
         console.log('Creating prescription with data:', data);
@@ -72,12 +72,12 @@ class PrescriptionService {
             ma_benh_nhan: appointment.ma_benh_nhan,
             ma_chuyen_khoa: appointment.ma_chuyen_khoa,
 
-            // ✅ user bệnh nhân (nullable)
+            //  user bệnh nhân (nullable)
             ma_nguoi_dung_hoa_don: appointment.ma_nguoi_tao_lich_hen || null,
 
             ten_dich_vu: appointment.ten_dich_vu || null,
             gia_dich_vu: appointment.gia_dich_vu_lich_hen || 0,
-            chi_phi_phat_sinh: Number(chi_phi_phat_sinh || 0), // ✅ SỬA
+            chi_phi_phat_sinh: Number(chi_phi_phat_sinh || 0), //  SỬA
 
             medicines,
             ghi_chu_hoa_don

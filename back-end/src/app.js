@@ -27,11 +27,11 @@ const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 phút
     max: 100, // 100 requests
     message: 'Quá nhiều request từ IP này, vui lòng thử lại sau 15 phút',
-    // ✅ THÊM: Skip rate limit trong development
+    //  THÊM: Skip rate limit trong development
     skip: (req) => ENV.NODE_ENV === 'development'
 });
 
-// ✅ CHỈ apply rate limit khi production
+//  CHỈ apply rate limit khi production
 if (ENV.NODE_ENV === 'production') {
     app.use('/api/', limiter);
 }
@@ -64,7 +64,7 @@ app.get('/health', (req, res) => {
         success: true,
         message: 'Server đang hoạt động bình thường',
         timestamp: new Date().toISOString(),
-        environment: ENV.NODE_ENV // ✅ THÊM để kiểm tra
+        environment: ENV.NODE_ENV //  THÊM để kiểm tra
     });
 });
 

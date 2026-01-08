@@ -18,7 +18,7 @@ class AppointmentValidator {
                     'any.required': 'Tên bệnh nhân là bắt buộc'
                 }),
 
-            ho_benh_nhan: Joi.string()  // ✅ THÊM
+            ho_benh_nhan: Joi.string()  //  THÊM
                 .max(50)
                 .allow(null, '')
                 .messages({
@@ -29,18 +29,19 @@ class AppointmentValidator {
                 .pattern(/^[0-9]{10}$/)
                 .required()
                 .messages({
+                    'string.empty': 'Số điện thoại không được để trống',
                     'string.pattern.base': 'Số điện thoại phải có 10 chữ số',
                     'any.required': 'Số điện thoại là bắt buộc'
                 }),
 
-            email_benh_nhan: Joi.string()  // ✅ THÊM
+            email_benh_nhan: Joi.string()  //  THÊM
                 .email()
                 .allow(null, '')
                 .messages({
                     'string.email': 'Email không hợp lệ'
                 }),
 
-            ngay_sinh_benh_nhan: Joi.date()  // ✅ THÊM
+            ngay_sinh_benh_nhan: Joi.date()  //  THÊM
                 .max('now')
                 .allow(null)
                 .messages({
@@ -101,7 +102,7 @@ class AppointmentValidator {
                     'any.required': 'Ngày khám là bắt buộc'
                 }),
 
-            gio_bat_dau: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_bat_dau)
+            gio_bat_dau: Joi.string()  //  ĐỔI TÊN (từ thoi_gian_bat_dau)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
@@ -109,7 +110,7 @@ class AppointmentValidator {
                     'any.required': 'Giờ bắt đầu là bắt buộc'
                 }),
 
-            gio_ket_thuc: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_ket_thuc)
+            gio_ket_thuc: Joi.string()  //  ĐỔI TÊN (từ thoi_gian_ket_thuc)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
@@ -118,7 +119,7 @@ class AppointmentValidator {
                 })
 
         }).custom((value, helpers) => {
-            if (value.gio_bat_dau >= value.gio_ket_thuc) {  // ✅ ĐỔI TÊN
+            if (value.gio_bat_dau >= value.gio_ket_thuc) {  //  ĐỔI TÊN
                 return helpers.error('custom.timeRange', {
                     message: 'Giờ kết thúc phải lớn hơn giờ bắt đầu'
                 });
@@ -173,7 +174,7 @@ class AppointmentValidator {
                     'any.required': 'Ngày khám là bắt buộc'
                 }),
 
-            gio_bat_dau: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_bat_dau)
+            gio_bat_dau: Joi.string()  //  ĐỔI TÊN (từ thoi_gian_bat_dau)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
@@ -181,7 +182,7 @@ class AppointmentValidator {
                     'any.required': 'Giờ bắt đầu là bắt buộc'
                 }),
 
-            gio_ket_thuc: Joi.string()  // ✅ ĐỔI TÊN (từ thoi_gian_ket_thuc)
+            gio_ket_thuc: Joi.string()  //  ĐỔI TÊN (từ thoi_gian_ket_thuc)
                 .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
                 .required()
                 .messages({
@@ -190,7 +191,7 @@ class AppointmentValidator {
                 })
 
         }).custom((value, helpers) => {
-            if (value.gio_bat_dau >= value.gio_ket_thuc) {  // ✅ ĐỔI TÊN
+            if (value.gio_bat_dau >= value.gio_ket_thuc) {  //  ĐỔI TÊN
                 return helpers.error('custom.timeRange', {
                     message: 'Giờ kết thúc phải lớn hơn giờ bắt đầu'
                 });
@@ -212,7 +213,7 @@ class AppointmentValidator {
                 }),
 
             trang_thai_lich_hen: Joi.number()
-                .valid(0, 1, 2, 3, 4, 5, 6)  // ✅ THÊM 5, 6 (CANCELLED, NO_SHOW)
+                .valid(0, 1, 2, 3, 4, 5, 6)  //  THÊM 5, 6 (CANCELLED, NO_SHOW)
                 .messages({
                     'any.only': 'Trạng thái không hợp lệ (0-PENDING, 1-CONFIRMED, 2-CHECKED_IN, 3-IN_PROGRESS, 4-COMPLETED, 5-CANCELLED, 6-NO_SHOW)'
                 }),
@@ -224,7 +225,7 @@ class AppointmentValidator {
                     'string.max': 'Lý do hủy không được quá 500 ký tự'
                 }),
 
-            ghi_chu_lich_hen: Joi.string()  // ✅ THÊM
+            ghi_chu_lich_hen: Joi.string()  //  THÊM
                 .max(1000)
                 .allow(null, '')
                 .messages({
@@ -248,7 +249,7 @@ class AppointmentValidator {
             patientId: Joi.string().guid().allow(null, ''),
             specialtyId: Joi.string().guid().allow(null, ''),
 
-            status: Joi.number().valid(0, 1, 2, 3, 4, 5, 6).allow(null),  // ✅ THÊM 5, 6
+            status: Joi.number().valid(0, 1, 2, 3, 4, 5, 6).allow(null),  //  THÊM 5, 6
 
             fromDate: Joi.date().allow(null, ''),
             toDate: Joi.date()
@@ -296,7 +297,7 @@ class AppointmentValidator {
         });
     }
 
-    // ✅ CHỈ DÙNG CHO /available-slots/v2
+    //  CHỈ DÙNG CHO /available-slots/v2
     static queryAvailableSlotsV2() {
         return Joi.object({
             date: Joi.string()
