@@ -12,8 +12,7 @@ function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         so_dien_thoai_nguoi_dung: "",
         mat_khau_nguoi_dung: "",
         confirmPassword: "",
-        gioi_tinh_nguoi_dung: 1, // 1: Nam, 0: Nữ
-        dia_chi_nguoi_dung: ""
+        gioi_tinh_nguoi_dung: 1
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");

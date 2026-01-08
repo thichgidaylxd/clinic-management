@@ -9,11 +9,13 @@ import {
     Loader2
 } from 'lucide-react';
 import { authAPI } from '../services/authAPI';
+import ChangePasswordModal from './modal/ChangePasswordModal';
 
 
 function Profile() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
+    const [showChangePassword, setShowChangePassword] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -36,7 +38,7 @@ function Profile() {
 
     const genderText = (value) => {
         if (value === 1) return 'Nam';
-        if (value === 2) return 'Nữ';
+        if (value === 0) return 'Nữ';
         return 'Khác';
     };
 
@@ -80,23 +82,34 @@ function Profile() {
                     <InfoItem icon={<Mail />} label="Email" value={user.email_nguoi_dung} />
                     <InfoItem icon={<Phone />} label="Số điện thoại" value={user.so_dien_thoai_nguoi_dung} />
                     <InfoItem icon={<User />} label="Giới tính" value={genderText(user.gioi_tinh_nguoi_dung)} />
-                    <InfoItem icon={<MapPin />} label="Địa chỉ" value={user.dia_chi_nguoi_dung || 'Chưa cập nhật'} />
                     <InfoItem icon={<Calendar />} label="Ngày tạo tài khoản" value={formatDate(user.ngay_tao_nguoi_dung)} />
                 </div>
 
                 {/* Footer */}
-                <div className="border-t px-6 py-4 bg-gray-50 flex justify-end">
-                    <span
-                        className={`px-4 py-1 rounded-full text-sm font-medium
-                        ${user.trang_thai_nguoi_dung === 1
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}
-                    >
+                <div className="border-t px-6 py-4 bg-gray-50 flex justify-between items-center">
+                    <span className={`px-4 py-1 rounded-full text-sm font-medium
+        ${user.trang_thai_nguoi_dung === 1
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}>
                         {user.trang_thai_nguoi_dung === 1 ? 'Đang hoạt động' : 'Ngưng hoạt động'}
                     </span>
+
+                    <button
+                        onClick={() => setShowChangePassword(true)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Đổi mật khẩu
+                    </button>
                 </div>
+                {showChangePassword && (
+                    <ChangePasswordModal
+                        onClose={() => setShowChangePassword(false)}
+                    />
+                )}
             </div>
+
+
         </div>
     );
 }

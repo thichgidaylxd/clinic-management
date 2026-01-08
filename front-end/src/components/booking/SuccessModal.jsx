@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 
 function SuccessModal({ isOpen, onClose, appointmentData }) {
     const navigate = useNavigate();
-
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
     if (!isOpen || !appointmentData) return null;
 
     const handleViewAppointments = () => {
-        const user = JSON.parse(localStorage.getItem('user') || 'null');
-        if (user) {
+
+        if (user && user.ten_vai_tro !== "Lễ tân") {
             navigate('/patient/appointments'); // Trang lịch hẹn của bệnh nhân
         } else {
             onClose();
@@ -83,20 +83,22 @@ function SuccessModal({ isOpen, onClose, appointmentData }) {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-3">
-                    <button
-                        onClick={handleViewAppointments}
-                        className="w-full bg-teal-700 text-white py-3 rounded-xl hover:bg-teal-800 transition font-medium"
-                    >
-                        Xem lịch hẹn
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="w-full border-2 border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition font-medium"
-                    >
-                        Về trang chủ
-                    </button>
-                </div>
+                {user && user.ten_vai_tro !== "Lễ tân" &&
+                    <div className="space-y-3">
+                        <button
+                            onClick={handleViewAppointments}
+                            className="w-full bg-teal-700 text-white py-3 rounded-xl hover:bg-teal-800 transition font-medium"
+                        >
+                            Xem lịch hẹn
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="w-full border-2 border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition font-medium"
+                        >
+                            Về trang chủ
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     );

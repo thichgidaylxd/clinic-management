@@ -364,6 +364,21 @@ export const adminAPI = {
         return handleResponse(response);
     },
 
+    resetUserPassword: async (id, newPassword) => {
+        const response = await fetch(
+            `${API_BASE_URL}/users/${id}/reset-password`,
+            {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({
+                    mat_khau_moi: newPassword
+                })
+            }
+        );
+        return handleResponse(response);
+    },
+
+
     getRoles: async () => {
         const response = await fetch(`${API_BASE_URL}/roles`, {
             headers: getAuthHeaders()

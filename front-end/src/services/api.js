@@ -178,5 +178,8 @@ export const bookingAPI = {
     getDoctorReviewStats: async (doctorId) => {
         const response = await fetch(`${API_BASE_URL}/reviews/doctor/${doctorId}/stats`);
         return handleResponse(response);
-    }
+    },
+
+
+
 };
