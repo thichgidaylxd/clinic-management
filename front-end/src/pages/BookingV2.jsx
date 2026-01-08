@@ -24,7 +24,7 @@ function BookingV2() {
     // Success modal
     const [showSuccess, setShowSuccess] = useState(false);
     const [appointmentData, setAppointmentData] = useState(null);
-
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
     const handleStep1Next = (data) => {
         setSelectedService(data.service);
         setSelectedSpecialty(data.specialty);
@@ -57,7 +57,7 @@ function BookingV2() {
 
     const handleCloseSuccess = () => {
         setShowSuccess(false);
-        navigate('/');
+        window.location.reload();
     };
 
     const formatDate = (dateString) => {
@@ -144,13 +144,16 @@ function BookingV2() {
             <div className="container mx-auto px-4 max-w-5xl">
                 {/* Header */}
                 <div className="mb-8">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-4"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        <span>Về trang chủ</span>
-                    </button>
+                    {user.ten_vai_tro !== "Lễ tân" && (
+                        <button
+                            onClick={() => navigate('/')}
+                            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-4"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                            <span>Về trang chủ</span>
+                        </button>
+                    )}
+
 
                     <h1 className="text-3xl font-bold text-gray-900">
                         Đặt Lịch Khám Nha Khoa
