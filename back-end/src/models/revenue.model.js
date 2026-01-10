@@ -13,24 +13,26 @@ class RevenueModel {
         AND ngay_tra_tien_hoa_don BETWEEN ? AND ?
     `;
 
-    const [[row]] = await db.execute(sql, [fromDate, toDate]);
+    const [[row]] = await db.execute(sql, [fromDate, toDate + ' 23:59:59']);
     return row;
   }
 
   static async getRevenueByDate(fromDate, toDate) {
     const sql = `
-      SELECT
-        DATE(ngay_tra_tien_hoa_don) AS ngay,
-        SUM(tong_thanh_tien_hoa_don) AS doanh_thu
-      FROM bang_hoa_don
-      WHERE trang_thai_hoa_don = 1
-        AND ngay_tra_tien_hoa_don BETWEEN ? AND ?
-      GROUP BY DATE(ngay_tra_tien_hoa_don)
-      ORDER BY ngay ASC
-    `;
+  SELECT
+    DATE(ngay_tra_tien_hoa_don) AS ngay,
+    SUM(tong_thanh_tien_hoa_don) AS doanh_thu
+  FROM bang_hoa_don
+  WHERE trang_thai_hoa_don = 1
+    AND ngay_tra_tien_hoa_don >= ?
+    AND ngay_tra_tien_hoa_don < DATE_ADD(?, INTERVAL 1 DAY)
+  GROUP BY DATE(ngay_tra_tien_hoa_don)
+  ORDER BY ngay ASC
+`;
 
     const [rows] = await db.execute(sql, [fromDate, toDate]);
     return rows;
+
   }
 }
 
