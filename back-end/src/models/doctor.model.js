@@ -206,26 +206,30 @@ class DoctorModel {
     return rows[0] || null;
   }
 
-  // Lấy bác sĩ có lịch làm việc trong ngày
+  // Lấy bác sĩ có lịch làm việc trong ngày + số sao đánh giá trung bình
   static async findByWorkSchedule(date, specialtyId = null) {
     let query = `
-        SELECT
-            BIN_TO_UUID(bs.ma_bac_si) AS ma_bac_si,
-            nd.ten_nguoi_dung,
-            nd.ho_nguoi_dung,
-            llv.thoi_gian_bat_dau_lich_lam_viec,
-            llv.thoi_gian_ket_thuc_lich_lam_viec
-        FROM bang_lich_lam_viec llv
-        INNER JOIN bang_bac_si bs
-            ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
-        INNER JOIN bang_nguoi_dung nd
-            ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
-        LEFT JOIN bang_bac_si_chuyen_khoa bsck
-            ON bs.ma_bac_si = bsck.ma_bac_si
-        WHERE llv.ngay_lich_lam_viec = ?
-          AND llv.trang_thai_lich_lam_viec = 1
-          AND bs.dang_hoat_dong_bac_si = 1
-    `;
+    SELECT
+        BIN_TO_UUID(bs.ma_bac_si) AS ma_bac_si,
+        nd.ten_nguoi_dung,
+        nd.ho_nguoi_dung,
+        llv.thoi_gian_bat_dau_lich_lam_viec,
+        llv.thoi_gian_ket_thuc_lich_lam_viec,
+        ROUND(AVG(dg.so_sao_danh_gia), 1) AS so_sao_trung_binh
+    FROM bang_lich_lam_viec llv
+    INNER JOIN bang_bac_si bs
+        ON llv.ma_bac_si_lich_lam_viec = bs.ma_bac_si
+    INNER JOIN bang_nguoi_dung nd
+        ON bs.ma_nguoi_dung_bac_si = nd.ma_nguoi_dung
+    LEFT JOIN bang_bac_si_chuyen_khoa bsck
+        ON bs.ma_bac_si = bsck.ma_bac_si
+    LEFT JOIN bang_danh_gia_bac_si dg
+        ON bs.ma_bac_si = dg.ma_bac_si_danh_gia
+        AND dg.trang_thai_danh_gia = 1
+    WHERE llv.ngay_lich_lam_viec = ?
+      AND llv.trang_thai_lich_lam_viec = 1
+      AND bs.dang_hoat_dong_bac_si = 1
+  `;
 
     const params = [date];
 
@@ -235,12 +239,19 @@ class DoctorModel {
     }
 
     query += `
-        ORDER BY llv.thoi_gian_bat_dau_lich_lam_viec
-    `;
+    GROUP BY
+        bs.ma_bac_si,
+        nd.ten_nguoi_dung,
+        nd.ho_nguoi_dung,
+        llv.thoi_gian_bat_dau_lich_lam_viec,
+        llv.thoi_gian_ket_thuc_lich_lam_viec
+    ORDER BY llv.thoi_gian_bat_dau_lich_lam_viec
+  `;
 
     const [rows] = await db.execute(query, params);
     return rows;
   }
+
 
 
   // Cập nhật bác sĩ
