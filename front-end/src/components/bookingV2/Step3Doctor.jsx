@@ -156,33 +156,63 @@ function Step3Doctor({
                                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                                     {doctor.ho_nguoi_dung} {doctor.ten_nguoi_dung}
                                 </h3>
+                                {/* Rating */}
+                                <div className="flex items-center gap-1 mt-1">
+                                    {doctor.so_sao_trung_binh ? (
+                                        <>
+                                            <div className="flex items-center">
+                                                {[...Array(5)].map((_, index) => (
+                                                    <svg
+                                                        key={index}
+                                                        className={`w-4 h-4 ${index < Math.round(doctor.so_sao_trung_binh)
+                                                                ? 'text-yellow-400'
+                                                                : 'text-gray-300'
+                                                            }`}
+                                                        fill="currentColor"
+                                                        viewBox="0 0 20 20"
+                                                    >
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.974c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.176 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.286-3.974a1 1 0 00-.364-1.118L2.049 9.401c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.286-3.974z" />
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                            <span className="text-sm text-gray-600 ml-1">
+                                                {doctor.so_sao_trung_binh.toFixed(1)}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className="text-sm text-gray-400 italic">
+                                            Chưa có đánh giá
+                                        </span>
+                                    )}
+                                </div>
+
 
                                 {/* Position */}
-                                {doctor.ten_chuc_vu && (
+                                {/* {doctor.ten_chuc_vu && (
                                     <div className="flex items-center gap-2 text-gray-600 mb-2">
                                         <Briefcase className="w-4 h-4" />
                                         <span className="text-sm">{doctor.ten_chuc_vu}</span>
                                     </div>
-                                )}
+                                )} */}
 
                                 {/* Experience */}
-                                {doctor.so_nam_kinh_nghiem_bac_si > 0 && (
+                                {/* {doctor.so_nam_kinh_nghiem_bac_si > 0 && (
                                     <div className="flex items-center gap-2 text-gray-600 mb-2">
                                         <Award className="w-4 h-4" />
                                         <span className="text-sm">
                                             {doctor.so_nam_kinh_nghiem_bac_si} năm kinh nghiệm
                                         </span>
                                     </div>
-                                )}
+                                )} */}
 
                                 {/* Specialty */}
-                                {doctor.chuyen_khoa && (
+                                {/* {doctor.chuyen_khoa && (
                                     <div className="flex items-center gap-2 text-teal-700 mb-2">
                                         <span className="text-sm font-medium">
                                             🏥 {doctor.chuyen_khoa}
                                         </span>
                                     </div>
-                                )}
+                                )} */}
 
                                 {/* Work Schedule */}
                                 <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-3 pt-3 border-t">
@@ -192,7 +222,7 @@ function Step3Doctor({
                                             {doctor.thoi_gian_bat_dau_lich_lam_viec} - {doctor.thoi_gian_ket_thuc_lich_lam_viec}
                                         </span>
                                     </div>
-                                    {doctor.ten_phong_kham && (
+                                    {/* {doctor.ten_phong_kham && (
                                         <div className="flex items-center gap-2">
                                             <MapPin className="w-4 h-4" />
                                             <span>
@@ -200,7 +230,7 @@ function Step3Doctor({
                                                 {doctor.so_phong_kham && ` - Phòng ${doctor.so_phong_kham}`}
                                             </span>
                                         </div>
-                                    )}
+                                    )} */}
                                 </div>
                             </div>
                         </div>
